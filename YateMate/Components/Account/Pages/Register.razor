@@ -5,6 +5,7 @@
 @using System.Text.Encodings.Web
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
+@*@using System.Net.Mail*@
 @using YateMate.Data
 
 @inject UserManager<ApplicationUser> UserManager
@@ -15,16 +16,16 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Register</PageTitle>
+<PageTitle>Registrarse</PageTitle>
 
-<h1>Register</h1>
+<h1>Registrarse</h1>
 
 <div class="row">
     <div class="col-md-4">
         <StatusMessage Message="@Message"/>
         <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
             <DataAnnotationsValidator/>
-            <h2>Create a new account.</h2>
+            <h2>Crea una nueva cuenta.</h2>
             <hr/>
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="form-floating mb-3">
@@ -32,17 +33,52 @@
                 <label for="email">Email</label>
                 <ValidationMessage For="() => Input.Email" class="text-danger"/>
             </div>
+
+            <div class="form-floating mb-3">
+                <InputText id="nombre" @bind-Value="Input.Nombre" class="form-control" aria-required="true" />
+                <label for="nombre">Nombre</label>
+                <ValidationMessage For="() => Input.Nombre" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText id="apellido" @bind-Value="Input.Apellido" class="form-control" aria-required="true" />
+                <label for="apellido">Apellido</label>
+                <ValidationMessage For="() => Input.Apellido" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputText id="nacionalidad" @bind-Value="Input.Nacionalidad" class="form-control" aria-required="true" />
+                <label for="nacionalidad">Nacionalidad</label>
+                <ValidationMessage For="() => Input.Nacionalidad" class="text-danger" />
+            </div>
+            @*cambiar a InputRadio o InputSelect*@
+            <div class="form-floating mb-3">
+                <InputText id="genero" @bind-Value="Input.Genero" class="form-control" aria-required="true" />
+                <label for="genero">Genero</label>
+                <ValidationMessage For="() => Input.Genero" class="text-danger" />
+            </div>
+            
+            <div class="form-floating mb-3">
+                <InputNumber id="dni" @bind-Value="Input.Dni" class="form-control" aria-required="true" />
+                <label for="dni">Dni</label>
+                <ValidationMessage For="() => Input.Dni" class="text-danger" />
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputDate id="fechaNacimiento" @bind-Value="Input.FechaNacimiento" class="form-control" aria-required="true" />
+                <label for="dni">Fecha de nacimiento</label>
+                <ValidationMessage For="() => Input.FechaNacimiento" class="text-danger" />
+            </div>
+            
             <div class="form-floating mb-3">
                 <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password"/>
-                <label for="password">Password</label>
+                <label for="password">Contrasenia (sacar) </label>
                 <ValidationMessage For="() => Input.Password" class="text-danger"/>
             </div>
             <div class="form-floating mb-3">
                 <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password"/>
-                <label for="confirm-password">Confirm Password</label>
+                <label for="confirm-password">Confirma contrasenia</label>
                 <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger"/>
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Register</button>
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Registrarse</button>
         </EditForm>
     </div>
     @* <div class="col-md-6 col-md-offset-2"> *@
@@ -65,8 +101,21 @@
 
     public async Task RegisterUser(EditContext editContext)
     {
-        var user = CreateUser();
+        //var user = CreateUser();
+        //MailAddress address = new MailAddress(Input.Email);
+        //string userName = address.User;
 
+        var user = new ApplicationUser()
+        {
+            //UserName = userName,
+            Email = Input.Email,
+            Nombre = Input.Nombre,
+            Apellido = Input.Apellido,
+            Nacionalidad = Input.Nacionalidad,
+            Genero = Input.Genero, 
+            Dni = Input.Dni
+                
+        };
         await UserStore.SetUserNameAsync(user, Input.Email, CancellationToken.None);
         var emailStore = GetEmailStore();
         await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
@@ -140,6 +189,32 @@
         [Display(Name = "Confirm password")]
         [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
         public string ConfirmPassword { get; set; } = "";
+        
+        [Required]
+        [Display(Name = "Nombre")]
+        public string Nombre { get; set; } = null!;
+        
+        [Required]
+        [Display(Name = "Apellido")]
+        public string Apellido { get; set; } = null!;
+        
+        [Required]
+        //sacar este string length y hace que solo pueda elegir
+        [StringLength(9, ErrorMessage = "El {0} debe tener entre {2} y {1} caracteres", MinimumLength = 8)]
+        [Display(Name = "Genero")]
+        public string Genero { get; set; } = "";
+
+        [Required]
+        [Display(Name = "Fecha de Nacimiento")]
+        public DateTime FechaNacimiento { get; set; }
+
+        [Required]
+        [Display(Name = "Dni")]
+        public int Dni { get; set; } = 0;
+        
+        [Required]
+        [Display(Name = "Nacionalidad")]
+        public string Nacionalidad { get; set; } = "";
     }
 
 }

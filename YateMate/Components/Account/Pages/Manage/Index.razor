@@ -9,9 +9,9 @@
 @inject IdentityUserAccessor UserAccessor
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Profile</PageTitle>
+<PageTitle>Mi perfil</PageTitle>
 
-<h3>Profile</h3>
+<h3>Modificar</h3>
 <StatusMessage/>
 
 <div class="row">
@@ -20,23 +20,70 @@
             <DataAnnotationsValidator/>
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="form-floating mb-3">
-                <input type="text" value="@username" class="form-control" placeholder="Please choose your username." disabled/>
-                <label for="username" class="form-label">Username</label>
+                <input type="text" value="@_username" class="form-control" placeholder="Please choose your username." disabled/>
+                <label for="_username" class="form-label">Nombre de usuario</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputText id="nombre" @bind-Value="Input.Nombre" class="form-control" aria-required="true" />
+                <label for="nombre">Nombre</label>
+                <ValidationMessage For="() => Input.Nombre" class="text-danger" />
             </div>
             <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number."/>
-                <label for="phone-number" class="form-label">Phone number</label>
-                <ValidationMessage For="() => Input.PhoneNumber" class="text-danger"/>
+                <InputText id="apellido" @bind-Value="Input.Apellido" class="form-control" aria-required="true" />
+                <label for="apellido">Apellido</label>
+                <ValidationMessage For="() => Input.Apellido" class="text-danger" />
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Save</button>
+            
+            @*de aca para abajo no se autocompleta, fijarte como hacer*@
+            <div class="form-floating mb-3">
+                <InputText id="nacionalidad" @bind-Value="Input.Nacionalidad" class="form-control" aria-required="true" />
+                <label for="nacionalidad">Nacionalidad</label>
+                <ValidationMessage For="() => Input.Nacionalidad" class="text-danger" />
+            </div>
+            @*cambiar a InputRadio o InputSelect*@
+            <div class="form-floating mb-3">
+                <InputText id="genero" @bind-Value="Input.Genero" class="form-control" aria-required="true" />
+                <label for="genero">Genero</label>
+                <ValidationMessage For="() => Input.Genero" class="text-danger" />
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputNumber id="dni" @bind-Value="Input.Dni" class="form-control" aria-required="true" />
+                <label for="dni">Dni</label>
+                <ValidationMessage For="() => Input.Dni" class="text-danger" />
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputDate id="fechaNacimiento" @bind-Value="Input.FechaNacimiento" class="form-control" aria-required="true" />
+                <label for="dni">Fecha de nacimiento</label>
+                <ValidationMessage For="() => Input.FechaNacimiento" class="text-danger" />
+            </div>
+            
+            
+            @* <div class="form-floating mb-3"> *@
+            @*     <InputText @bind-Value="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number."/> *@
+            @*     <label for="phone-number" class="form-label">Numero de telefono (sacar) </label> *@
+            @*     <ValidationMessage For="() => Input.PhoneNumber" class="text-danger"/> *@
+            @* </div> *@
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Modificar datos</button>
         </EditForm>
     </div>
 </div>
 
 @code {
-    private ApplicationUser user = default!;
-    private string? username;
-    private string? phoneNumber;
+    private ApplicationUser _user = default!;
+    private string? _username;
+    private string? _nombre; 
+    private string? _apellido;
+    private DateTime? _fechaNacimiento;
+    private string? _genero;
+    private int? _dni;
+    private string? _nacionalidad;
+
+
+
+    //private string? _phoneNumber;
 
     [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
 
@@ -44,25 +91,37 @@
 
     protected override async Task OnInitializedAsync()
     {
-        user = await UserAccessor.GetRequiredUserAsync(HttpContext);
-        username = await UserManager.GetUserNameAsync(user);
-        phoneNumber = await UserManager.GetPhoneNumberAsync(user);
+        _user = await UserAccessor.GetRequiredUserAsync(HttpContext);
+        _username = await UserManager.GetUserNameAsync(_user);
+        _nombre = _user.Nombre;
+        _apellido = _user.Apellido;
+        _fechaNacimiento = _user.FechaNacimiento;
+        _dni = _user.Dni;
+        _genero = _user.Genero;
+        _nacionalidad = _user.Nacionalidad;
+        //phoneNumber = await UserManager.GetPhoneNumberAsync(user);
 
-        Input.PhoneNumber ??= phoneNumber;
+        //Input.PhoneNumber ??= phoneNumber;
+        Input.Nombre ??= _nombre;
+        Input.Apellido ??= _apellido;
+        Input.FechaNacimiento ??= _fechaNacimiento;
+        Input.Dni ??= _dni;
+        Input.Genero ??= _genero;
+        Input.Nacionalidad ??= _nacionalidad;
     }
 
     private async Task OnValidSubmitAsync()
     {
-        if (Input.PhoneNumber != phoneNumber)
-        {
-            var setPhoneResult = await UserManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-            if (!setPhoneResult.Succeeded)
-            {
-                RedirectManager.RedirectToCurrentPageWithStatus("Error: Failed to set phone number.", HttpContext);
-            }
-        }
+        // if (Input.PhoneNumber != phoneNumber)
+        // {
+        //     var setPhoneResult = await UserManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
+        //     if (!setPhoneResult.Succeeded)
+        //     {
+        //         RedirectManager.RedirectToCurrentPageWithStatus("Error: Failed to set phone number.", HttpContext);
+        //     }
+        // }
 
-        await SignInManager.RefreshSignInAsync(user);
+        await SignInManager.RefreshSignInAsync(_user);
         RedirectManager.RedirectToCurrentPageWithStatus("Your profile has been updated", HttpContext);
     }
 
@@ -71,6 +130,25 @@
         [Phone]
         [Display(Name = "Phone number")]
         public string? PhoneNumber { get; set; }
+        
+        [Display(Name = "Nombre")]
+        public string? Nombre { get; set; } = null!;
+        
+        [Display(Name = "Apellido")]
+        public string? Apellido { get; set; } = null!;
+        
+        //sacar este string length y hace que solopueda elegir
+        [Display(Name = "Genero")]
+        public string? Genero { get; set; } = "";
+        
+        [Display(Name = "Fecha de Nacimiento")]
+        public DateTime? FechaNacimiento { get; set; }
+        
+        [Display(Name = "Dni")]
+        public int? Dni { get; set; } = 0;
+        
+        [Display(Name = "Nacionalidad")]
+        public string? Nacionalidad { get; set; } = "";
     }
 
 }
