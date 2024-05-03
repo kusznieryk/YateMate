@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Primitives;
 using YateMate.Components.Account.Pages;
 using YateMate.Components.Account.Pages.Manage;
-using YateMate.Data;
+using YateMate.Aplicacion.Entidades;
 
 namespace Microsoft.AspNetCore.Routing;
 

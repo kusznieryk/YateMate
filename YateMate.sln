@@ -2,6 +2,10 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YateMate", "YateMate\YateMate.csproj", "{CDAF0436-292D-4112-BDD8-7EF65B6A9753}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YateMate.Aplicacion", "YateMate.Aplicacion\YateMate.Aplicacion.csproj", "{91CECCB8-F719-494F-A706-C2EB8F762F75}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "YateMate.Repositorio", "YateMate.Repositorio\YateMate.Repositorio.csproj", "{D2EB3305-CF11-4F9E-96CD-C875C663FB2B}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +16,13 @@ Global
 		{CDAF0436-292D-4112-BDD8-7EF65B6A9753}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CDAF0436-292D-4112-BDD8-7EF65B6A9753}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CDAF0436-292D-4112-BDD8-7EF65B6A9753}.Release|Any CPU.Build.0 = Release|Any CPU
+		{91CECCB8-F719-494F-A706-C2EB8F762F75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{91CECCB8-F719-494F-A706-C2EB8F762F75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{91CECCB8-F719-494F-A706-C2EB8F762F75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{91CECCB8-F719-494F-A706-C2EB8F762F75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D2EB3305-CF11-4F9E-96CD-C875C663FB2B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D2EB3305-CF11-4F9E-96CD-C875C663FB2B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D2EB3305-CF11-4F9E-96CD-C875C663FB2B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D2EB3305-CF11-4F9E-96CD-C875C663FB2B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

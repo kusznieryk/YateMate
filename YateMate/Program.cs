@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using YateMate.Components;
 using YateMate.Components.Account;
-using YateMate.Data;
-
+using YateMate.Repositorio;
+using YateMate.Aplicacion.Entidades;
 namespace YateMate;
 
 public class Program
@@ -29,10 +29,9 @@ public class Program
             })
             .AddIdentityCookies();
 
-        var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
-                               throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
+      
         builder.Services.AddDbContext<ApplicationDbContext>(options =>
-            options.UseSqlite(connectionString));
+            options.UseSqlite("DataSource=../YateMate.Repositorio/Data/app.db;Cache=Shared"));
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
         builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)

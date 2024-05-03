@@ -3,7 +3,8 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using YateMate.Data;
+using YateMate.Aplicacion.Entidades;
+using YateMate.Repositorio;
 
 #nullable disable
 

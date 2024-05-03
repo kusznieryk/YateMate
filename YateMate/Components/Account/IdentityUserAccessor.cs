@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Identity;
-using YateMate.Data;
+using YateMate.Aplicacion.Entidades;
+
 
 namespace YateMate.Components.Account;
 
