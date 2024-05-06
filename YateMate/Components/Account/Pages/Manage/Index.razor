@@ -1,6 +1,7 @@
 ﻿@page "/Account/Manage"
 
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
 @using YateMate.Aplicacion.Entidades;
 
@@ -8,6 +9,7 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject IdentityUserAccessor UserAccessor
 @inject IdentityRedirectManager RedirectManager
+@attribute [Authorize(Roles = "Cliente")]
 
 <PageTitle>Mi perfil</PageTitle>
 

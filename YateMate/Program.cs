@@ -64,11 +64,12 @@ public class Program
             app.UseHsts();
         }
 
-        // asi se agregan roles y un admin a la base de datos, si descomentas esto main tiene que ser async Task
+        // asi se agregan roles, un admin y un empleado a la base de datos si no estan agregados,
+        // si descomentas esto main tiene que ser async Task
         // using (var scope = app.Services.CreateScope())
         // {
         //     var email = "admin@admin.com";
-        //     var password = "Pass123$";
+        //     var password = "Test123,";
         //     string[] roles = ["Admin", "Empleado", "Cliente"];
         //     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         //     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
@@ -89,6 +90,19 @@ public class Program
         //         var result = await userManager.CreateAsync(user, password);
         //         await userManager.AddToRoleAsync(user, "Admin");
         //     }
+        //     
+        //     email = "empleado@empleado.com";
+        //     password = "Empleado123,";
+        //     
+        //     if (await userManager.FindByNameAsync(email) == null)
+        //     {
+        //         var user = new ApplicationUser();
+        //         user.UserName = email;
+        //         user.Email = email;
+        //         user.EmailConfirmed = true;
+        //         var result = await userManager.CreateAsync(user, password);
+        //         await userManager.AddToRoleAsync(user, "Empleado");
+        //     }
         // }
         app.UseHttpsRedirection();
 
@@ -98,7 +112,8 @@ public class Program
         app.MapRazorComponents<App>()
             .AddInteractiveServerRenderMode();
 
-        // Add additional endpoints required by the Identity /Account Razor components.
+        // Add additional endpoints required by the Identity /Account Razor components. 
+        // esto solo hace falta porque tiene el logout, pero tiene mucho de 2fa y eso
         app.MapAdditionalIdentityEndpoints();
 
         app.Run();
