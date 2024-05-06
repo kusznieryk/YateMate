@@ -35,13 +35,21 @@ public class Program
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
         builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
-            .AddRoles<IdentityRole>()
+            .AddRoles<IdentityRole>() //con esto podes tener roles
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddSignInManager()
             .AddDefaultTokenProviders();
 
-        builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
-
+        
+        builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration); //esto es para guardar secretos
+        
+        // Consolw.WriteLine("Secretos:);
+        // Console.WriteLine(builder.Configuration["ActualEmail"]);
+        // Console.WriteLine(builder.Configuration["EmailAuthKey"]);
+        // Console.WriteLine();
+        
+        builder.Services.AddSingleton<IEmailSender<ApplicationUser>, EmailSender>();
+        
         var app = builder.Build();
 
         // Configure the HTTP request pipeline.
@@ -56,6 +64,32 @@ public class Program
             app.UseHsts();
         }
 
+        // asi se agregan roles y un admin a la base de datos, si descomentas esto main tiene que ser async Task
+        // using (var scope = app.Services.CreateScope())
+        // {
+        //     var email = "admin@admin.com";
+        //     var password = "Pass123$";
+        //     string[] roles = ["Admin", "Empleado", "Cliente"];
+        //     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        //     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+        //     foreach (var role in roles)
+        //     {
+        //         if (!await roleManager.RoleExistsAsync(role))
+        //         {
+        //             IdentityRole roleRole = new IdentityRole(role);
+        //             await roleManager.CreateAsync(roleRole);
+        //         }
+        //     }
+        //     if (await userManager.FindByNameAsync(email) == null)
+        //     {
+        //         var user = new ApplicationUser();
+        //         user.UserName = email;
+        //         user.Email = email;
+        //         user.EmailConfirmed = true;
+        //         var result = await userManager.CreateAsync(user, password);
+        //         await userManager.AddToRoleAsync(user, "Admin");
+        //     }
+        // }
         app.UseHttpsRedirection();
 
         app.UseStaticFiles();
