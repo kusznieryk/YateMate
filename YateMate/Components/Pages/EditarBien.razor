@@ -1,0 +1,90 @@
+@page "/bien/{Id:int?}"
+@using YateMate.Aplicacion.UseCases.Oferta
+@inject ObtenerBienUseCase ObtenerBienUseCase
+@inject ModificarBienUseCase ModificarBienUseCase
+@inject AgregarBienUseCase AgregarBienUseCase
+@inject NavigationManager Navegador;
+
+@if (err.Length > 1)
+{
+    <h3>@err</h3>
+}
+@if (_esNuevoBien)
+{
+    <h3>Agregando un nuevo bien</h3>
+}
+else
+{
+    <h3>Modificando al bien con id "@_bien.Id"</h3>
+}
+<form @onsubmit="Aceptar">
+    <label class="form-control">
+        Id:
+    @if (_esNuevoBien)
+    {
+        <input placeholder="" @bind="_bien.Id"  required="required">
+    }
+    else
+    {
+        <input placeholder="" @bind="_bien.Id" disabled>
+    }
+    </label>
+    <label class="form-control">
+        Nombre:
+    <input placeholder="" @bind="_bien.Nombre" required="required">
+    </label>
+    <label class="form-control">
+        Descripcion:
+    <input placeholder="" type="number" @bind="_descripcion" required="required">
+    </label>
+    <label class="form-control">
+        Imagen:
+        <input placeholder="" type="number" @bind="_imagen" required="required">
+    </label>
+    <button type="submit" class="btn btn-primary">Aceptar</button>
+</form>
+
+@code {
+    Bien _bien = new("", "", [0x00], 0);
+    string err = "";
+    string _descripcion = "";
+    string _usuarioId = "";
+    byte[]? _imagen;
+    [Parameter] public int? Id { get; set; }
+    bool _esNuevoBien = true;
+    protected override void OnParametersSet()
+    {
+        if (Id != null)
+        {
+            var bienHallado = ObtenerBienUseCase.Ejecutar(Id.Value);
+            if (bienHallado != null)
+            {
+                _bien = bienHallado;
+                _esNuevoBien = false;
+            }
+        }
+    }
+    void Aceptar()
+    {
+        try
+        {
+            _bien.Descripcion = _descripcion;
+            _bien.UsuarioId = int.Parse(_usuarioId);
+            _bien.Imagen = _imagen;
+            if (_esNuevoBien)
+            {
+                AgregarBienUseCase.Ejecutar(_bien);
+            }
+            else
+            {
+                ModificarBienUseCase.Ejecutar(_bien);
+            }
+            Navegador.NavigateTo("listadoBienes");
+            
+        }
+        catch (Exception e)
+        {
+            err = e.Message;
+        }
+    }
+}

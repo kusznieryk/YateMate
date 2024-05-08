@@ -1,0 +1,64 @@
+@page "/listadoBienes"
+@using YateMate.Aplicacion.UseCases.Oferta
+@using YateMate.Components.Account.Shared
+@inject ListarBienesDeUseCase ListarBienesDeUseCase
+@inject EliminarBienUseCase EliminarBienUseCase
+@inject NavigationManager Navegador;
+
+<DialogoConfirmacion @ref="dialogo" OnConfirmado="Eliminar" />
+<table class="table">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>NOMBRE</th>
+        <th>DESCRIPCION</th>
+        <th>ID USUARIO</th>
+        <th>IMAGEN</th>
+        <th>ACCION</th>
+    </tr>
+    </thead>
+    <tbody>
+    @foreach (var bien in _lista)
+    {
+        <tr>
+            <td>@bien.Id</td>
+            <td>@bien.Nombre</td>
+            <td>@bien.Descripcion</td>
+            <td>@bien.UsuarioId</td>
+            <td>@bien.Imagen</td>
+            <td>
+                <button class="btn btn-primary" @onclick="()=>ModificarBien(bien)" >
+                    <span class="oi oi-pencil"></span>
+                </button>
+                <button class="btn btn-danger" @onclick="()=>ConfirmarEliminacion(bien)">
+                    <span class="oi oi-trash"></span>
+                </button>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@code {
+    List<Bien> _lista = new List<Bien>();
+    DialogoConfirmacion dialogo = null!;
+    Bien? _BienParaEliminar = null;
+    private void ConfirmarEliminacion(Bien bien)
+    {
+        _BienParaEliminar = bien;
+        dialogo.Mensaje = $"¿Desea eliminar al bien con id {bien.Id}?";
+        dialogo.Mostrar();
+    }
+    void ModificarBien(Bien bien)
+    {
+        Navegador.NavigateTo($"Bien/{bien.Id}");
+    }
+    private void Eliminar()
+    {
+        if (_BienParaEliminar != null)
+        {
+            EliminarBienUseCase.Ejecutar(_BienParaEliminar.Id);
+            _lista = ListarBienesDeUseCase.Ejecutar(_BienParaEliminar.UsuarioId); 
+        }
+    }
+}
