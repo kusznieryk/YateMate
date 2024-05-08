@@ -9,8 +9,17 @@ public class RepositorioBien : IRepositorioBien
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
-            context.Add(bien);
-            context.SaveChanges();
+            var duenio = context.ApplicationUsers.FirstOrDefault(a => int.Parse(a.Id) == bien.UsuarioId);
+            if (duenio != null)
+            {
+                duenio.Bienes.Add(bien);
+                context.Add(bien);
+                context.SaveChanges();
+            }
+            else
+            {
+                throw new Exception("No existe un usuario con ese ID");
+            }
         }
     }
 
