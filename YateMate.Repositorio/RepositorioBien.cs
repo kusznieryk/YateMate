@@ -7,7 +7,7 @@ public class RepositorioBien : IRepositorioBien
 {
     public void AgregarBien(Bien bien)
     {
-        using (var context = new ApplicationDbContext())
+        using (var context = ApplicationDbContext.CrearContexto())
         {
             context.Add(bien);
             context.SaveChanges();
@@ -16,7 +16,7 @@ public class RepositorioBien : IRepositorioBien
 
     public Bien? ObtenerBien(int id)
     {
-        using (var context = new ApplicationDbContext())
+        using (var context = ApplicationDbContext.CrearContexto())
         {
             return context.Bienes.FirstOrDefault(b => b.Id == id);
         }
@@ -24,7 +24,7 @@ public class RepositorioBien : IRepositorioBien
 
     public void ModificarBien(Bien bien)
     {
-        using (var context = new ApplicationDbContext())
+        using (var context =ApplicationDbContext.CrearContexto())
         {
             var bienViejo = context.Bienes.FirstOrDefault(b => b.Id == bien.Id);
             if (bienViejo != null)
@@ -39,7 +39,7 @@ public class RepositorioBien : IRepositorioBien
 
     public void EliminarBien(int id)
     {
-        using (var context = new ApplicationDbContext())
+        using (var context = ApplicationDbContext.CrearContexto())
         {
             var bien = context.Bienes.FirstOrDefault(b => b.Id == id);
             if (bien != null)
@@ -52,7 +52,7 @@ public class RepositorioBien : IRepositorioBien
 
     public List<Bien> ListarBienesDe(int id)
     {
-        using (var context = new ApplicationDbContext())
+        using (var context = ApplicationDbContext.CrearContexto())
         {
             return context.Bienes.Where(b => b.UsuarioId == id).ToList();
         }

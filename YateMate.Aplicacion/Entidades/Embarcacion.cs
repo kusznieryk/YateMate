@@ -1,17 +1,15 @@
+using System.ComponentModel.DataAnnotations;
+
 namespace YateMate.Aplicacion.Entidades;
 
-public class Embarcacion
+public class Embarcacion(string nombre, double eslora, double calado, string clienteId)
 {
-    public Embarcacion(string? nombre, double eslora, double calado)
-    {
-        Nombre = nombre;
-        Eslora = eslora;
-        Calado = calado;
-        this.Id = Guid.NewGuid().GetHashCode();
-    }
-    public int Id { get; }
-    public string? Nombre { get; set; }
+    
+    public int Id { get; set; } = Guid.NewGuid().GetHashCode();
+    [MaxLength(50)]
+    public string Nombre { get; set; } = nombre;
 
-    public double Eslora{ get; set; }
-    public double Calado { get; set; }
+    public string ClienteId { get; set; } = clienteId;
+    public double Eslora{ get; set; } = eslora;
+    public double Calado { get; set; } = calado;
 }

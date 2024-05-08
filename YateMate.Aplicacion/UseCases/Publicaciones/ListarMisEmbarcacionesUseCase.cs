@@ -5,7 +5,7 @@ namespace YateMate.Aplicacion.UseCases;
 
 public class ListarMisEmbarcacionesUseCase(IRepositorioEmbarcacion repo)
 {
-    public List<Embarcacion> Ejecutar(int idCliente)
+    public List<Embarcacion> Ejecutar(string idCliente)
     {
         return repo.ObtenerEmbarcacionesDe(idCliente);
     }
