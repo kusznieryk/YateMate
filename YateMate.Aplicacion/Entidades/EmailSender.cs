@@ -15,8 +15,7 @@ public class EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
     
          public Task SendConfirmationLinkAsync(ApplicationUser user, string email, 
          string confirmationLink) => SendEmailAsync(email, "Confirma tu cuenta:", 
-         $"Por favor confirma tu cuenta haciendo click en el siguiente enlace " +
-         "{confirmationLink}");
+         $"Por favor confirma tu cuenta haciendo click en el siguiente enlace {confirmationLink}");
        //nota: este metodo no se deberia ejecutar nunca, no usamos link de confirmacion de cuenta
 
      public Task SendPasswordResetLinkAsync(ApplicationUser user, string email, 
