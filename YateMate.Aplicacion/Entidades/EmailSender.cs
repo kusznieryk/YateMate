@@ -29,11 +29,11 @@ public class EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
     
     public async Task SendEmailAsync(string toEmail, string subject, string message)
     {
-        if (string.IsNullOrEmpty(Options.EmailAuthKey) || string.IsNullOrEmpty(Options.ActualEmail))
+        if (string.IsNullOrEmpty(Options.EmailAuthKey))
         {
             
-            Console.WriteLine($"contrasenia: {Options.EmailAuthKey} mail: {Options.ActualEmail} options to string {Options.ToString()}");
-            throw new Exception("Contraseña del mail o el mail en si no estan seteados. Agregaste los secretos?");
+            Console.WriteLine($"Api Mailtrap: {Options.EmailAuthKey} ");
+            throw new Exception("La apiKey es null o no esta seteada. Agregaste el secreto?");
             
         }
 
@@ -43,14 +43,18 @@ public class EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
     public async Task Execute(string apiKey, string subject, string message, 
         string toEmail)
     {
-        //usamos el servidor smtp que te da gmail, necesitas tener una cuenta con 2fa y habilitar application passwords
-         var client = new SmtpClient("smtp.gmail.com", 587);
-         string? pass = Options.EmailAuthKey;
-         string? emailFrom = Options.ActualEmail;
-         client.Credentials = new NetworkCredential(emailFrom, pass);
+        if (message.Contains("amp;"))
+        {
+            message = message.Replace("&amp;", "&");
+        }
+         var client = new SmtpClient("sandbox.smtp.mailtrap.io", 2525)
+         {
+             Credentials = new NetworkCredential("b7680a9e8a9a3a", apiKey),
+             EnableSsl = true
+         };
          client.EnableSsl = true;
-         await client.SendMailAsync(emailFrom, toEmail, subject, message);
+         client.Send("YateMate@YateMate.com", toEmail, subject, message);
          
-         _logger.LogInformation("Email to {EmailAddress} sent!", toEmail);
+         _logger.LogInformation($"Email to {toEmail} sent!, with subject {subject} and message {message}");
      }
 }
