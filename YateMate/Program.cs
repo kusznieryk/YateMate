@@ -39,6 +39,17 @@ public class Program
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddSignInManager()
             .AddDefaultTokenProviders();
+        
+        
+        //https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.identityoptions?view=aspnetcore-8.0&viewFallbackFrom=net-8.0
+        builder.Services.Configure<IdentityOptions>(options =>
+        {
+            // Password settings.
+            options.Password.RequiredLength = 8;
+            
+            // User settings.
+            // options.User.RequireUniqueEmail = true; //este por defecto se inicializa en falso pero igual funca
+        });
 
         
         builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration); //esto es para guardar secretos

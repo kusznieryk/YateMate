@@ -21,10 +21,11 @@
         <EditForm Model="Input" FormName="profile" OnValidSubmit="OnValidSubmitAsync" method="post">
             <DataAnnotationsValidator/>
             <ValidationSummary class="text-danger" role="alert"/>
-            <div class="form-floating mb-3">
-                <input type="text" value="@_username" class="form-control" placeholder="Please choose your username." disabled/>
-                <label for="_username" class="form-label">Nombre de usuario</label>
-            </div>
+            
+            @* <div class="form-floating mb-3"> *@
+            @*     <input type="text" value="@_username" class="form-control" placeholder="Please choose your username." disabled/> *@
+            @*     <label for="_username" class="form-label">Nombre de usuario</label> *@
+            @* </div> *@
 
             <div class="form-floating mb-3">
                 <InputText id="nombre" @bind-Value="Input.Nombre" class="form-control" aria-required="true" />
@@ -43,11 +44,15 @@
                 <label for="nacionalidad">Nacionalidad</label>
                 <ValidationMessage For="() => Input.Nacionalidad" class="text-danger" />
             </div>
-            @*cambiar a InputRadio o InputSelect*@
+
             <div class="form-floating mb-3">
-                <InputText id="genero" @bind-Value="Input.Genero" class="form-control" aria-required="true" />
-                <label for="genero">Genero</label>
-                <ValidationMessage For="() => Input.Genero" class="text-danger" />
+                <label for="genero" class="text-muted">Género</label>
+                <InputSelect id="genero" @bind-Value="Input.Genero" class="form-control" aria-required="true">
+                    <ValidationMessage For="() => Input.Genero" class="text-danger"/>
+                    <option value=""></option> @* esta en blanco porque si no muestra Masculino re feo, igual se ve feo*@
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                </InputSelect>
             </div>
 
             <div class="form-floating mb-3">
@@ -62,12 +67,6 @@
                 <ValidationMessage For="() => Input.FechaNacimiento" class="text-danger" />
             </div>
             
-            
-            @* <div class="form-floating mb-3"> *@
-            @*     <InputText @bind-Value="Input.PhoneNumber" class="form-control" placeholder="Please enter your phone number."/> *@
-            @*     <label for="phone-number" class="form-label">Numero de telefono (sacar) </label> *@
-            @*     <ValidationMessage For="() => Input.PhoneNumber" class="text-danger"/> *@
-            @* </div> *@
             <button type="submit" class="w-100 btn btn-lg btn-primary">Modificar datos</button>
         </EditForm>
     </div>
@@ -101,9 +100,9 @@
         _dni = _user.Dni;
         _genero = _user.Genero;
         _nacionalidad = _user.Nacionalidad;
-        //phoneNumber = await UserManager.GetPhoneNumberAsync(user);
+        
 
-        //Input.PhoneNumber ??= phoneNumber;
+        
         Input.Nombre ??= _nombre;
         Input.Apellido ??= _apellido;
         Input.FechaNacimiento ??= _fechaNacimiento;
@@ -114,14 +113,6 @@
 
     private async Task OnValidSubmitAsync()
     {
-        // if (Input.PhoneNumber != phoneNumber)
-        // {
-        //     var setPhoneResult = await UserManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-        //     if (!setPhoneResult.Succeeded)
-        //     {
-        //         RedirectManager.RedirectToCurrentPageWithStatus("Error: Failed to set phone number.", HttpContext);
-        //     }
-        // }
 
         await SignInManager.RefreshSignInAsync(_user);
         RedirectManager.RedirectToCurrentPageWithStatus("Your profile has been updated", HttpContext);

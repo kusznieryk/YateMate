@@ -12,10 +12,10 @@ public class ApplicationUser : IdentityUser
     public string? Apellido { get; set; }
     public DateTime? FechaNacimiento { get; set; }
 
-    [MaxLength(9)] //Masculino = 9 letras, sacar esto
+    [MaxLength(20)] //le puse 20 por poner algo
     public string? Genero { get; set; }
     
-    public int? Dni { get; set; }
+    public int? Dni { get; set; } //ver si cambiar a string
     
     [MaxLength(100)]
     public string? Nacionalidad { get; set; }  //no se esto que tipo hacerlo

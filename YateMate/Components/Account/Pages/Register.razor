@@ -5,12 +5,13 @@
 @using System.Text.Encodings.Web
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
-@*@using System.Net.Mail*@
 @using YateMate.Aplicacion.Entidades;
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IUserStore<ApplicationUser> UserStore
-@inject SignInManager<ApplicationUser> SignInManager
+@inject SignInManager<ApplicationUser> SignInManager 
+@*dice que no se usa pero es mentira, si lo sacas se creashea la pagina*@
+
 @inject IEmailSender<ApplicationUser> EmailSender
 @inject ILogger<Register> Logger
 @inject NavigationManager NavigationManager
@@ -27,9 +28,10 @@
             <DataAnnotationsValidator/>
             <h2>Crea una nueva cuenta.</h2>
             <hr/>
+            
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="form-floating mb-3">
-                <InputText @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com"/>
+                <InputText id="email" @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com"/>
                 <label for="email">Email</label>
                 <ValidationMessage For="() => Input.Email" class="text-danger"/>
             </div>
@@ -39,23 +41,29 @@
                 <label for="nombre">Nombre</label>
                 <ValidationMessage For="() => Input.Nombre" class="text-danger" />
             </div>
+            
             <div class="form-floating mb-3">
                 <InputText id="apellido" @bind-Value="Input.Apellido" class="form-control" aria-required="true" />
                 <label for="apellido">Apellido</label>
                 <ValidationMessage For="() => Input.Apellido" class="text-danger" />
             </div>
+            
             <div class="form-floating mb-3">
                 <InputText id="nacionalidad" @bind-Value="Input.Nacionalidad" class="form-control" aria-required="true" />
                 <label for="nacionalidad">Nacionalidad</label>
                 <ValidationMessage For="() => Input.Nacionalidad" class="text-danger" />
             </div>
-            @*cambiar a InputRadio o InputSelect*@
-            <div class="form-floating mb-3">
-                <InputText id="genero" @bind-Value="Input.Genero" class="form-control" aria-required="true" />
-                <label for="genero">Genero</label>
-                <ValidationMessage For="() => Input.Genero" class="text-danger" />
-            </div>
             
+            <div class="form-floating mb-3">
+                <label for="genero" class="text-muted">Género</label>
+                <InputSelect id="genero" @bind-Value="Input.Genero" class="form-control" aria-required="true">
+                    <ValidationMessage For="() => Input.Genero" class="text-danger"/>
+                    <option value=""></option> @* tiene que estar en blanco porque si no muestra Masculino re feo *@
+                    <option value="Masculino">Masculino</option>
+                    <option value="Femenino">Femenino</option>
+                </InputSelect>
+            </div>
+
             <div class="form-floating mb-3">
                 <InputNumber id="dni" @bind-Value="Input.Dni" class="form-control" aria-required="true" />
                 <label for="dni">Dni</label>
@@ -64,40 +72,24 @@
 
             <div class="form-floating mb-3">
                 <InputDate id="fechaNacimiento" @bind-Value="Input.FechaNacimiento" class="form-control" aria-required="true" />
-                <label for="dni">Fecha de nacimiento</label>
+                <label for="fechaNacimiento">Fecha de nacimiento</label>
                 <ValidationMessage For="() => Input.FechaNacimiento" class="text-danger" />
             </div>
             
-            @* <div class="form-floating mb-3"> *@
-            @*     <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password"/> *@
-            @*     <label for="password">Contrasenia (sacar) </label> *@
-            @*     <ValidationMessage For="() => Input.Password" class="text-danger"/> *@
-            @* </div> *@
-            @* <div class="form-floating mb-3"> *@
-            @*     <InputText type="password" @bind-Value="Input.ConfirmPassword" class="form-control" autocomplete="new-password" aria-required="true" placeholder="password"/> *@
-            @*     <label for="confirm-password">Confirma contrasenia</label> *@
-            @*     <ValidationMessage For="() => Input.ConfirmPassword" class="text-danger"/> *@
-            @* </div> *@
             <button type="submit" class="w-100 btn btn-lg btn-primary">Registrarse</button>
         </EditForm>
     </div>
-    @* <div class="col-md-6 col-md-offset-2"> *@
-    @*     <section> *@
-    @*         <h3>Use another service to register.</h3> *@
-    @*         <hr/> *@
-    @*         <ExternalLoginPicker/> *@
-    @*     </section> *@
-    @* </div> *@
+    
 </div>
 
 @code {
-    private IEnumerable<IdentityError>? identityErrors;
+    private IEnumerable<IdentityError>? _identityErrors;
 
     [SupplyParameterFromForm] private InputModel Input { get; set; } = new();
 
     [SupplyParameterFromQuery] private string? ReturnUrl { get; set; }
 
-    private string? Message => identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
+    private string? Message => _identityErrors is null ? null : $"Error: {string.Join(", ", _identityErrors.Select(error => error.Description))}";
 
     public async Task RegisterUser(EditContext editContext)
     {
@@ -125,7 +117,7 @@
         ////pongo una contrasenia por defecto porque es necesaria, no hay problema porque no confirmo email hasta cambiar la contrasenia por primera vez
         if (!result.Succeeded)
         {
-            identityErrors = result.Errors;
+            _identityErrors = result.Errors;
             return;
         }
         await UserManager.AddToRoleAsync(user, "Cliente");
@@ -148,34 +140,14 @@
         code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
         var callbackUrl = NavigationManager.GetUriWithQueryParameters(
             NavigationManager.ToAbsoluteUri("Account/ResetPassword").AbsoluteUri,
-            new Dictionary<string, object?> { ["code"] = code });
-        Console.WriteLine($"la url para poner tu contrasenia es {callbackUrl}");
-        await EmailSender.SendPasswordResetLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
+            new Dictionary<string, object?> { ["code"] = code, ["email"] = Input.Email });
         
-        // if (UserManager.Options.SignIn.RequireConfirmedAccount)
-        // {
-        //     RedirectManager.RedirectTo(
-        //         "Account/RegisterConfirmation",
-        //         new() { ["email"] = Input.Email, ["returnUrl"] = ReturnUrl });
-        // }
-        //
-        // await SignInManager.SignInAsync(user, isPersistent: false);
+        Console.WriteLine($"La url para poner tu contrasenia es {callbackUrl}");
+        
+        await EmailSender.SendPasswordResetLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
         
         RedirectManager.RedirectTo("Account/ForgotPasswordConfirmation");
         RedirectManager.RedirectTo(ReturnUrl);
-    }
-
-    private ApplicationUser CreateUser()
-    {
-        try
-        {
-            return Activator.CreateInstance<ApplicationUser>();
-        }
-        catch
-        {
-            throw new InvalidOperationException($"Can't create an instance of '{nameof(ApplicationUser)}'. " +
-                                                $"Ensure that '{nameof(ApplicationUser)}' is not an abstract class and has a parameterless constructor.");
-        }
     }
 
     private IUserEmailStore<ApplicationUser> GetEmailStore()
@@ -194,17 +166,6 @@
         [EmailAddress]
         [Display(Name = "Email")]
         public string Email { get; set; } = "";
-
-        // [Required]
-        // [StringLength(100, ErrorMessage = "The {0} must be at least {2} and at max {1} characters long.", MinimumLength = 6)]
-        // [DataType(DataType.Password)]
-        // [Display(Name = "Password")]
-        // public string Password { get; set; } = "";
-
-        // [DataType(DataType.Password)]
-        // [Display(Name = "Confirm password")]
-        // [Compare("Password", ErrorMessage = "The password and confirmation password do not match.")]
-        // public string ConfirmPassword { get; set; } = "";
         
         [Required]
         [Display(Name = "Nombre")]
@@ -215,8 +176,6 @@
         public string Apellido { get; set; } = null!;
         
         [Required]
-        //sacar este string length y hace que solo pueda elegir
-        [StringLength(9, ErrorMessage = "El {0} debe tener entre {2} y {1} caracteres", MinimumLength = 8)]
         [Display(Name = "Genero")]
         public string Genero { get; set; } = "";
 
@@ -226,7 +185,7 @@
 
         [Required]
         [Display(Name = "Dni")]
-        public int Dni { get; set; } = 0;
+        public int Dni { get; set; }
         
         [Required]
         [Display(Name = "Nacionalidad")]
