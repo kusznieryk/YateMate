@@ -8,16 +8,15 @@ namespace YateMate.Aplicacion.Entidades;
 public class EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
     ILogger<EmailSender> logger) : IEmailSender<ApplicationUser>
 {
-    private readonly ILogger logger = logger;
+    private readonly ILogger _logger = logger;
 
     public AuthMessageSenderOptions Options { get; } = optionsAccessor.Value;
 
     
          public Task SendConfirmationLinkAsync(ApplicationUser user, string email, 
          string confirmationLink) => SendEmailAsync(email, "Confirma tu cuenta:", 
-         $"Por favor confirma tu cuenta haciendo click en el siguiente enlace " +
-         "{confirmationLink}");
-//     //nota: este metodo no se deberia ejecutar nunca, no usamos link de confirmacion de cuenta
+         $"Por favor confirma tu cuenta haciendo click en el siguiente enlace {confirmationLink}");
+       //nota: este metodo no se deberia ejecutar nunca, no usamos link de confirmacion de cuenta
 
      public Task SendPasswordResetLinkAsync(ApplicationUser user, string email, 
          string resetLink) => SendEmailAsync(email, "Cambia tu contraseña:", 
@@ -52,6 +51,6 @@ public class EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
          client.EnableSsl = true;
          await client.SendMailAsync(emailFrom, toEmail, subject, message);
          
-         logger.LogInformation("Email to {EmailAddress} sent!", toEmail);
+         _logger.LogInformation("Email to {EmailAddress} sent!", toEmail);
      }
 }
