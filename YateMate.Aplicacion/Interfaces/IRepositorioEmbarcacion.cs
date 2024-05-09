@@ -5,6 +5,10 @@ namespace YateMate.Aplicacion.Interfaces;
 public interface IRepositorioEmbarcacion
 {
     void AgregarEmbarcacion(Embarcacion embarcacion);
-    List<Embarcacion> ListarEmbarcacionesDe(int id);
-    void ModificarEmbarcacion(Embarcacion embarcacion);
+    List<Embarcacion> ObtenerEmbarcaciones();
+    List<Embarcacion> ObtenerEmbarcacionesDe(string clienteId);
+
+    Embarcacion ObtenerEmbarcacion(int idCliente);
+    bool EliminarEmbarcacion(int idEmbarcacion);
+
 }

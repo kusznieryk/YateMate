@@ -1,6 +1,7 @@
 ﻿@implements IDisposable
 
 @inject NavigationManager NavigationManager
+@* @inject AuthenticationStateProvider AuthenticationStateProvider  *@
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -16,7 +17,7 @@
         <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
             <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Inicio
         </NavLink>
-        </div>
+    </div>
 
         @* <div class="nav-item px-3"> *@
         @*     <NavLink class="nav-link" href="weather"> *@
@@ -24,29 +25,52 @@
         @*     </NavLink> *@
         @* </div> *@
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="auth">
-                <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Ver Mis trueques
-            </NavLink>
-        </div>
-
-        <AuthorizeView>
+        
+            
+        <AuthorizeView Roles="Cliente, Empleado">
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Manage">
                         <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Mi perfil
                     </NavLink>
                 </div>
+            </Authorized>
+        </AuthorizeView>
+        
+        <AuthorizeView Roles="Admin">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="admin">
+                        <span class="bi bi-admin-fill-nav-menu" aria-hidden="true"></span> Solo admin
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+            
+        <AuthorizeView Roles="Cliente">
+            <Authorized>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="auth">
+                        <span class="bi bi-lock-nav-menu" aria-hidden="true"></span> Ver Mis Bienes
+                    </NavLink>
+                </div>
+            </Authorized>
+        </AuthorizeView>
+        
+        <AuthorizeView>
+            
+            <Authorized>
                 <div class="nav-item px-3">
                     <form action="Account/Logout" method="post">
                         <AntiforgeryToken/>
-                        <input type="hidden" name="ReturnUrl" value="@currentUrl"/>
+                        <input type="hidden" name="ReturnUrl" value="@_currentUrl"/>
                         <button type="submit" class="nav-link">
                             <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Cerrar Sesion
                         </button>
                     </form>
                 </div>
             </Authorized>
+
             <NotAuthorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Register">
@@ -59,22 +83,43 @@
                     </NavLink>
                 </div>
             </NotAuthorized>
+            
         </AuthorizeView>
     </nav>
 </div>
 
 @code {
-    private string? currentUrl;
+    private string? _currentUrl;
 
     protected override void OnInitialized()
     {
-        currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
+        _currentUrl = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
         NavigationManager.LocationChanged += OnLocationChanged;
+        
+        // var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        // var user = authState.User;
+        //
+        // // Check if the user is authenticated
+        // if (user.Identity.IsAuthenticated)
+        // {
+        //     // Log the user claims
+        //     Console.WriteLine("User Claims:");
+        //     foreach (var claim in user.Claims)
+        //     {
+        //         Console.WriteLine($"{claim.Type}: {claim.Value}");
+        //     }
+        //
+        //     Console.WriteLine($"esta el usuario en cliente? {user.IsInRole("Cliente")}");
+        // }
+        // else
+        // {
+        //     Console.WriteLine("User is not authenticated.");
+        // }
     }
 
     private void OnLocationChanged(object? sender, LocationChangedEventArgs e)
     {
-        currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
+        _currentUrl = NavigationManager.ToBaseRelativePath(e.Location);
         StateHasChanged();
     }
 

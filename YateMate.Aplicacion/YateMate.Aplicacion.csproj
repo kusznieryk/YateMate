@@ -7,12 +7,13 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <Folder Include="Interfaces\" />
-      <Folder Include="UseCases\" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.4" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.4" />
+      <Reference Include="Microsoft.AspNetCore.Identity">
+        <HintPath>..\..\..\..\..\Program Files\dotnet\shared\Microsoft.AspNetCore.App\8.0.3\Microsoft.AspNetCore.Identity.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>
