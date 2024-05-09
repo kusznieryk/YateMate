@@ -5,6 +5,9 @@ using YateMate.Components;
 using YateMate.Components.Account;
 using YateMate.Repositorio;
 using YateMate.Aplicacion.Entidades;
+using YateMate.Aplicacion.Interfaces;
+using YateMate.Aplicacion.UseCases;
+
 namespace YateMate;
 
 public class Program
@@ -12,11 +15,17 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-
+        
         // Add services to the container.
         builder.Services.AddRazorComponents()
             .AddInteractiveServerComponents();
 
+        
+        //ADD USE CASES
+        builder.Services.AddTransient<ListarMisEmbarcacionesUseCase>();
+        builder.Services.AddScoped<IRepositorioEmbarcacion, RepositorioEmbarcacion>();
+            
+            
         builder.Services.AddCascadingAuthenticationState();
         builder.Services.AddScoped<IdentityUserAccessor>();
         builder.Services.AddScoped<IdentityRedirectManager>();

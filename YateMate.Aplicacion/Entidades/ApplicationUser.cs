@@ -19,4 +19,7 @@ public class ApplicationUser : IdentityUser
     
     [MaxLength(100)]
     public string? Nacionalidad { get; set; }  //no se esto que tipo hacerlo
+    
+    public List<Embarcacion>? Embarcaciones { get; set; }
+    public List<Bien>? Bienes { get; set; }
 }
