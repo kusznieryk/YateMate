@@ -1,0 +1,71 @@
+@page "/embarcaciones"
+@using YateMate.Components.Account
+@inject ListarMisEmbarcacionesUseCase ListarMisEmbarcaciones
+@inject NavigationManager Navegador;
+
+@inject IdentityUserAccessor UserAccessor
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <title>Hola</title>
+</head>
+<body>
+<div >
+    
+    @if (_lista.Count == 0)
+    {
+        <h2>No tiene ninguna embarcación para mostrar</h2>
+    }
+    else
+    {
+        <MudTable Items="_lista" Hover="true" Breakpoint="Breakpoint.Sm">
+            <HeaderContent>
+                <MudTh>Nombre</MudTh>
+                <MudTh>Eslora</MudTh>
+                <MudTh>Calado</MudTh>
+                <MudTh>Publicar</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="Nombre">@context.Nombre</MudTd>
+                <MudTd DataLabel="Calado">@context.Calado</MudTd>
+                <MudTd DataLabel="Eslora">@context.Eslora</MudTd>
+                <MudTd DataLabel="Publicar button">
+                    <form @onsubmit="OnClickHandlder" @formname="OnClickHandler" method="post">
+                        <MudButton onsubmit="OnClickHandlder" ButtonType="ButtonType.Submit">Publicar </MudButton>
+                        <AntiforgeryToken></AntiforgeryToken>
+                    </form>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+    @foreach (var embarcacion in _lista)
+    {
+
+        <h2>@embarcacion.Nombre</h2>
+    }
+</div>
+</body>
+</html>
+
+@code{
+    [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
+
+    List<Embarcacion>? _lista= new List<Embarcacion>();
+    ApplicationUser _user = null!;
+    
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _user = await UserAccessor.GetRequiredUserAsync(HttpContext);
+        _lista = ListarMisEmbarcaciones.Ejecutar(_user.Id);
+    }
+
+    public void OnClickHandlder(EventArgs e)
+    {
+        Console.WriteLine("No implementado, deberia re dirigir si la embarcacion no esta publicada");
+    }
+    
+
+}
