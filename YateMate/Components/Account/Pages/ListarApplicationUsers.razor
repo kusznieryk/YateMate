@@ -1,0 +1,91 @@
+@page "/ListarApplicationUsers"
+@using YateMate.Aplicacion.UseCases.ApplicationUser
+@inject IdentityUserAccessor UserAccessor
+@inject ObtenerApplicationUsersUseCase ObtenerApplicationUsersUseCase
+@inject EliminarApplicationUserUseCase EliminarApplicationUserUseCase
+
+<h3>ListarApplicationUsers</h3>
+
+<div style="overflow-x:@(!_tieneElementos ? "hidden" : "scroll");">
+    
+
+    <table id="table" class="table">
+        <thead>
+        <tr>
+            <th>EMAIL</th>
+            <th>NOMBRE</th>
+            <th>APELLIDO</th>
+            <th>NACIONALIDAD</th>
+            <th>GENERO</th>
+            <th>DNI</th>
+            <th>FECHA DE NACIMIENTO</th>
+            <th>ACCIÓN</th>
+        </tr>
+        </thead>
+        <tbody>
+        @if (!_tieneElementos) {
+        <p>No hay elementos</p>
+        } else {
+        @foreach (var applicationUser in _lista)
+        {
+            <tr>
+                <td>@applicationUser.Email</td>
+                <td>@applicationUser.Nombre</td>
+                <td>@applicationUser.Apellido</td>
+                <td>@applicationUser.Nacionalidad</td>
+                <td>@applicationUser.Genero</td>
+                <td>@applicationUser.Dni</td>
+                <td>@applicationUser.FechaNacimiento</td>
+                <td>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <EditForm Model="Input" FormName="@($"Eliminar-cliente-{applicationUser.Id}")" OnValidSubmit="() => EliminarApplicationUser(applicationUser)" method="post">
+                                <InputText hidden="true" @bind-Value="Input.a"/>
+                                <button type="submit" class="w-100 btn btn-lg btn-primary">Eliminar</button>
+                            </EditForm>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        }
+        }
+        </tbody>
+    </table>
+
+
+</div>
+
+
+@code {
+    
+    [SupplyParameterFromForm] private InputModel Input { get; set; } = new();
+
+    private sealed class InputModel
+    {
+        public string a { get; set; } = "";
+    }
+    
+    List<ApplicationUser> _lista = new List<ApplicationUser>();
+    bool _tieneElementos = false;
+    
+    protected override void OnInitialized()
+    {
+        _lista = ObtenerApplicationUsersUseCase.Ejecutar();
+    }
+    protected override void OnParametersSet()
+    {
+        if(_lista.Count > 0) 
+        {
+            _tieneElementos = true;
+
+        }
+    }
+    
+    ApplicationUser? _userAEliminar = null;
+    private void EliminarApplicationUser(ApplicationUser user)
+    {
+        _userAEliminar = user;
+        EliminarApplicationUserUseCase.Ejecutar(_userAEliminar.Id);
+        _lista = ObtenerApplicationUsersUseCase.Ejecutar();
+    }
+}
