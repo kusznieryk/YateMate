@@ -8,6 +8,7 @@ using YateMate.Aplicacion.Entidades;
 using YateMate.Aplicacion.Interfaces;
 using YateMate.Aplicacion.UseCases;
 using YateMate.Aplicacion.UseCases.Bien;
+using YateMate.Aplicacion.UseCases.ApplicationUser;
 
 namespace YateMate;
 
@@ -25,6 +26,11 @@ public class Program
         //ADD USE CASES
         builder.Services.AddTransient<ListarMisEmbarcacionesUseCase>();
         builder.Services.AddScoped<IRepositorioEmbarcacion, RepositorioEmbarcacion>();
+        
+        builder.Services.AddTransient<EliminarApplicationUserUseCase>();
+        builder.Services.AddTransient<ObtenerApplicationUsersUseCase>();
+        builder.Services.AddScoped<IRepositorioApplicationUser, RepositorioApplicationUser>();
+        
             
             
         builder.Services.AddCascadingAuthenticationState();
@@ -91,7 +97,6 @@ public class Program
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
-
         // asi se agregan roles, un admin y un empleado a la base de datos si no estan agregados,
         // si descomentas esto main tiene que ser async Task
         // using (var scope = app.Services.CreateScope())
