@@ -10,16 +10,16 @@
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Log in</PageTitle>
+<PageTitle>Iniciar sesión</PageTitle>
 
-<h1>Log in</h1>
+<h1>Iniciar sesión</h1>
 <div class="row">
     <div class="col-md-4">
         <section>
             <StatusMessage Message="@errorMessage"/>
             <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator/>
-                <h2>Use a local account to log in.</h2>
+                <h2>Ingresa los datos de tu cuenta para iniciar sesión.</h2>
                 <hr/>
                 <ValidationSummary class="text-danger" role="alert"/>
                 <div class="form-floating mb-3">
@@ -29,29 +29,29 @@
                 </div>
                 <div class="form-floating mb-3">
                     <InputText type="password" @bind-Value="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password"/>
-                    <label for="password" class="form-label">Password</label>
+                    <label for="password" class="form-label">Contraseña</label>
                     <ValidationMessage For="() => Input.Password" class="text-danger"/>
                 </div>
-                <div class="checkbox mb-3">
-                    <label class="form-label">
-                        <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input"/>
-                        Remember me
-                    </label>
-                </div>
+                @* <div class="checkbox mb-3"> *@
+                @*     <label class="form-label"> *@
+                @*         <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input"/> *@
+                @*         Remember me *@
+                @*     </label> *@
+                @* </div> *@
                 <div>
                     <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
                 </div>
-                <div>
-                    <p>
-                        <a href="Account/ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a href="Account/ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
-                </div>
+                @* <div> *@
+                @*     <p> *@
+                @*         <a href="Account/ForgotPassword">Forgot your password?</a> *@
+                @*     </p> *@
+                @*     <p> *@
+                @*         <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a> *@
+                @*     </p> *@
+                @*     <p> *@
+                @*         <a href="Account/ResendEmailConfirmation">Resend email confirmation</a> *@
+                @*     </p> *@
+                @* </div> *@
             </EditForm>
         </section>
     </div>
