@@ -28,6 +28,8 @@ public class Program
         
         builder.Services.AddTransient<EliminarApplicationUserUseCase>();
         builder.Services.AddTransient<ObtenerApplicationUsersUseCase>();
+        builder.Services.AddTransient<ModificarApplicationUserUseCase>();
+        builder.Services.AddTransient<ObtenerEmpleadosUseCase>();
         builder.Services.AddScoped<IRepositorioApplicationUser, RepositorioApplicationUser>();
         
             
@@ -49,11 +51,13 @@ public class Program
             options.UseSqlite("DataSource=../YateMate.Repositorio/Data/app.db;Cache=Shared"));
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+        //Identity
         builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
             .AddRoles<IdentityRole>() //con esto podes tener roles
             .AddEntityFrameworkStores<ApplicationDbContext>()
             .AddSignInManager()
-            .AddDefaultTokenProviders();
+            .AddDefaultTokenProviders()
+            .AddErrorDescriber<SpanishIdentityErrorDescriber>();
         
         
         //https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.identityoptions?view=aspnetcore-8.0&viewFallbackFrom=net-8.0
@@ -65,7 +69,6 @@ public class Program
             // User settings.
             // options.User.RequireUniqueEmail = true; //este por defecto se inicializa en falso pero igual funca
         });
-
         
         builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration); //esto es para guardar secretos
         
@@ -98,25 +101,25 @@ public class Program
         //     string[] roles = ["Admin", "Empleado", "Cliente"];
         //     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         //     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-        //     foreach (var role in roles)
-        //     {
-        //         if (!await roleManager.RoleExistsAsync(role))
-        //         {
-        //             IdentityRole roleRole = new IdentityRole(role);
-        //             await roleManager.CreateAsync(roleRole);
-        //         }
-        //     }
-        //     if (await userManager.FindByNameAsync(email) == null)
-        //     {
-        //         var user = new ApplicationUser();
-        //         user.UserName = email;
-        //         user.Email = email;
-        //         user.EmailConfirmed = true;
-        //         var result = await userManager.CreateAsync(user, password);
-        //         await userManager.AddToRoleAsync(user, "Admin");
-        //     }
-        //     
-        //     email = "empleado@empleado.com";
+            // foreach (var role in roles)
+            // {
+            //     if (!await roleManager.RoleExistsAsync(role))
+            //     {
+            //         IdentityRole roleRole = new IdentityRole(role);
+            //         await roleManager.CreateAsync(roleRole);
+            //     }
+            // }
+            // if (await userManager.FindByNameAsync(email) == null)
+            // {
+            //     var user = new ApplicationUser();
+            //     user.UserName = email;
+            //     user.Email = email;
+            //     user.EmailConfirmed = true;
+            //     var result = await userManager.CreateAsync(user, password);
+            //     await userManager.AddToRoleAsync(user, "Admin");
+            // }
+            
+        //     email = "empleado1@empleado.com";
         //     password = "Empleado123,";
         //     
         //     if (await userManager.FindByNameAsync(email) == null)
@@ -125,8 +128,25 @@ public class Program
         //         user.UserName = email;
         //         user.Email = email;
         //         user.EmailConfirmed = true;
+        //         user.Apellido = "tapa";
         //         var result = await userManager.CreateAsync(user, password);
         //         await userManager.AddToRoleAsync(user, "Empleado");
+        //     }
+        //         
+        //     email = "empleado2@empleado.com";
+        //     password = "Empleado123,";
+        //     
+        //     if (await userManager.FindByNameAsync(email) == null)
+        //     {
+        //         var user = new ApplicationUser();
+        //         user.UserName = email;
+        //         user.Email = email;
+        //         user.EmailConfirmed = true;
+        //         user.Apellido = "tapita";
+        //         var result = await userManager.CreateAsync(user, password);
+        //         await userManager.AddToRoleAsync(user, "Empleado");
+        //         
+        //         
         //     }
         // }
         app.UseHttpsRedirection();

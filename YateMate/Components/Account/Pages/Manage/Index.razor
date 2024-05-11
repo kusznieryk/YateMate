@@ -1,44 +1,53 @@
 ﻿@page "/Account/Manage"
 
 @using System.ComponentModel.DataAnnotations
+@using System.Text
+@using System.Text.Encodings.Web
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.WebUtilities
 @using YateMate.Aplicacion.Entidades;
+@using YateMate.Aplicacion.UseCases.ApplicationUser
 
 @inject UserManager<ApplicationUser> UserManager
 @inject SignInManager<ApplicationUser> SignInManager
 @inject IdentityUserAccessor UserAccessor
 @inject IdentityRedirectManager RedirectManager
+@inject IEmailSender<ApplicationUser> EmailSender
+@inject NavigationManager NavigationManager
+@inject ModificarApplicationUserUseCase ModificarUser;
+
 @attribute [Authorize(Roles = "Cliente")]
 
 <PageTitle>Mi perfil</PageTitle>
 
 <h3>Modificar</h3>
-<StatusMessage/>
-
+<StatusMessage Message="@message"/>
+@* <StatusMessage/> *@
 <div class="row">
     <div class="col-md-6">
         <EditForm Model="Input" FormName="profile" OnValidSubmit="OnValidSubmitAsync" method="post">
             <DataAnnotationsValidator/>
             <ValidationSummary class="text-danger" role="alert"/>
             
-            @* <div class="form-floating mb-3"> *@
-            @*     <input type="text" value="@_username" class="form-control" placeholder="Please choose your username." disabled/> *@
-            @*     <label for="_username" class="form-label">Nombre de usuario</label> *@
-            @* </div> *@
+            <div class="form-floating mb-3">
+                <InputText id="email" @bind-Value="Input.EmailAModificar" class="form-control" aria-required="true" />
+                <label for="email">Email</label>
+                <ValidationMessage For="() => Input.EmailAModificar" class="text-danger" />
+            </div>
 
             <div class="form-floating mb-3">
                 <InputText id="nombre" @bind-Value="Input.Nombre" class="form-control" aria-required="true" />
                 <label for="nombre">Nombre</label>
                 <ValidationMessage For="() => Input.Nombre" class="text-danger" />
             </div>
+            
             <div class="form-floating mb-3">
                 <InputText id="apellido" @bind-Value="Input.Apellido" class="form-control" aria-required="true" />
                 <label for="apellido">Apellido</label>
                 <ValidationMessage For="() => Input.Apellido" class="text-danger" />
             </div>
             
-            @*de aca para abajo no se autocompleta, fijarte como hacer*@
             <div class="form-floating mb-3">
                 <InputText id="nacionalidad" @bind-Value="Input.Nacionalidad" class="form-control" aria-required="true" />
                 <label for="nacionalidad">Nacionalidad</label>
@@ -47,11 +56,14 @@
 
             <div class="form-floating mb-3">
                 <label for="genero" class="text-muted">Género</label>
-                <InputSelect id="genero" @bind-Value="Input.Genero" class="form-control" aria-required="true">
+                <InputSelect id="genero" @bind-Value="Input.Genero" class="form-control" aria-required="true" TValue="Genero?">
                     <ValidationMessage For="() => Input.Genero" class="text-danger"/>
-                    <option value=""></option> @* esta en blanco porque si no muestra Masculino re feo, igual se ve feo*@
-                    <option value="Masculino">Masculino</option>
-                    <option value="Femenino">Femenino</option>
+
+                    @foreach (Genero genero in Enum.GetValues(typeof(Genero)))
+                    {
+                        <option value=@genero> @genero </option>
+                        <br/>
+                    }
                 </InputSelect>
             </div>
 
@@ -74,26 +86,24 @@
 
 @code {
     private ApplicationUser _user = default!;
-    private string? _username;
+    private string? _email;
     private string? _nombre; 
     private string? _apellido;
     private DateTime? _fechaNacimiento;
-    private string? _genero;
     private int? _dni;
     private string? _nacionalidad;
-
-
-
-    //private string? _phoneNumber;
+    private YateMate.Aplicacion.Entidades.Genero _genero;
 
     [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
 
     [SupplyParameterFromForm] private InputModel Input { get; set; } = new();
 
+    private string? message;
+
     protected override async Task OnInitializedAsync()
     {
         _user = await UserAccessor.GetRequiredUserAsync(HttpContext);
-        _username = await UserManager.GetUserNameAsync(_user);
+        _email = await UserManager.GetUserNameAsync(_user);
         _nombre = _user.Nombre;
         _apellido = _user.Apellido;
         _fechaNacimiento = _user.FechaNacimiento;
@@ -101,7 +111,7 @@
         _genero = _user.Genero;
         _nacionalidad = _user.Nacionalidad;
         
-
+        Console.WriteLine($"Datos sacados de la base de datos {_email} {_nombre} {_apellido} nacimiento:{_fechaNacimiento} dni:{_dni} genero:{_genero} nacionalidad:{_nacionalidad}");
         
         Input.Nombre ??= _nombre;
         Input.Apellido ??= _apellido;
@@ -109,39 +119,98 @@
         Input.Dni ??= _dni;
         Input.Genero ??= _genero;
         Input.Nacionalidad ??= _nacionalidad;
+        Input.EmailAModificar ??= _email;
+        
+        Console.WriteLine($"Datos de los inputs {Input.EmailAModificar}" +
+                          $" nom:{Input.Nombre}" +
+                          $" ap:{Input.Apellido}" +
+                          $" nacimiento:{Input.FechaNacimiento}" +
+                          $" dni:{Input.Dni}" +
+                          $" Genero:{Input.Genero}" +
+                          $" nacionalidad:{Input.Nacionalidad}");
     }
 
     private async Task OnValidSubmitAsync()
     {
+        Console.WriteLine($"Datos de los inputs despues del form {Input.EmailAModificar}" +
+                          $" nom:{Input.Nombre}" +
+                          $" ap:{Input.Apellido}" +
+                          $" nacimiento:{Input.FechaNacimiento}" +
+                          $" dni:{Input.Dni}" +
+                          $" Genero:{Input.Genero}" +
+                          $" nacionalidad:{Input.Nacionalidad}");
+        
+        _user.Nombre = Input.Nombre;
+        _user.Apellido = Input.Apellido;
+        _user.FechaNacimiento = Input.FechaNacimiento;
+        _user.Dni = Input.Dni;
+        _user.Genero = (Genero) Input.Genero;
+        _user.Nacionalidad = Input.Nacionalidad;
+        
+        ModificarUser.Ejecutar(_user);
+        
+        message = "Cambios guardados";
+        
+        if (Input.EmailAModificar is not null && Input.EmailAModificar != _email)
+        {
+            var otroUserConEseMail = await UserManager.FindByEmailAsync(Input.EmailAModificar);
+            if (otroUserConEseMail is not null)
+            {
+                message= ". Ese mail ya esta en uso";
+            }
+            
+            var userId = await UserManager.GetUserIdAsync(_user);
+            var code = await UserManager.GenerateChangeEmailTokenAsync(_user, Input.EmailAModificar);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            var callbackUrl = NavigationManager.GetUriWithQueryParameters(
+                NavigationManager.ToAbsoluteUri("Account/ConfirmEmailChange").AbsoluteUri,
+                new Dictionary<string, object?> { ["userId"] = userId, ["email"] = Input.EmailAModificar, ["code"] = code });
 
-        await SignInManager.RefreshSignInAsync(_user);
-        RedirectManager.RedirectToCurrentPageWithStatus("Your profile has been updated", HttpContext);
+            Console.WriteLine($"email enviado onValidSubmit Async con el link {callbackUrl}");
+
+            await EmailSender.SendConfirmationLinkAsync(_user, Input.EmailAModificar, HtmlEncoder.Default.Encode(callbackUrl));
+
+            message = "Hemos enviado un link de confirmación para el cambio de correo.";
+        }
+        else
+        {
+            Console.WriteLine($"No se mando mail porq el mail era igual {Input.EmailAModificar} {_email}");
+        }
+        
+        //await UserManager.UpdateAsync(_user); // con esto no haria falta inyectar el modificarUseCase pero bueno, queda lindo
+        await SignInManager.RefreshSignInAsync(_user); //no se si hace falta pero ya venia esto
+        // RedirectManager.RedirectToCurrentPageWithStatus("Tu perfil se ha actualizado", HttpContext);
     }
 
     private sealed class InputModel
     {
-        [Phone]
-        [Display(Name = "Phone number")]
-        public string? PhoneNumber { get; set; }
+        [Display(Name = "Email")] 
+        [Required]
+        public string? EmailAModificar { get; set; } = null;
         
         [Display(Name = "Nombre")]
+        [Required]
         public string? Nombre { get; set; } = null!;
         
         [Display(Name = "Apellido")]
+        [Required]
         public string? Apellido { get; set; } = null!;
         
-        //sacar este string length y hace que solopueda elegir
         [Display(Name = "Genero")]
-        public string? Genero { get; set; } = "";
-        
+        [Required]
+        public Genero? Genero { get; set; } = null;
+
         [Display(Name = "Fecha de Nacimiento")]
-        public DateTime? FechaNacimiento { get; set; }
+        [Required]
+        public DateTime? FechaNacimiento { get; set; } = null;
         
         [Display(Name = "Dni")]
-        public int? Dni { get; set; } = 0;
+        [Required]
+        public int? Dni { get; set; } = null;
         
         [Display(Name = "Nacionalidad")]
-        public string? Nacionalidad { get; set; } = "";
+        [Required]
+        public string? Nacionalidad { get; set; } = null;
     }
 
 }

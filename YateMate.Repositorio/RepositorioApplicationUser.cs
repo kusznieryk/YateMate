@@ -26,4 +26,49 @@ public class RepositorioApplicationUser : IRepositorioApplicationUser
             return context.ApplicationUsers.ToList();
         }
     }
+
+    public void ModificarApplicationUser(ApplicationUser user)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            var applicationUserAModificar = context.ApplicationUsers.FirstOrDefault(au => au.Id.Equals(user.Id));
+            if (applicationUserAModificar != null)
+            {
+                applicationUserAModificar.Nombre = user.Nombre;
+                applicationUserAModificar.Apellido = user.Apellido;
+                applicationUserAModificar.FechaNacimiento = user.FechaNacimiento;
+                applicationUserAModificar.Dni = user.Dni;
+                applicationUserAModificar.Genero = user.Genero;
+                applicationUserAModificar.Nacionalidad = user.Nacionalidad;
+                
+                context.SaveChanges();
+            }
+        }
+    }
+
+    public List<ApplicationUser> ObtenerEmpleados()
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            var empleados = context.ApplicationUsers
+                .Join(
+                    context.UserRoles,
+                    user => user.Id,
+                    userRole => userRole.UserId,
+                    (user, userRole) => new { User = user, UserRole = userRole }
+                )
+                .Join(
+                    context.Roles,
+                    userUserRole => userUserRole.UserRole.RoleId,
+                    role => role.Id,
+                    (userUserRole, role) => new { userUserRole.User, Role = role }
+                )
+                .Where(x => x.Role.Name == "Empleado")
+                .Select(x => x.User)
+                .ToList();
+            //como no aprobe dbd la consulta la hizo una ia
+            return empleados;
+
+        }
+    }
 }
