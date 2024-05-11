@@ -1,13 +1,15 @@
 @page "/bien/{Id:int?}"
 @using YateMate.Aplicacion.UseCases.Bien
+@rendermode InteractiveServer 
 @inject ObtenerBienUseCase ObtenerBienUseCase
 @inject ModificarBienUseCase ModificarBienUseCase
 @inject AgregarBienUseCase AgregarBienUseCase
+@inject IdentityUserAccessor UserAccessor
 @inject NavigationManager Navegador;
 
-@if (err.Length > 1)
+@if (_err.Length > 1)
 {
-    <h3>@err</h3>
+    <h3>@_err</h3>
 }
 @if (_esNuevoBien)
 {
@@ -19,39 +21,37 @@ else
 }
 <form @onsubmit="Aceptar">
     <label class="form-control">
-        Id:
-    @if (_esNuevoBien)
-    {
-        <input placeholder="" @bind="_bien.Id"  required="required">
-    }
-    else
-    {
-        <input placeholder="" @bind="_bien.Id" disabled>
-    }
-    </label>
-    <label class="form-control">
         Nombre:
-    <input placeholder="" @bind="_bien.Nombre" required="required">
+    <input placeholder="" @bind="_nombre" required="required">
     </label>
     <label class="form-control">
         Descripcion:
-    <input placeholder="" type="number" @bind="_descripcion" required="required">
+    <input placeholder="" @bind="_descripcion" required="required">
     </label>
     <label class="form-control">
         Imagen:
-        <input placeholder="" type="number" @bind="_imagen" required="required">
+        <input placeholder="" @bind="_imagen" required="required">
     </label>
     <button type="submit" class="btn btn-primary">Aceptar</button>
 </form>
 
 @code {
-    Bien _bien = new("", "", [0x00], 0);
-    string err = "";
-    string _descripcion = "";
-    string _usuarioId = "";
-    byte[]? _imagen;
-    [Parameter] public int? Id { get; set; }
+    // [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
+    // ApplicationUser _user;
+    //
+    // protected override async Task OnInitializedAsync()
+    // {
+    //     _user = await UserAccessor.GetRequiredUserAsync(HttpContext);
+    // }
+    
     bool _esNuevoBien = true;
+    Bien _bien = new Bien("", "", "", "");
+    string _err = "";
+    string _nombre = "";
+    string _descripcion = "";
+    string _imagen = "";
+    
+    [Parameter] public int? Id { get; set; }
     protected override void OnParametersSet()
     {
         if (Id != null)
@@ -68,23 +68,26 @@ else
     {
         try
         {
+            // Console.WriteLine("Entro al try");
+            _bien.Nombre = _nombre;
             _bien.Descripcion = _descripcion;
-            _bien.UsuarioId = int.Parse(_usuarioId);
+            _bien.UsuarioId = "1206f22b-e6b3-4e81-a1cf-68113e041056"; //harcodee para que se le agregue al id de natias, deberia ir _user.id pero no anda por el http context
             _bien.Imagen = _imagen;
             if (_esNuevoBien)
             {
+                // Console.WriteLine("Entro al if");
                 AgregarBienUseCase.Ejecutar(_bien);
             }
             else
             {
                 ModificarBienUseCase.Ejecutar(_bien);
             }
-            Navegador.NavigateTo("listadoBienes");
+            Navegador.NavigateTo("/ListarMisBienes");
             
         }
         catch (Exception e)
         {
-            err = e.Message;
+            _err = e.Message;
         }
     }
 }
