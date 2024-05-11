@@ -34,6 +34,21 @@
                         <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Mi perfil
                     </NavLink>
                 </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="ListarMisBienes">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Ver Mis Bienes
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="bien">
+                        <span class="oi oi-plus" aria-hidden="true"></span> Agregar Bien
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="ListadoTruequesDisponibles">
+                        <span class="bi bi-list-nested-nav-menu" aria-hidden="true"></span> Trueques disponibles
+                    </NavLink>
+                </div>
             </Authorized>
         </AuthorizeView>
         
@@ -62,19 +77,6 @@
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="admin">
                         <span class="bi bi-admin-fill-nav-menu" aria-hidden="true"></span> Solo admin
-                    </NavLink>
-                </div>
-            </Authorized>
-        </AuthorizeView>
-            
-        <AuthorizeView Roles="Cliente">
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="listadoBienes">
-                        <span class="oi oi-list-rich" aria-hidden="true"></span> Ver Mis Bienes
-                    </NavLink>
-                    <NavLink class="nav-link" href="bien">
-                        <span class="oi oi-plus" aria-hidden="true"></span>
                     </NavLink>
                 </div>
             </Authorized>
