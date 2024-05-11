@@ -12,7 +12,7 @@ public class ListarBienesDeUseCase
         this._repo = repo;
     }
 
-    public List<Entidades.Bien> Ejecutar(int id)
+    public List<Entidades.Bien> Ejecutar(String id)
     {
         return _repo.ListarBienesDe(id);
     }

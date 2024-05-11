@@ -9,16 +9,16 @@ public class RepositorioBien : IRepositorioBien
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
-            var duenio = context.ApplicationUsers.FirstOrDefault(a => int.Parse(a.Id) == bien.UsuarioId);
+            var duenio = context.ApplicationUsers.FirstOrDefault(a => a.Id == bien.UsuarioId);
             if (duenio != null)
             {
-                duenio.Bienes.Add(bien);
+                duenio.Bienes?.Add(bien);
                 context.Add(bien);
                 context.SaveChanges();
             }
             else
             {
-                throw new Exception("No existe un usuario con ese ID");
+                throw new Exception("No se encontro a un usuario con ese ID");
             }
         }
     }
@@ -59,7 +59,7 @@ public class RepositorioBien : IRepositorioBien
         }
     }
 
-    public List<Bien> ListarBienesDe(int id)
+    public List<Bien> ListarBienesDe(string id)
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
