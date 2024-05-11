@@ -14,7 +14,18 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .Options;
         return new ApplicationDbContext(contextOptions);
     }
-    #nullable disable
+
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        modelBuilder.Entity<ApplicationUser>()
+            .Property(p => p.Genero)
+            .HasConversion(
+                v => v.ToString(),
+                v => (Genero)Enum.Parse(typeof(Genero), v));
+    }
+
+#nullable disable
     //public DbSet<Amarra> Amarras { get; set; }
     public DbSet<Bien> Bienes { get; set; }
     public DbSet<Embarcacion> Embarcaciones { get; set; }
