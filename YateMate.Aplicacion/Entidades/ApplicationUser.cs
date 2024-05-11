@@ -11,9 +11,8 @@ public class ApplicationUser : IdentityUser
     [MaxLength(100)]
     public string? Apellido { get; set; }
     public DateTime? FechaNacimiento { get; set; }
-
-    [MaxLength(20)] //le puse 20 por poner algo
-    public string? Genero { get; set; }
+    
+    public Genero Genero { get; set; }
     
     public int? Dni { get; set; } //ver si cambiar a string
     
