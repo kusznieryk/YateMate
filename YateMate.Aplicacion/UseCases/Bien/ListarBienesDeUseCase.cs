@@ -1,7 +1,7 @@
 using System.Collections;
-using YateMate.Aplicacion.Entidades;
 using YateMate.Aplicacion.Interfaces;
-namespace YateMate.Aplicacion.UseCases.Oferta;
+using YateMate.Aplicacion.Entidades;
+namespace YateMate.Aplicacion.UseCases.Bien;
 
 public class ListarBienesDeUseCase
 {
@@ -12,7 +12,7 @@ public class ListarBienesDeUseCase
         this._repo = repo;
     }
 
-    public List<Bien> Ejecutar(int id)
+    public List<Entidades.Bien> Ejecutar(String id)
     {
         return _repo.ListarBienesDe(id);
     }

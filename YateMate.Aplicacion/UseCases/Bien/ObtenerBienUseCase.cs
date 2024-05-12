@@ -1,6 +1,6 @@
 using YateMate.Aplicacion.Entidades;
 using YateMate.Aplicacion.Interfaces;
-namespace YateMate.Aplicacion.UseCases.Oferta;
+namespace YateMate.Aplicacion.UseCases.Bien;
 
 public class ObtenerBienUseCase
 {
@@ -11,7 +11,7 @@ public class ObtenerBienUseCase
         this._repo = repo;
     }
 
-    public Bien? Ejecutar(int id)
+    public Entidades.Bien? Ejecutar(int id)
     {
         return _repo.ObtenerBien(id);
     }

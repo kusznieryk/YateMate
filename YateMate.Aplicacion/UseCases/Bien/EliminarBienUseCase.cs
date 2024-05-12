@@ -1,6 +1,6 @@
 using YateMate.Aplicacion.Entidades;
 using YateMate.Aplicacion.Interfaces;
-namespace YateMate.Aplicacion.UseCases.Oferta;
+namespace YateMate.Aplicacion.UseCases.Bien;
 
 public class EliminarBienUseCase
 {

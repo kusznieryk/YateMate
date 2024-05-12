@@ -7,7 +7,9 @@ using YateMate.Repositorio;
 using YateMate.Aplicacion.Entidades;
 using YateMate.Aplicacion.Interfaces;
 using YateMate.Aplicacion.UseCases;
+using YateMate.Aplicacion.UseCases.Bien;
 using YateMate.Aplicacion.UseCases.ApplicationUser;
+using YateMate.Aplicacion.UseCases.Oferta;
 
 namespace YateMate;
 
@@ -32,6 +34,15 @@ public class Program
         builder.Services.AddTransient<ObtenerEmpleadosUseCase>();
         builder.Services.AddScoped<IRepositorioApplicationUser, RepositorioApplicationUser>();
         
+        builder.Services.AddTransient<AgregarBienUseCase>();
+        builder.Services.AddTransient<EliminarBienUseCase>();
+        builder.Services.AddTransient<ModificarBienUseCase>();
+        builder.Services.AddTransient<ListarBienesDeUseCase>();
+        builder.Services.AddTransient<ObtenerBienUseCase>();
+        builder.Services.AddScoped<IRepositorioBien,RepositorioBien>();
+        
+        builder.Services.AddTransient<ListarTruequesDisponiblesUseCase>();
+        builder.Services.AddScoped<IRepositorioOferta,RepositorioOferta>();
             
             
         builder.Services.AddCascadingAuthenticationState();
@@ -78,6 +89,7 @@ public class Program
         // Console.WriteLine();
         
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, EmailSender>();
+        
         
         var app = builder.Build();
 

@@ -1,6 +1,7 @@
 using YateMate.Aplicacion.Entidades;
 using YateMate.Aplicacion.Interfaces;
-namespace YateMate.Aplicacion.UseCases.Oferta;
+
+namespace YateMate.Aplicacion.UseCases.Bien;
 
 public class AgregarBienUseCase
 {
@@ -11,7 +12,7 @@ public class AgregarBienUseCase
         this._repo = repo;
     }
 
-    public void Ejecutar(Bien bien)
+    public void Ejecutar(Entidades.Bien bien)
     {
         _repo.AgregarBien(bien);
     }
