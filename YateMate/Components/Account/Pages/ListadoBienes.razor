@@ -13,7 +13,17 @@
 @if (!_tieneElementos) {
     <p>No tiene bienes cargados en el sistema.</p>
     
-    }
+<button type="button" class="btn btn-primary" @onclick="@(() => Navegador.NavigateTo("bien/"))">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"></path>
+    </svg>
+    Agregar Bien
+</button>
+              
+   
+
+
+}
 else
     {
         <table class="table">
@@ -31,7 +41,7 @@ else
         @foreach (var bien in _lista)
         {
             <tr>
-                <td>@bien.Imagen</td>
+                @* <td> <img src=@bien.Imagen alt="Imagen del usuario"/> </td> *@
                 <td>@bien.Nombre</td>
                 <td>@bien.Descripcion</td>
                 <td>@bien.Id</td>
@@ -76,6 +86,8 @@ else
         {
             Console.WriteLine("Authstate es null, no se que decirte");
         }
+
+        _lista = ListarBienesDeUseCase.Ejecutar(_userId);
     }
     
     
@@ -91,11 +103,14 @@ else
     {
         Navegador.NavigateTo($"bien/{bien.Id}");
     }
+    
     private void Eliminar(Bien bien)
     {
         _BienParaEliminar = bien;
         EliminarBienUseCase.Ejecutar(_BienParaEliminar.Id);
-        _lista = ListarBienesDeUseCase.Ejecutar(_userId); 
-        Navegador.Refresh();
+        _lista = ListarBienesDeUseCase.Ejecutar(_userId);
+        if (_lista.Count == 0)
+            _tieneElementos = false;
+        
     }
 }

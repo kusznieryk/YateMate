@@ -40,7 +40,7 @@ else
         </div>
 
         <div class="form-floating mb-3">
-            <InputFile id="Imagen" @bind-Value="Input.Imagen" class="form-control" required="required" accept="image/*"/>
+            <InputFile OnChange="OnInputFileChange" id="Imagen" @bind-Value="Input.Imagen" class="form-control" required="required" accept="image/*"/>
             @* <label for="Imagen" class="form-control"> Imagen</label> *@
         </div>
 
@@ -56,6 +56,9 @@ else
     private Task<AuthenticationState>? _AuthenticationState { get; set; }
 
     private string? _userId;    
+    string imgBase64 = "";
+    string imgUrl = "";
+    
     protected override async Task OnInitializedAsync()
     {
         if (_AuthenticationState is not null)
@@ -70,7 +73,24 @@ else
             Console.WriteLine("Authstate es null, no se que decirte");
         }
     }
-    
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        // Console.WriteLine("En oninput file change");
+        var file = e.File;
+        var buffer = new byte[file.Size];
+        using (var stream = file.OpenReadStream(maxAllowedSize: file.Size))
+        {
+                
+            await stream.ReadExactlyAsync(buffer);
+        }
+        
+        
+        imgBase64 = Convert.ToBase64String(buffer);
+        // Console.WriteLine(imgBase64);
+        // Console.WriteLine(file.ContentType);
+        imgUrl = $"data:{file.ContentType};base64,{imgBase64}";
+    }
     
     bool _esNuevoBien = true;
     Bien _bien = new Bien("", "", "", "");
@@ -93,13 +113,18 @@ else
         }
     }
     
-    void Aceptar()
+    async void Aceptar()
     {
-            // Console.WriteLine("Entro al try");
             _bien.Nombre = Input.Nombre;
             _bien.Descripcion = Input.Descripcion;
-            _bien.UsuarioId = _userId; 
-            _bien.Imagen = Input.Imagen;
+            _bien.Imagen = imgUrl;
+            _bien.UsuarioId = _userId;
+            
+            if(_userId is null)
+                Console.WriteLine("user id es null, no se q decirte");
+            
+            if(String.IsNullOrEmpty(imgUrl))
+                Console.WriteLine("img url no tiene valor, no se q decirte");
             
             // Console.WriteLine(Input.Nombre);
             if (_esNuevoBien)
@@ -124,7 +149,7 @@ else
         public string Descripcion;
         
         [Required]
-        public string Imagen;
+        public IBrowserFile Imagen;
     }
 
 }
