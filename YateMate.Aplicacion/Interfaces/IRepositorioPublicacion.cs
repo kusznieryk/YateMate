@@ -4,9 +4,9 @@ namespace YateMate.Aplicacion.Interfaces;
 
 public interface IRepositorioPublicacion
 {
-    bool AgregarPublicacion(Embarcacion embarcacion);
-    List<Embarcacion> ObtenerPublicaciones();
-    List<Embarcacion> ObtenerPublicacionesDe(int idCliente);
-    Embarcacion ObtenerPublicacion(int idPublicacion);
+    bool AgregarPublicacion(Publicacion publicacion);
+    List<Publicacion> ObtenerPublicaciones();
+    List<Publicacion> ObtenerPublicacionesDe(string idCliente);
+    Publicacion? ObtenerPublicacion(int idPublicacion);
     bool EliminarPublicacion(int idPublicacion);
 }

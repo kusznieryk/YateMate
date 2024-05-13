@@ -7,6 +7,7 @@ using YateMate.Repositorio;
 using YateMate.Aplicacion.Entidades;
 using YateMate.Aplicacion.Interfaces;
 using YateMate.Aplicacion.UseCases;
+using MudBlazor.Services;
 using YateMate.Aplicacion.UseCases.Bien;
 using YateMate.Aplicacion.UseCases.ApplicationUser;
 using YateMate.Aplicacion.UseCases.Oferta;
@@ -43,7 +44,12 @@ public class Program
         
         builder.Services.AddTransient<ListarTruequesDisponiblesUseCase>();
         builder.Services.AddScoped<IRepositorioOferta,RepositorioOferta>();
-            
+              
+        builder.Services.AddTransient<ObtenerPublicacionUseCase>();
+        builder.Services.AddTransient<PublicarEmbarcacionUseCase>();
+        builder.Services.AddTransient<ListarMisPublicacionesUseCase>();
+        builder.Services.AddScoped<IRepositorioPublicacion, RepositorioPublicacion>();
+
             
         builder.Services.AddCascadingAuthenticationState();
         builder.Services.AddScoped<IdentityUserAccessor>();
@@ -69,7 +75,7 @@ public class Program
             .AddSignInManager()
             .AddDefaultTokenProviders()
             .AddErrorDescriber<SpanishIdentityErrorDescriber>();
-        
+
         
         //https://learn.microsoft.com/en-us/dotnet/api/microsoft.aspnetcore.identity.identityoptions?view=aspnetcore-8.0&viewFallbackFrom=net-8.0
         builder.Services.Configure<IdentityOptions>(options =>
@@ -80,7 +86,8 @@ public class Program
             // User settings.
             options.User.RequireUniqueEmail = true;
         });
-        
+
+        builder.Services.AddMudServices();
         builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration); //esto es para guardar secretos
         
         // Consolw.WriteLine("Secretos:);
@@ -89,7 +96,6 @@ public class Program
         // Console.WriteLine();
         
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, EmailSender>();
-        
         
         var app = builder.Build();
 
@@ -104,6 +110,7 @@ public class Program
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
+
         // asi se agregan roles, un admin y un empleado a la base de datos si no estan agregados,
         // si descomentas esto main tiene que ser async Task
         // using (var scope = app.Services.CreateScope())
