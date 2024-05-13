@@ -68,6 +68,7 @@ public class Program
             options.UseSqlite("DataSource=../YateMate.Repositorio/Data/app.db;Cache=Shared"));
         builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
+        //Identity
         builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.RequireConfirmedAccount = true)
             .AddRoles<IdentityRole>() //con esto podes tener roles
             .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -83,7 +84,7 @@ public class Program
             options.Password.RequiredLength = 8;
             
             // User settings.
-            // options.User.RequireUniqueEmail = true; //este por defecto se inicializa en falso pero igual funca
+            options.User.RequireUniqueEmail = true;
         });
 
         builder.Services.AddMudServices();
@@ -133,11 +134,12 @@ public class Program
         //         user.UserName = email;
         //         user.Email = email;
         //         user.EmailConfirmed = true;
+        //         user.Genero = Genero.Masculino;
         //         var result = await userManager.CreateAsync(user, password);
         //         await userManager.AddToRoleAsync(user, "Admin");
         //     }
         //     
-        //     email = "empleado@empleado.com";
+        //     email = "empleado1@empleado.com";
         //     password = "Empleado123,";
         //     
         //     if (await userManager.FindByNameAsync(email) == null)
@@ -146,8 +148,37 @@ public class Program
         //         user.UserName = email;
         //         user.Email = email;
         //         user.EmailConfirmed = true;
+        //         user.Nombre = "Jose";
+        //         user.Apellido = "tapa";
+        //         user.Genero = Genero.Femenino;
+        //         user.Nacionalidad = "Argentina";
+        //         user.Dni = 1234567;
+        //         user.FechaNacimiento = DateTime.Now;
+        //
         //         var result = await userManager.CreateAsync(user, password);
         //         await userManager.AddToRoleAsync(user, "Empleado");
+        //     }
+        //         
+        //     email = "empleado2@empleado.com";
+        //     password = "Empleado123,";
+        //     
+        //     if (await userManager.FindByNameAsync(email) == null)
+        //     {
+        //         var user = new ApplicationUser();
+        //         user.UserName = email;
+        //         user.Email = email;
+        //         user.EmailConfirmed = true;
+        //         user.Nombre = "Josefina";
+        //         user.Apellido = "tapita";
+        //         user.Genero = Genero.Femenino;
+        //         user.Nacionalidad = "Argentina";
+        //         user.Dni = 1234567;
+        //         user.FechaNacimiento = DateTime.Now;
+        //
+        //         var result = await userManager.CreateAsync(user, password);
+        //         await userManager.AddToRoleAsync(user, "Empleado");
+        //         
+        //         
         //     }
         // }
         app.UseHttpsRedirection();

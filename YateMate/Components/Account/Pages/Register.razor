@@ -31,7 +31,7 @@
             
             <ValidationSummary class="text-danger" role="alert"/>
             <div class="form-floating mb-3">
-                <InputText id="email" @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com"/>
+                <InputText id="email" @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true"/>
                 <label for="email">Email</label>
                 <ValidationMessage For="() => Input.Email" class="text-danger"/>
             </div>
@@ -55,13 +55,13 @@
             </div>
             
             <div class="form-floating mb-3">
-                <label for="genero" class="text-muted">Género</label>
                 <InputSelect id="genero" @bind-Value="Input.Genero" class="form-control" aria-required="true">
                     <ValidationMessage For="() => Input.Genero" class="text-danger"/>
                     <option value=""></option> @* tiene que estar en blanco porque si no muestra Masculino re feo *@
                     <option value="Masculino">Masculino</option>
                     <option value="Femenino">Femenino</option>
                 </InputSelect>
+                <label for="genero" class="text-muted">Género</label>
             </div>
 
             <div class="form-floating mb-3">
@@ -105,7 +105,8 @@
             Apellido = Input.Apellido,
             Nacionalidad = Input.Nacionalidad,
             Genero = Input.Genero, 
-            Dni = Input.Dni
+            Dni = Input.Dni,
+            FechaNacimiento = Input.FechaNacimiento
                 
         };
         //Input.Password = "Falso123,";
@@ -117,7 +118,11 @@
         ////pongo una contrasenia por defecto porque es necesaria, no hay problema porque no confirmo email hasta cambiar la contrasenia por primera vez
         if (!result.Succeeded)
         {
-            _identityErrors = result.Errors;
+            _identityErrors = result.Errors.Where(error => error.Code != "DuplicateUserName"); 
+            //lo saco porque ya hay un error por doble email y en la pagina email y usuario son lo mismo
+
+            
+            Console.WriteLine(_identityErrors.FirstOrDefault().Code);
             return;
         }
         await UserManager.AddToRoleAsync(user, "Cliente");

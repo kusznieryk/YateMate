@@ -6,8 +6,7 @@ namespace YateMate.Aplicacion.Entidades;
 public class Bien
 {
     public int Id { get; set; } = Guid.NewGuid().GetHashCode();
-    [MaxLength(50)]
-    public string Nombre { get; set; }
+    [MaxLength(50)] public string Nombre { get; set; }
     public string Descripcion { get; set; }
     public string UsuarioId { get; set; }
     public string Imagen { get; set; }

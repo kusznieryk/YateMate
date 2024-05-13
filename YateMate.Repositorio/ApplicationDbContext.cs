@@ -11,7 +11,9 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     {
         var contextOptions = new DbContextOptionsBuilder<ApplicationDbContext>()
             .UseSqlite("DataSource=../YateMate.Repositorio/Data/app.db;Cache=Shared")
+            //.EnableDetailedErrors(detailedErrorsEnabled:true) //el nombre lo explica
             .Options;
+        
         return new ApplicationDbContext(contextOptions);
     }
 
