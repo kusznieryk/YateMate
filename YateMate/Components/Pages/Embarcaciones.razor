@@ -1,13 +1,13 @@
 @page "/embarcaciones"
+@using YateMate.Aplicacion.UseCases.Oferta
 @using YateMate.Components.Account
 @inject ListarMisEmbarcacionesUseCase ListarMisEmbarcaciones
-@inject NavigationManager Navegador;
-
+@inject ObtenerPublicacionUseCase ObtenerPublicacion
 @inject IdentityUserAccessor UserAccessor
 
 <!DOCTYPE html>
 
-<html>
+<html lang="es">
 <head>
     <title>Hola</title>
 </head>
@@ -31,19 +31,14 @@
                 <MudTd DataLabel="Nombre">@context.Nombre</MudTd>
                 <MudTd DataLabel="Calado">@context.Calado</MudTd>
                 <MudTd DataLabel="Eslora">@context.Eslora</MudTd>
-                <MudTd DataLabel="Publicar button">
-                    <form @onsubmit="OnClickHandlder" @formname="OnClickHandler" method="post">
-                        <MudButton onsubmit="OnClickHandlder" ButtonType="ButtonType.Submit">Publicar </MudButton>
-                        <AntiforgeryToken></AntiforgeryToken>
-                    </form>
-                </MudTd>
+                    <MudTd DataLabel="Publicar button">
+                @if (!EstaPublicado(@context.Id))
+                {
+                        <MudLink href="@("/publicar/" + context.Id)"> Publicar</MudLink>
+                }
+                    </MudTd>
             </RowTemplate>
         </MudTable>
-    }
-    @foreach (var embarcacion in _lista)
-    {
-
-        <h2>@embarcacion.Nombre</h2>
     }
 </div>
 </body>
@@ -52,9 +47,8 @@
 @code{
     [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
 
-    List<Embarcacion>? _lista= new List<Embarcacion>();
+    List<Embarcacion> _lista= new ();
     ApplicationUser _user = null!;
-    
     
     protected override async Task OnInitializedAsync()
     {
@@ -62,10 +56,8 @@
         _lista = ListarMisEmbarcaciones.Ejecutar(_user.Id);
     }
 
-    public void OnClickHandlder(EventArgs e)
+    bool EstaPublicado(int id)
     {
-        Console.WriteLine("No implementado, deberia re dirigir si la embarcacion no esta publicada");
+        return ObtenerPublicacion.Ejecutar(id)!=null;
     }
-    
-
 }

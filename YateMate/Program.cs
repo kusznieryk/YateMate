@@ -7,6 +7,8 @@ using YateMate.Repositorio;
 using YateMate.Aplicacion.Entidades;
 using YateMate.Aplicacion.Interfaces;
 using YateMate.Aplicacion.UseCases;
+using MudBlazor.Services;
+using YateMate.Aplicacion.UseCases.Oferta;
 
 namespace YateMate;
 
@@ -24,13 +26,21 @@ public class Program
         //ADD USE CASES
         builder.Services.AddTransient<ListarMisEmbarcacionesUseCase>();
         builder.Services.AddScoped<IRepositorioEmbarcacion, RepositorioEmbarcacion>();
+        
+        builder.Services.AddTransient<ObtenerPublicacionUseCase>();
+        builder.Services.AddTransient<PublicarEmbarcacionUseCase>();
+        builder.Services.AddTransient<ListarMisPublicacionesUseCase>();
+        builder.Services.AddScoped<IRepositorioPublicacion, RepositorioPublicacion>();
             
-            
+        
+
         builder.Services.AddCascadingAuthenticationState();
         builder.Services.AddScoped<IdentityUserAccessor>();
         builder.Services.AddScoped<IdentityRedirectManager>();
         builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
+
+        
         builder.Services.AddAuthentication(options =>
             {
                 options.DefaultScheme = IdentityConstants.ApplicationScheme;
@@ -60,7 +70,7 @@ public class Program
             // options.User.RequireUniqueEmail = true; //este por defecto se inicializa en falso pero igual funca
         });
 
-        
+        builder.Services.AddMudServices();
         builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration); //esto es para guardar secretos
         
         // Consolw.WriteLine("Secretos:);
