@@ -1,0 +1,112 @@
+@page "/ListarApplicationUsers"
+@using YateMate.Aplicacion.UseCases.ApplicationUser
+@using YateMate.Components.Account
+@inject IdentityUserAccessor UserAccessor
+@inject ObtenerClientesUseCase ObtenerClientesUseCase
+@inject EliminarApplicationUserUseCase EliminarApplicationUserUseCase
+@inject NavigationManager NavigationManager
+
+<h3>Listado de Clientes</h3>
+    @if (!_tieneElementos) {
+        <p>No hay elementos</p>
+    } 
+    else 
+    {
+        <table id="table" class="table">
+            <thead>
+            <tr>
+                <th>EMAIL</th>
+                <th>NOMBRE</th>
+                <th>APELLIDO</th>
+                <th>NACIONALIDAD</th>
+                <th>GENERO</th>
+                <th>DNI</th>
+                <th>FECHA DE NACIMIENTO</th>
+                <th>ACCIÓN</th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach (var applicationUser in _lista)
+            {
+                <tr>
+                    <td>@applicationUser.Email</td>
+                    <td>@applicationUser.Nombre</td>
+                    <td>@applicationUser.Apellido</td>
+                    <td>@applicationUser.Nacionalidad</td>
+                    <td>@applicationUser.Genero</td>
+                    <td>@applicationUser.Dni</td>
+                    <td>@applicationUser.FechaNacimiento</td>
+                    <td>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <EditForm Model="new()" FormName="@($"Eliminar-cliente-{applicationUser.Id}")" OnValidSubmit="() => EliminarApplicationUser(applicationUser)" method="post">
+                                    <button type="submit" class="btn btn-lg btn-danger btn-block">Eliminar</button>
+                                </EditForm>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <EditForm Model="new()" FormName="@($"Agregar-embarcacion-{applicationUser.Id}")" OnValidSubmit="() => AgregarEmbarcacion(applicationUser.Id)" method="post">
+                                    <button type="submit" class="btn btn-lg btn-primary btn-block" >Agregar Embarcacion</button>
+                                </EditForm>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <EditForm Model="new()" FormName="@($"Listar-embarcaciones-{applicationUser.Id}")" OnValidSubmit="() => ListarEmbarcaciones(applicationUser.Id)" method="post">
+                                    <button type="submit" class="btn btn-lg btn-primary btn-block" >Listar Embarcaciones</button>
+                                </EditForm>
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+            }
+            </tbody>
+        </table>    
+        }
+
+    
+
+@code {
+    
+    List<ApplicationUser> _lista = new List<ApplicationUser>();
+    bool _tieneElementos = false;
+    
+    protected override void OnInitialized()
+    {
+        _lista = ObtenerClientesUseCase.Ejecutar();
+    }
+    protected override void OnParametersSet()
+    {
+        if(_lista.Count > 0) 
+        {
+            _tieneElementos = true;
+
+        }
+    }
+    
+    ApplicationUser? _userAEliminar = null;
+    private void EliminarApplicationUser(ApplicationUser user)
+    {
+        _userAEliminar = user;
+        
+        EliminarApplicationUserUseCase.Ejecutar(_userAEliminar.Id);
+        _lista = ObtenerClientesUseCase.Ejecutar();
+        _tieneElementos = _lista.Count > 0;
+    }
+
+    private void AgregarEmbarcacion(String id)
+    {
+        int _id;
+        Int32.TryParse(id, out _id);
+        NavigationManager.NavigateTo($"/AgregarEmbarcacionACliente/{_id}");
+    }
+
+    private void ListarEmbarcaciones(string id)
+    {
+        int _id;
+        Int32.TryParse(id, out _id);
+        NavigationManager.NavigateTo($"/listadoembarcaciones/{_id}");
+    }
+        
+}

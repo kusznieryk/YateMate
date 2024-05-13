@@ -10,4 +10,5 @@ public interface IRepositorioApplicationUser
     void ModificarApplicationUser(ApplicationUser user);
 
     List<ApplicationUser> ObtenerEmpleados(); //podria recibir el nombre del rol, lo hardcodeo como Empleado adentro
+    List<ApplicationUser> ObtenerClientes();
 }
