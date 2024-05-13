@@ -5,8 +5,8 @@ namespace YateMate.Aplicacion.UseCases;
 
 public class PublicarEmbarcacionUseCase(IRepositorioPublicacion repo)
 {
-    public bool Ejecutar(Embarcacion embarcacion)
+    public bool Ejecutar(Publicacion publicacion)
     {
-        return repo.AgregarPublicacion(embarcacion);
+        return repo.AgregarPublicacion(publicacion);
     }
 }

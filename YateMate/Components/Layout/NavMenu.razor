@@ -86,6 +86,11 @@
             
             <Authorized>
                 <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="embarcaciones">
+                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Ver mis embarcaciones
+                    </NavLink>
+                </div>
+                <div class="nav-item px-3">
                     <form action="Account/Logout" method="post">
                         <AntiforgeryToken/>
                         <input type="hidden" name="ReturnUrl" value="@_currentUrl"/>
