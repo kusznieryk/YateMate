@@ -5,10 +5,11 @@ namespace YateMate.Aplicacion.UseCases;
 
 public class ListarMisPublicacionesUseCase(IRepositorioPublicacion repo)
 {
-    List<Embarcacion> Ejecutar(int idCliente)
+    List<Embarcacion> Ejecutar(string idCliente)
     {
-        //return repo.ObtenerPublicacionesDe(idCliente);
-        return new List<Embarcacion>();
+
+       return repo.ObtenerPublicacionesDe(idCliente);
+
     }
 
 }

@@ -1,11 +1,15 @@
 @page "/bien/{Id:int?}"
+
+@using System.ComponentModel.DataAnnotations
 @using YateMate.Aplicacion.UseCases.Bien
-@rendermode InteractiveServer 
+
 @inject ObtenerBienUseCase ObtenerBienUseCase
 @inject ModificarBienUseCase ModificarBienUseCase
 @inject AgregarBienUseCase AgregarBienUseCase
 @inject IdentityUserAccessor UserAccessor
 @inject NavigationManager Navegador;
+
+@rendermode InteractiveServer
 
 @if (_err.Length > 1)
 {
@@ -19,37 +23,81 @@ else
 {
     <h3>Modificando al bien con id "@_bien.Id"</h3>
 }
-<form @onsubmit="Aceptar">
-    <label class="form-control">
-        Nombre:
-    <input placeholder="" @bind="_nombre" required="required">
-    </label>
-    <label class="form-control">
-        Descripcion:
-    <input placeholder="" @bind="_descripcion" required="required">
-    </label>
-    <label class="form-control">
-        Imagen:
-        <input placeholder="" @bind="_imagen" required="required">
-    </label>
-    <button type="submit" class="btn btn-primary">Aceptar</button>
-</form>
+
+<div class="col-md-4">
+    <EditForm Model="Input" method="post" OnValidSubmit="Aceptar" FormName="bien">
+
+        <div class="form-floating mb-3">
+            <InputText id="nombre" @bind-Value="Input.Nombre" class="form-control" aria-required="true" />
+            <label for="nombre">Nombre</label>
+            @* <ValidationMessage For="() => Input.Nombre" class="text-danger" /> *@
+        </div>
+        
+        
+        <div class="form-floating mb-3">
+            <InputText id="Descripcion" @bind-Value="Input.Descripcion" class="form-control" aria-required="required"/>
+            <label for="Descripcion" class="form-control"> Descripcion </label>
+        </div>
+
+        <div class="form-floating mb-3">
+            <InputFile OnChange="OnInputFileChange" id="Imagen" @bind-Value="Input.Imagen" class="form-control" required="required" accept="image/*"/>
+            @* <label for="Imagen" class="form-control"> Imagen</label> *@
+        </div>
+
+        <button type="submit" class="w-100 btn btn-lg btn-primary">Aceptar</button>
+    </EditForm>
+</div>
+
+
 
 @code {
-    // [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
-    // ApplicationUser _user;
-    //
-    // protected override async Task OnInitializedAsync()
-    // {
-    //     _user = await UserAccessor.GetRequiredUserAsync(HttpContext);
-    // }
+    
+    [CascadingParameter]
+    private Task<AuthenticationState>? _AuthenticationState { get; set; }
+
+    private string? _userId;    
+    string imgBase64 = "";
+    string imgUrl = "";
+    
+    protected override async Task OnInitializedAsync()
+    {
+        if (_AuthenticationState is not null)
+        {
+            var authState = await _AuthenticationState;
+            var user = authState.User;
+            
+            _userId = user.Claims.FirstOrDefault()?.Value;
+        }
+        else
+        {
+            Console.WriteLine("Authstate es null, no se que decirte");
+        }
+    }
+
+    private async Task OnInputFileChange(InputFileChangeEventArgs e)
+    {
+        // Console.WriteLine("En oninput file change");
+        var file = e.File;
+        var buffer = new byte[file.Size];
+        using (var stream = file.OpenReadStream(maxAllowedSize: file.Size))
+        {
+                
+            await stream.ReadExactlyAsync(buffer);
+        }
+        
+        
+        imgBase64 = Convert.ToBase64String(buffer);
+        // Console.WriteLine(imgBase64);
+        // Console.WriteLine(file.ContentType);
+        imgUrl = $"data:{file.ContentType};base64,{imgBase64}";
+    }
     
     bool _esNuevoBien = true;
     Bien _bien = new Bien("", "", "", "");
     string _err = "";
-    string _nombre = "";
-    string _descripcion = "";
-    string _imagen = "";
+
+    private InputModel Input{ get; set; } = new();
+    
     
     [Parameter] public int? Id { get; set; }
     protected override void OnParametersSet()
@@ -64,15 +112,21 @@ else
             }
         }
     }
-    void Aceptar()
+    
+    async void Aceptar()
     {
-        try
-        {
-            // Console.WriteLine("Entro al try");
-            _bien.Nombre = _nombre;
-            _bien.Descripcion = _descripcion;
-            _bien.UsuarioId = "1206f22b-e6b3-4e81-a1cf-68113e041056"; //harcodee para que se le agregue al id de natias, deberia ir _user.id pero no anda por el http context
-            _bien.Imagen = _imagen;
+            _bien.Nombre = Input.Nombre;
+            _bien.Descripcion = Input.Descripcion;
+            _bien.Imagen = imgUrl;
+            _bien.UsuarioId = _userId;
+            
+            if(_userId is null)
+                Console.WriteLine("user id es null, no se q decirte");
+            
+            if(String.IsNullOrEmpty(imgUrl))
+                Console.WriteLine("img url no tiene valor, no se q decirte");
+            
+            // Console.WriteLine(Input.Nombre);
             if (_esNuevoBien)
             {
                 // Console.WriteLine("Entro al if");
@@ -84,10 +138,18 @@ else
             }
             Navegador.NavigateTo("/ListarMisBienes");
             
-        }
-        catch (Exception e)
-        {
-            _err = e.Message;
-        }
     }
+
+    private sealed class InputModel
+    {
+        [Required]
+        public string Nombre;
+        
+        [Required]
+        public string Descripcion;
+        
+        [Required]
+        public IBrowserFile Imagen;
+    }
+
 }

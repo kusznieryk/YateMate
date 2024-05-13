@@ -70,7 +70,7 @@
             <Authorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="admin">
-                        <span class="bi bi-admin-fill-nav-menu" aria-hidden="true"></span> Solo admin
+                        <span class="bi bi-admin-fill-nav-menu" aria-hidden="true"></span> Administrar
                     </NavLink>
                 </div>
             </Authorized>
@@ -87,9 +87,9 @@
                 <div class="nav-item px-3">
                     <form action="Account/Logout" method="post">
                         <AntiforgeryToken/>
-                        <input type="hidden" name="ReturnUrl" value="@_currentUrl"/>
+                        <input type="hidden" name="ReturnUrl"/>
                         <button type="submit" class="nav-link">
-                            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Cerrar sesion
+                            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Cerrar sesión
                         </button>
                     </form>
                 </div>
@@ -101,9 +101,10 @@
                         <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Registrarse
                     </NavLink>
                 </div>
+                
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Login">
-                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Iniciar sesion
+                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Iniciar sesión
                     </NavLink>
                 </div>
             </NotAuthorized>

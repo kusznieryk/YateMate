@@ -86,7 +86,7 @@ public class Program
             options.Password.RequiredLength = 8;
             
             // User settings.
-            // options.User.RequireUniqueEmail = true; //este por defecto se inicializa en falso pero igual funca
+            options.User.RequireUniqueEmail = true;
         });
         builder.Services.AddMudServices();
         builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration); //esto es para guardar secretos
@@ -148,9 +148,35 @@ public class Program
         //         user.UserName = email;
         //         user.Email = email;
         //         user.EmailConfirmed = true;
-        //         user.Apellido = "tapa";
+
+        //         user.Genero = Genero.Masculino;
+
         //         var result = await userManager.CreateAsync(user, password);
         //         await userManager.AddToRoleAsync(user, "Empleado");
+        //     }
+
+        //     
+        //     email = "empleado1@empleado.com";
+        //     password = "Empleado123,";
+        //     
+        //     if (await userManager.FindByNameAsync(email) == null)
+        //     {
+        //         var user = new ApplicationUser();
+        //         user.UserName = email;
+        //         user.Email = email;
+        //         user.EmailConfirmed = true;
+
+        //         user.Nombre = "Jose";
+        //         user.Apellido = "tapa";
+        //         user.Genero = Genero.Femenino;
+        //         user.Nacionalidad = "Argentina";
+        //         user.Dni = 1234567;
+        //         user.FechaNacimiento = DateTime.Now;
+        //
+        //         var result = await userManager.CreateAsync(user, password);
+        //         await userManager.AddToRoleAsync(user, "Empleado");
+        //         
+        //         
         //     }
         //         
         //     email = "empleado2@empleado.com";
@@ -162,7 +188,13 @@ public class Program
         //         user.UserName = email;
         //         user.Email = email;
         //         user.EmailConfirmed = true;
+        //         user.Nombre = "Josefina";
         //         user.Apellido = "tapita";
+        //         user.Genero = Genero.Femenino;
+        //         user.Nacionalidad = "Argentina";
+        //         user.Dni = 1234567;
+        //         user.FechaNacimiento = DateTime.Now;
+        //
         //         var result = await userManager.CreateAsync(user, password);
         //         await userManager.AddToRoleAsync(user, "Empleado");
         //         
