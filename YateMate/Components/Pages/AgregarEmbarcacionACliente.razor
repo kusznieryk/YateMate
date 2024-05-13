@@ -1,0 +1,43 @@
+@page "/AgregarEmbarcacionACliente/{Id:int?}"
+@rendermode InteractiveServer
+@using YateMate.Aplicacion.UseCases.Embarcaciones
+@inject AgregarEmbarcacionUseCase AgregarEmbarcacionUseCase
+@inject NavigationManager Navegador;
+
+<h3>Agregar Embarcacion</h3>
+
+<EditForm OnSubmit="OnValidSubmit" Model="Model" Enhance >
+    <div class="form-group">
+        <label for="nombre">Nombre</label>
+        <input type="text" class="form-control" id="nombre" @bind="Model.Nombre" required />
+    </div>
+    <div class="form-group">
+        <label for="eslora">Eslora</label>
+        <input type="number" step="0.1" class="form-control" id="eslora" @bind="Model.Eslora" required />
+    </div>
+    <div class="form-group">
+        <label for="calado">Calado</label>
+        <input type="number" step="0.1" class="form-control" id="calado" @bind="Model.Calado" required />
+    </div>
+</EditForm>
+<div class="row">
+    <div class="col-md-6">
+            <button type="submit" class="btn btn-lg btn-primary btn-block" @onclick="OnValidSubmit">Agregar Embarcacion</button>
+    </div>
+</div>
+@code 
+{
+    [Parameter] public int Id { get; set; }
+    [SupplyParameterFromForm]
+    public Embarcacion Model { get; set; }= new ("", 0,0, "");
+    
+    
+    public void OnValidSubmit()
+    {
+        Model.ClienteId = Id.ToString();
+        AgregarEmbarcacionUseCase.Ejecutar(Model);
+        Navegador.NavigateTo("/ListarApplicationUsers");
+    }
+    
+}
+
