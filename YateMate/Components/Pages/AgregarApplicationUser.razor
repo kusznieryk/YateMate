@@ -6,6 +6,7 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 @using YateMate.Aplicacion.Entidades;
+@using YateMate.Components.Account.Pages
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IUserStore<ApplicationUser> UserStore
@@ -15,6 +16,7 @@
 @inject IEmailSender<ApplicationUser> EmailSender
 @inject ILogger<Register> Logger
 @inject NavigationManager NavigationManager
+
 
 <PageTitle>Agregar Cliente</PageTitle>
 
@@ -54,13 +56,13 @@
             </div>
             
             <div class="form-floating mb-3">
-                <label for="genero" class="text-muted">Género</label>
                 <InputSelect id="genero" @bind-Value="Input.Genero" class="form-control" aria-required="true">
                     <ValidationMessage For="() => Input.Genero" class="text-danger"/>
                     <option value=""></option> @* tiene que estar en blanco porque si no muestra Masculino re feo *@
                     <option value="Masculino">Masculino</option>
                     <option value="Femenino">Femenino</option>
                 </InputSelect>
+                <label for="genero" class="text-muted">Género</label>
             </div>
 
             <div class="form-floating mb-3">
