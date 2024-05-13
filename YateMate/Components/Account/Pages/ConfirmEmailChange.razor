@@ -10,7 +10,7 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject IdentityRedirectManager RedirectManager
 
-<PageTitle>Confirm email change</PageTitle>
+<PageTitle>Confirma cambio de email</PageTitle>
 
 <h1>Confirma tu cambio de email</h1>
 
@@ -47,7 +47,7 @@
         var result = await UserManager.ChangeEmailAsync(user, Email, code);
         if (!result.Succeeded)
         {
-            message = "Error changing email.";
+            message = "Error al cambiar el email.";
             return;
         }
 
@@ -56,12 +56,12 @@
         var setUserNameResult = await UserManager.SetUserNameAsync(user, Email);
         if (!setUserNameResult.Succeeded)
         {
-            message = "Error changing user name.";
+            message = "Error al cambiar el nombre de usuario.";
             return;
         }
 
         await SignInManager.RefreshSignInAsync(user);
-        message = "Thank you for confirming your email change.";
+        message = "Gracias por confirmar tu cambio de email.";
     }
 
 }

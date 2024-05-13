@@ -19,10 +19,10 @@
         visible=true;
         StateHasChanged();
     }
-    void Cerrar(bool cofirm)
+    void Cerrar(bool confirm)
     {
         visible=false;
-        if(cofirm) 
+        if(confirm) 
             OnConfirmado.InvokeAsync();
     }
 

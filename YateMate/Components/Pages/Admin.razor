@@ -1,12 +1,15 @@
 @page "/admin"
 @using Microsoft.AspNetCore.Identity
 @using YateMate.Aplicacion.UseCases.ApplicationUser
+@using YateMate.Components.Account.Shared
 
 @inject ObtenerEmpleadosUseCase ObtenerEmpleadosUseCase;
 @inject EliminarApplicationUserUseCase EliminarApplicationUserUseCase
-@* @inject UserManager<ApplicationUser> UserManager le agrego el rol desde aca ya fue*@ 
-@inject NavigationManager NavigationManager
+@* @inject UserManager<ApplicationUser> UserManager le agrego el rol desde aca ya fue*@
 
+@rendermode InteractiveServer
+
+<DialogoConfirmacion @ref="dialogo" OnConfirmado="EliminarApplicationUser" />
 
 <h3>Admin</h3>
     @if (!_tieneElementos) {
@@ -42,14 +45,13 @@
                     <td>
                         <div class="row">
                             <div class="col-md-6">
-                                <EditForm Model="Input" FormName="@($"Eliminar-cliente-{empleado.Id}")" OnValidSubmit="() => EliminarApplicationUser(empleado)" method="post">
-                                    <InputText hidden="true" @bind-Value="Input.a"/>
-                    <button type="submit" class="w-200 btn btn-lg btn-primary">Eliminar</button>
-                    </EditForm>
-                    </div>
-                    </div>
+                                <EditForm Model="new()" FormName="@($"Eliminar-cliente-{empleado.Id}")" OnValidSubmit="() => ConfirmarEliminacion(empleado)" method="post">
+                                    <button type="submit" class="w-200 btn btn-lg btn-primary">Eliminar</button>
+                                </EditForm>
+                            </div>
+                        </div>
                     </td>
-                    </tr>
+                </tr>
                     
             }
         </tbody>
@@ -60,14 +62,8 @@
 
     @code {
         
-    [SupplyParameterFromForm] private InputModel Input { get; set; } = new();
-
-    private sealed class InputModel
-    {
-        public string a { get; set; } = "";
-    }
-
-    List<ApplicationUser> _lista = new List<ApplicationUser>();
+        
+    List<ApplicationUser> _lista = new();
     bool _tieneElementos = false;
 
     protected override void OnInitialized()
@@ -82,16 +78,23 @@
         }
     }
 
-    ApplicationUser? _userAEliminar = null;
-    private void EliminarApplicationUser(ApplicationUser user)
+    DialogoConfirmacion dialogo = null!;
+    void ConfirmarEliminacion(ApplicationUser user)
     {
         _userAEliminar = user;
+        dialogo.Mensaje = $"Deseas eliminar al empleado {user.Nombre} ?";
+        dialogo.Mostrar();
+    }
+
+    ApplicationUser? _userAEliminar = null;
+    private void EliminarApplicationUser()
+    {
         EliminarApplicationUserUseCase.Ejecutar(_userAEliminar.Id);
         _lista = ObtenerEmpleadosUseCase.Ejecutar();
         
-        if(_lista.Count == 0) 
+        if(_lista.Count == 0)
         {
-            NavigationManager.NavigateTo("/admin", forceLoad:true); //esto es una negrada, es para que haga refresh la pagina y q se actualice
+            _tieneElementos = false;
         }
         
     }

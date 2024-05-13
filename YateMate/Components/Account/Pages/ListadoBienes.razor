@@ -1,31 +1,33 @@
 @page "/ListarMisBienes"
-@* @rendermode InteractiveServer *@
+@rendermode InteractiveServer
+
 @using YateMate.Aplicacion.UseCases.Bien
 @using YateMate.Components.Account.Shared
-@inject IdentityUserAccessor UserAccessor;
+@* @inject IdentityUserAccessor UserAccessor; *@
 @inject ListarBienesDeUseCase ListarBienesDeUseCase
 @inject EliminarBienUseCase EliminarBienUseCase
 @inject NavigationManager Navegador;
 
 <h3>Mis bienes</h3>
 
-<table class="table">
-    <thead>
-    <tr>
-        <th>IMAGEN</th>
-        <th>NOMBRE</th>
-        <th>DESCRIPCION</th>
-        <th>ID</th>
-        <th>ID USUARIO</th>
-        <th>ACCION</th>
-    </tr>
-    </thead>
-    <tbody>
-    @if (!_tieneElementos) {
+@if (!_tieneElementos) {
     <p>No tiene bienes cargados en el sistema.</p>
+    
     }
-    else
+else
     {
+        <table class="table">
+            <thead>
+            <tr>
+                <th>IMAGEN</th>
+                <th>NOMBRE</th>
+                <th>DESCRIPCION</th>
+                <th>ID</th>
+                <th>ID USUARIO</th>
+                <th>ACCION</th>
+            </tr>
+            </thead>
+            <tbody>
         @foreach (var bien in _lista)
         {
             <tr>
@@ -35,48 +37,47 @@
                 <td>@bien.Id</td>
                 <td>@bien.UsuarioId</td>
                 <td>
-                    <EditForm Model="Input" FormName="@($"Modificar-bien-{bien.Id}")" OnValidSubmit="() => ModificarBien(bien)" method="post">
-                        <InputText hidden="true" @bind-Value="Input.a"/>
+                    <EditForm Model="new()" FormName="@($"Modificar-bien-{bien.Id}")" OnValidSubmit="() => ModificarBien(bien)" method="post">
                         <button type="submit" class="w-100 btn btn-lg btn-primary">Modificar</button>
                     </EditForm>
-                    <EditForm Model="Input" FormName="@($"Eliminar-bien-{bien.Id}")" OnValidSubmit="() => Eliminar(bien)" method="post">
-                        <InputText hidden="true" @bind-Value="Input.a"/>
+                    <EditForm Model="new()" FormName="@($"Eliminar-bien-{bien.Id}")" OnValidSubmit="() => Eliminar(bien)" method="post">
                         <button type="submit" class="w-100 btn btn-lg btn-primary">Eliminar</button>
                     </EditForm>
                 </td>
             </tr>
         }
+            </tbody>
+        </table>
     }
-    </tbody>
-</table>
+    
 
 @code {
     
-    [SupplyParameterFromForm] private InputModel Input { get; set; } = new();
-
-    private sealed class InputModel
-    {
-        public string a { get; set; } = "";
-    }
     
     DialogoConfirmacion dialogo = null!;
     bool _tieneElementos;
-    List<Bien> _lista = new List<Bien>();
+    List<Bien> _lista = new();
     Bien? _BienParaEliminar;
     
-    [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
-    ApplicationUser _user;
+    [CascadingParameter]
+    private Task<AuthenticationState>? _AuthenticationState { get; set; }
+    private string? _userId;    
     
     protected override async Task OnInitializedAsync()
     {
-        _user = await UserAccessor.GetRequiredUserAsync(HttpContext);
-        _lista = ListarBienesDeUseCase.Ejecutar(_user.Id);
+        if (_AuthenticationState is not null)
+        {
+            var authState = await _AuthenticationState;
+            var user = authState.User;
+            
+            _userId = user.Claims.FirstOrDefault()?.Value;
+        }
+        else
+        {
+            Console.WriteLine("Authstate es null, no se que decirte");
+        }
     }
     
-    // protected override void OnInitialized()
-    // {
-    //     _lista = ListarBienesDeUseCase.Ejecutar(_user.Id);
-    // }
     
     protected override void OnParametersSet()
     {
@@ -94,7 +95,7 @@
     {
         _BienParaEliminar = bien;
         EliminarBienUseCase.Ejecutar(_BienParaEliminar.Id);
-        _lista = ListarBienesDeUseCase.Ejecutar(_user.Id); 
+        _lista = ListarBienesDeUseCase.Ejecutar(_userId); 
         Navegador.Refresh();
     }
 }

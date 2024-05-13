@@ -55,16 +55,16 @@
             </div>
 
             <div class="form-floating mb-3">
-                <label for="genero" class="text-muted">Género</label>
-                <InputSelect id="genero" @bind-Value="Input.Genero" class="form-control" aria-required="true" TValue="Genero?">
+                
+                <InputSelect id="genero" @bind-Value="Input.Genero" class="form-select" aria-required="true" TValue="Genero?">
                     <ValidationMessage For="() => Input.Genero" class="text-danger"/>
 
                     @foreach (Genero genero in Enum.GetValues(typeof(Genero)))
                     {
                         <option value=@genero> @genero </option>
-                        <br/>
                     }
                 </InputSelect>
+                <label for="genero" class="text-muted">Género</label>
             </div>
 
             <div class="form-floating mb-3">
@@ -149,28 +149,33 @@
         
         ModificarUser.Ejecutar(_user);
         
-        message = "Cambios guardados";
+        message = "Tus cambios se han guardado";
         
         if (Input.EmailAModificar is not null && Input.EmailAModificar != _email)
         {
             var otroUserConEseMail = await UserManager.FindByEmailAsync(Input.EmailAModificar);
             if (otroUserConEseMail is not null)
             {
-                message= ". Ese mail ya esta en uso";
+                message+= ", excepto el email, que ya esta en uso";
+                Input.EmailAModificar = _email;
             }
-            
-            var userId = await UserManager.GetUserIdAsync(_user);
-            var code = await UserManager.GenerateChangeEmailTokenAsync(_user, Input.EmailAModificar);
-            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
-            var callbackUrl = NavigationManager.GetUriWithQueryParameters(
-                NavigationManager.ToAbsoluteUri("Account/ConfirmEmailChange").AbsoluteUri,
-                new Dictionary<string, object?> { ["userId"] = userId, ["email"] = Input.EmailAModificar, ["code"] = code });
+            else
+            {
+                
+                var userId = await UserManager.GetUserIdAsync(_user);
+                var code = await UserManager.GenerateChangeEmailTokenAsync(_user, Input.EmailAModificar);
+                code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+                var callbackUrl = NavigationManager.GetUriWithQueryParameters(
+                    NavigationManager.ToAbsoluteUri("Account/ConfirmEmailChange").AbsoluteUri,
+                    new Dictionary<string, object?> { ["userId"] = userId, ["email"] = Input.EmailAModificar, ["code"] = code });
 
-            Console.WriteLine($"email enviado onValidSubmit Async con el link {callbackUrl}");
+                Console.WriteLine($"email enviado onValidSubmit Async con el link {callbackUrl}");
 
-            await EmailSender.SendConfirmationLinkAsync(_user, Input.EmailAModificar, HtmlEncoder.Default.Encode(callbackUrl));
+                await EmailSender.SendConfirmationLinkAsync(_user, Input.EmailAModificar, HtmlEncoder.Default.Encode(callbackUrl));
 
-            message = "Hemos enviado un link de confirmación para el cambio de correo.";
+                message = "Hemos enviado un link de confirmación para el cambio de correo.";
+            }
+
         }
         else
         {

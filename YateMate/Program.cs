@@ -78,7 +78,7 @@ public class Program
             options.Password.RequiredLength = 8;
             
             // User settings.
-            // options.User.RequireUniqueEmail = true; //este por defecto se inicializa en falso pero igual funca
+            options.User.RequireUniqueEmail = true;
         });
         
         builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration); //esto es para guardar secretos
@@ -113,24 +113,25 @@ public class Program
         //     string[] roles = ["Admin", "Empleado", "Cliente"];
         //     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
         //     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-            // foreach (var role in roles)
-            // {
-            //     if (!await roleManager.RoleExistsAsync(role))
-            //     {
-            //         IdentityRole roleRole = new IdentityRole(role);
-            //         await roleManager.CreateAsync(roleRole);
-            //     }
-            // }
-            // if (await userManager.FindByNameAsync(email) == null)
-            // {
-            //     var user = new ApplicationUser();
-            //     user.UserName = email;
-            //     user.Email = email;
-            //     user.EmailConfirmed = true;
-            //     var result = await userManager.CreateAsync(user, password);
-            //     await userManager.AddToRoleAsync(user, "Admin");
-            // }
-            
+        //     foreach (var role in roles)
+        //     {
+        //         if (!await roleManager.RoleExistsAsync(role))
+        //         {
+        //             IdentityRole roleRole = new IdentityRole(role);
+        //             await roleManager.CreateAsync(roleRole);
+        //         }
+        //     }
+        //     if (await userManager.FindByNameAsync(email) == null)
+        //     {
+        //         var user = new ApplicationUser();
+        //         user.UserName = email;
+        //         user.Email = email;
+        //         user.EmailConfirmed = true;
+        //         user.Genero = Genero.Masculino;
+        //         var result = await userManager.CreateAsync(user, password);
+        //         await userManager.AddToRoleAsync(user, "Admin");
+        //     }
+        //     
         //     email = "empleado1@empleado.com";
         //     password = "Empleado123,";
         //     
@@ -140,7 +141,13 @@ public class Program
         //         user.UserName = email;
         //         user.Email = email;
         //         user.EmailConfirmed = true;
+        //         user.Nombre = "Jose";
         //         user.Apellido = "tapa";
+        //         user.Genero = Genero.Femenino;
+        //         user.Nacionalidad = "Argentina";
+        //         user.Dni = 1234567;
+        //         user.FechaNacimiento = DateTime.Now;
+        //
         //         var result = await userManager.CreateAsync(user, password);
         //         await userManager.AddToRoleAsync(user, "Empleado");
         //     }
@@ -154,7 +161,13 @@ public class Program
         //         user.UserName = email;
         //         user.Email = email;
         //         user.EmailConfirmed = true;
+        //         user.Nombre = "Josefina";
         //         user.Apellido = "tapita";
+        //         user.Genero = Genero.Femenino;
+        //         user.Nacionalidad = "Argentina";
+        //         user.Dni = 1234567;
+        //         user.FechaNacimiento = DateTime.Now;
+        //
         //         var result = await userManager.CreateAsync(user, password);
         //         await userManager.AddToRoleAsync(user, "Empleado");
         //         
