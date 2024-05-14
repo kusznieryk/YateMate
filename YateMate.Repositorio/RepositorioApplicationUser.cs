@@ -71,4 +71,29 @@ public class RepositorioApplicationUser : IRepositorioApplicationUser
 
         }
     }
+    
+    public List<ApplicationUser> ObtenerClientes()
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            var clientes = context.ApplicationUsers
+                .Join(
+                    context.UserRoles,
+                    user => user.Id,
+                    userRole => userRole.UserId,
+                    (user, userRole) => new { User = user, UserRole = userRole }
+                )
+                .Join(
+                    context.Roles,
+                    userUserRole => userUserRole.UserRole.RoleId,
+                    role => role.Id,
+                    (userUserRole, role) => new { userUserRole.User, Role = role }
+                )
+                .Where(x => x.Role.Name == "Cliente")
+                .Select(x => x.User)
+                .ToList();
+            return clientes;
+
+        }
+    }
 }

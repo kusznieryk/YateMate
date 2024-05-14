@@ -7,8 +7,8 @@ public interface IRepositorioEmbarcacion
     void AgregarEmbarcacion(Embarcacion embarcacion);
     List<Embarcacion> ObtenerEmbarcaciones();
     List<Embarcacion> ObtenerEmbarcacionesDe(string clienteId);
-
-    Embarcacion ObtenerEmbarcacion(int idCliente);
+    void ModificarEmbarcacion(Embarcacion embarcacion);
+    Embarcacion ObtenerEmbarcacion(int embarcacionId);
     bool EliminarEmbarcacion(int idEmbarcacion);
 
 }
