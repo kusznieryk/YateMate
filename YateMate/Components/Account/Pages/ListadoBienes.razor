@@ -3,6 +3,7 @@
 
 @using YateMate.Aplicacion.UseCases.Bien
 @using YateMate.Components.Account.Shared
+@using MudBlazor.Components
 @* @inject IdentityUserAccessor UserAccessor; *@
 @inject ListarBienesDeUseCase ListarBienesDeUseCase
 @inject EliminarBienUseCase EliminarBienUseCase
@@ -10,56 +11,51 @@
 
 <h3>Mis bienes</h3>
 
-@if (!_tieneElementos) {
+@if (!_tieneElementos) 
+{
     <p>No tiene bienes cargados en el sistema.</p>
     
+}
+else
+{
+    //https://stackoverflow.com/questions/71209726/same-size-for-all-muditem-using-mudblazor
+    //otro poco lo tunee yo (Claude) 
+    
+    <MudPaper Width="100%" Class="darkbackground" MinHeight="350" Style="border: none; box-shadow: none;"> @*esto es para sacarle las lineas de afuera*@
+        <MudContainer>
+            <MudGrid>
+                @foreach (var bien in _lista)
+                {
+                    <MudItem xs="4" Style="display:flex;">
+                        <MudPaper Width="100%" Square="false" Class="pa-10 ma-2 infobox" Style="border: none; box-shadow: none;">
+                            <MudCard>
+                                <MudCardMedia Image=@bien.Imagen Height="200" Style="object-fit: contain;" />
+                                <MudCardContent Style="min-height: 100px">
+                                    <MudText Typo="Typo.h5" Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@bien.Nombre</MudText> @*esto es para que si hay mucho texto ponga 3 puntos *@
+                                    <MudText Typo="Typo.body2" Style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">@bien.Descripcion</MudText>
+                                </MudCardContent>
+                                <MudCardActions Style="justify-content: space-between;">
+                                    <MudButton Variant="Variant.Text" OnClick="EventCallback.Empty" Color="Color.Primary">Ver más</MudButton> @*Aca hay que crear un evento que rediriga/abra una ventana en la que podamos modificar/eliminar el bien y eso*@
+                                    @* <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Info"  Size="Size.Small">Editar</MudButton> *@
+                                    <MudButton Variant="Variant.Text" OnClick="() => Eliminar(bien)" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error"> Borrar </MudButton>
+                                    </MudCardActions>
+                            </MudCard>
+                        </MudPaper>
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudContainer>
+    </MudPaper>
+    
+}
+
+<br/>
 <button type="button" class="btn btn-primary" @onclick="@(() => Navegador.NavigateTo("bien/"))">
     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
         <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"></path>
     </svg>
     Agregar Bien
 </button>
-              
-   
-
-
-}
-else
-    {
-        <table class="table">
-            <thead>
-            <tr>
-                <th>IMAGEN</th>
-                <th>NOMBRE</th>
-                <th>DESCRIPCION</th>
-                <th>ID</th>
-                <th>ID USUARIO</th>
-                <th>ACCION</th>
-            </tr>
-            </thead>
-            <tbody>
-        @foreach (var bien in _lista)
-        {
-            <tr>
-                @* <td> <img src=@bien.Imagen alt="Imagen del usuario"/> </td> *@
-                <td>@bien.Nombre</td>
-                <td>@bien.Descripcion</td>
-                <td>@bien.Id</td>
-                <td>@bien.UsuarioId</td>
-                <td>
-                    <EditForm Model="new()" FormName="@($"Modificar-bien-{bien.Id}")" OnValidSubmit="() => ModificarBien(bien)" method="post">
-                        <button type="submit" class="w-100 btn btn-lg btn-primary">Modificar</button>
-                    </EditForm>
-                    <EditForm Model="new()" FormName="@($"Eliminar-bien-{bien.Id}")" OnValidSubmit="() => Eliminar(bien)" method="post">
-                        <button type="submit" class="w-100 btn btn-lg btn-primary">Eliminar</button>
-                    </EditForm>
-                </td>
-            </tr>
-        }
-            </tbody>
-        </table>
-    }
-    
 
 @code {
     
