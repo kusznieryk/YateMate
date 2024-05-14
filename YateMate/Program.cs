@@ -51,7 +51,14 @@ public class Program
         
         builder.Services.AddTransient<ListarTruequesDisponiblesUseCase>();
         builder.Services.AddScoped<IRepositorioOferta,RepositorioOferta>();
-            
+              
+        builder.Services.AddTransient<ObtenerPublicacionUseCase>();
+        builder.Services.AddTransient<PublicarEmbarcacionUseCase>();
+        builder.Services.AddTransient<ListarMisPublicacionesUseCase>();
+        builder.Services.AddTransient<FiltrarPublicacionesPorCaladoUseCase>();
+        builder.Services.AddTransient<FiltrarPublicacionesPorEsloraUseCase>();
+        builder.Services.AddScoped<IRepositorioPublicacion, RepositorioPublicacion>();
+
             
         builder.Services.AddCascadingAuthenticationState();
         builder.Services.AddScoped<IdentityUserAccessor>();

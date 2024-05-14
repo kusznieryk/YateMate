@@ -1,11 +1,13 @@
 using YateMate.Aplicacion.Entidades;
+using YateMate.Aplicacion.Interfaces;
 
 namespace YateMate.Aplicacion.UseCases;
 
-public class FiltrarPublicacionesPorCaladoUseCase
+public class FiltrarPublicacionesPorCaladoUseCase(IRepositorioEmbarcacion repo)
 {
-    public List<Embarcacion> Ejecutar(List<Embarcacion> original, double caladoMin, double caladoMax)
+    public List<Publicacion> Ejecutar(List<Publicacion> original, double caladoMin, double caladoMax)
     {
-        return original.Where((embarcacion => embarcacion.Calado<caladoMax && embarcacion.Calado>caladoMin)).ToList();
+        var emb = repo.ObtenerEmbarcaciones().Where(embarcacion => embarcacion.Calado<caladoMax && embarcacion.Calado>caladoMin).Select(emb=>emb.Id);
+        return original.Where(pub => emb.Contains(pub.EmbarcacionId)).ToList();
     }
 }

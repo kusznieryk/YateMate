@@ -1,0 +1,106 @@
+@page "/ListadoTruequesDisponibles"
+@using YateMate.Aplicacion.UseCases.Oferta
+@inject ListarTruequesDisponiblesUseCase ListarTruequesDisponiblesUseCase
+@inject NavigationManager Navegador;
+@inject FiltrarPublicacionesPorEsloraUseCase FiltrarPorEslora
+@inject FiltrarPublicacionesPorCaladoUseCase FiltrarPorCalado
+@rendermode InteractiveServer
+
+<h3>Trueques disponibles</h3>
+
+<div style="overflow-x:@(!_tieneElementos ? "hidden" : "auto")">
+    
+        @if (!_tieneElementos) {
+        <p>No hay trueques disponibles en este momento.</p>
+        } else {
+            
+            <MudGrid>
+                <MudItem sm="12" md="6">
+                    <h3>Eslora</h3>
+                    <MudRadioGroup @bind-Value="@OpcionEslora">
+                        <MudRadio Value="@("0 - 5")"> &lt;5 </MudRadio>
+                        <MudRadio Value="@("5 -10 ")"> &gt;5 - &lt;10</MudRadio>
+                        <MudRadio Value="@("10 - 15")"> &gt;10 - &lt;15</MudRadio>
+                        <MudRadio Value="@("15 - 20")"> &gt;15</MudRadio>
+                    </MudRadioGroup>
+                </MudItem>
+                <MudItem sm="12" md="6">
+                    <h3>Calado</h3>
+                    <MudRadioGroup @bind-Value="@OpcionCalado">
+                        <MudRadio Value="@("0 - 5")"> &lt;5 </MudRadio>
+                        <MudRadio Value="@("5 -10 ")"> &gt;5 - &lt;10</MudRadio>
+                        <MudRadio Value="@("10 - 15")"> &gt;10 - &lt;15</MudRadio>
+                        <MudRadio Value="@("15 -" +int.MaxValue)"> &gt;15</MudRadio>
+                    </MudRadioGroup>
+                </MudItem>
+                <MudItem sm="12" md="6">
+                    <MudButton Variant="Variant.Filled" DisableElevation="true" Color="Color.Primary" OnClick="HandleClick">Aplicar filtros</MudButton>
+                    <MudButton Variant="Variant.Outlined" DisableElevation="true" Color="Color.Primary" OnClick="HandleClickBorrar">Borrar filtros</MudButton>
+                </MudItem>
+                </MudGrid>
+        <MudGrid Style="width: 70%">
+            @foreach (var publicacion in _mostrar)
+            {
+                    <MudItem xs="10" sm="5" >
+                        <MudCardMedia Image="@publicacion.Image" Width="250" Height="300"  />                        
+                        <MudCardContent>
+                            <MudText Typo="Typo.h5">@publicacion.Titulo</MudText>
+                            <MudText Typo="Typo.body2">@publicacion.Descripcion</MudText>
+                        </MudCardContent>
+                        @*<MudCardActions Class="justify-space-between ">*@
+                            @* <MudButton Variant="Variant.Text" Color="Color.Primary"> ❤️</MudButton> *@
+                            @* <MudButton Variant="Variant.Text" Color="Color.Primary">Enviar mensaje</MudButton> *@
+                        @* </MudCardActions> *@
+                    </MudItem>
+                
+            }
+        </MudGrid>
+        }
+
+</div>
+
+
+@code {
+    public string OpcionEslora { get; set; } = "";
+    public string OpcionCalado { get; set; } = "";
+    List<Publicacion> _lista = new List<Publicacion>();
+    List<Publicacion> _mostrar = new List<Publicacion>();
+
+    bool _tieneElementos;
+    
+    protected override void OnInitialized()
+    {
+        _lista = ListarTruequesDisponiblesUseCase.Ejecutar();
+        _mostrar = _lista;
+    }
+    protected override void OnParametersSet()
+    {
+        if(_lista.Count > 0) 
+        {
+            _tieneElementos = true;
+            
+        }
+    }
+
+    protected void HandleClick()
+    {
+        _mostrar = _lista;
+        if (OpcionEslora != "")
+        {
+            var options = OpcionEslora.Split('-');
+            _mostrar = FiltrarPorEslora.Ejecutar(_lista, int.Parse(options[0]), int.Parse(options[1]));
+        }
+
+        if (OpcionCalado !="")
+        {
+            var options = OpcionCalado.Split('-');
+            _mostrar = FiltrarPorCalado.Ejecutar(_lista, int.Parse(options[0]), int.Parse(options[1])); 
+        }
+    }
+    protected void HandleClickBorrar()
+    {
+        OpcionEslora = "";
+        OpcionCalado = "";
+        _mostrar = _lista;
+    }
+}

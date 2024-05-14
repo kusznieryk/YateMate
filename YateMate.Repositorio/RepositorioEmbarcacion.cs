@@ -33,7 +33,16 @@ public class RepositorioEmbarcacion:IRepositorioEmbarcacion
     }
     public List<Embarcacion> ObtenerEmbarcaciones()
     {
-        throw new NotImplementedException();
+        using var context = ApplicationDbContext.CrearContexto();
+        var embarcaciones = context.Embarcaciones.ToList();
+        return embarcaciones;
+    }
+
+    public List<Embarcacion> ObtenerEmbarcacionesDe(int clienteId)
+    {
+        using var context = ApplicationDbContext.CrearContexto();
+        var embarcaciones = context.Embarcaciones.Where(embarcacion => embarcacion.ClienteId.Equals(clienteId)).ToList();
+        return embarcaciones;
     }
 
     public Embarcacion ObtenerEmbarcacion(int embarcacionId)

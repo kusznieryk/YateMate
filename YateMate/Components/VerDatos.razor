@@ -1,0 +1,33 @@
+@rendermode InteractiveServer
+
+@* <p>@Bien.Nombre</p> *@
+@* <p>@Bien.Descripcion</p> *@
+@* <img src=@Bien.Imagen/> *@
+
+<MudDialog>
+    <DialogContent>
+        Ver datos de mi bien
+    </DialogContent>
+    <DialogContent>
+        @Bien.Nombre
+    </DialogContent>
+    <DialogContent>
+        @Bien.Descripcion
+    </DialogContent>
+    <DialogContent>
+        <MudImage Src=@Bien.Imagen> </MudImage>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel">Cancel</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public Bien? Bien { get; set; }
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    void Submit() => MudDialog.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog.Cancel();
+
+}

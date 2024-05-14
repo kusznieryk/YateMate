@@ -22,4 +22,8 @@
       <ProjectReference Include="..\YateMate.Repositorio\YateMate.Repositorio.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="Components\Shared\" />
+    </ItemGroup>
+
 </Project>
