@@ -181,9 +181,10 @@
         Input.Dni ??= _user.Dni;
         Input.Genero ??= _user.Genero;
         Input.Nacionalidad ??= _user.Nacionalidad;
-        Input.EmailAModificar = _email;
+        Input.EmailAModificar ??= _email;
         
-        Console.WriteLine($"Datos de los inputs {Input.EmailAModificar}" +
+        Console.WriteLine($"Datos de los inputs" +
+                          $" mail:{Input.EmailAModificar}" +
                           $" nom:{Input.Nombre}" +
                           $" ap:{Input.Apellido}" +
                           $" nacimiento:{Input.FechaNacimiento}" +
@@ -255,7 +256,7 @@
         [Required(ErrorMessage = "Ingresa un email")]
         [EmailAddress(ErrorMessage = "La direccion de correo ingresada no es valida")]
         [Display(Name = "Email")]
-        public string? EmailAModificar { get; set; } = "";
+        public string? EmailAModificar { get; set; } = null;
         
         [Required(ErrorMessage = "Ingresa un nombre")]
         [Display(Name = "Nombre")]
