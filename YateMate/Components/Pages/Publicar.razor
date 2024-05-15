@@ -3,34 +3,46 @@
 @inject PublicarEmbarcacionUseCase PublicarEmbarcacion
 @inject NavigationManager Navegador;
 
-    <EditForm OnSubmit="OnValidSubmit" Model="Model" Enhance>
-        <MudCard>
-            <MudCardContent>
-                <MudTextField HelperText="Titulo de la Publicacion"
-                              @bind-Value="Model.Titulo" For="@(() => Model.Titulo)" Required="true"/>
-                <MudTextField T="string" HelperText="Descripcion de la Embarcacion" Variant="Variant.Text" Text="@Model.Descripcion" @bind-Value="Model.Descripcion" AutoGrow Lines="4" Required="true"/>
-                @if (@Model.Image != "")
-                {
-                    <MudImage src="@Model.Image" Style="width: 100%"></MudImage>
-                }
-                <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Context="EditButtonContext" Required="true" Accept="image/jpeg, image/jpg, image/png, image/webp" >
-                    <ButtonTemplate >
-                        <MudButton HtmlTag="label"
-                                   Variant="Variant.Filled"
-                                   Color="Color.Primary"
-                                   StartIcon="@Icons.Material.Filled.CloudUpload"
-                                   for="@EditButtonContext.Id"
-                                   >
-                            Subir imagen
-                        </MudButton>
-                    </ButtonTemplate>
-                </MudFileUpload>
-            </MudCardContent>
-            <MudCardActions>
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Publicar</MudButton>
-            </MudCardActions>
-        </MudCard>
-    </EditForm>
+
+<EditForm OnValidSubmit="OnValidSubmit" Model="Model" Enhance>
+    <MudCard>
+        <MudCardContent>
+            <MudTextField HelperText="Titulo de la Publicacion"
+                          @bind-Value="Model.Titulo"
+                          For="@(() => Model.Titulo)" Required="true"
+                          RequiredError="El Titulo es obligatorio"/>
+            <MudTextField T="string"
+                          HelperText="Descripcion de la Embarcacion"
+                          Variant="Variant.Text" Text="@Model.Descripcion"
+                          @bind-Value="Model.Descripcion"
+                          AutoGrow Lines="4" Required="true"
+                          RequiredError="La descripcion es obligatoria"/>
+            @if (@Model.Image != "")
+            {
+                <MudImage src="@Model.Image" Style="max-height: 500px"></MudImage>
+            }
+            <MudFileUpload T="IBrowserFile"
+                           FilesChanged="UploadFiles"
+                           Context="EditButtonContext"
+                           Required="true"
+                           RequiredError="Cargar una imagen es obligatorio"
+                           Accept="image/jpeg, image/jpg, image/png, image/webp">
+                <ButtonTemplate >
+                    <MudButton HtmlTag="label"
+                               Variant="Variant.Filled"
+                               Color="Color.Primary"
+                               StartIcon="@Icons.Material.Filled.CloudUpload"
+                               for="@EditButtonContext.Id">
+                        Subir imagen
+                    </MudButton>
+                </ButtonTemplate>
+            </MudFileUpload>
+        </MudCardContent>
+        <MudCardActions>
+            <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Publicar</MudButton>
+        </MudCardActions>
+    </MudCard>
+</EditForm>
 
 @code
 {

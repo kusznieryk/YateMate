@@ -6,16 +6,9 @@
 
 <MudDialog>
     <DialogContent>
-        Ver datos de mi bien
-    </DialogContent>
-    <DialogContent>
-        @Bien.Nombre
-    </DialogContent>
-    <DialogContent>
-        @Bien.Descripcion
-    </DialogContent>
-    <DialogContent>
-        <MudImage Src=@Bien.Imagen> </MudImage>
+        <MudText> @Bien.Nombre</MudText>
+        <MudText>@Bien.Descripcion</MudText>
+        <MudImage Src="@Bien.Imagen"Style="width: 100%"></MudImage>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel">Cancel</MudButton>
