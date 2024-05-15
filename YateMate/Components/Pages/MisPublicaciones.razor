@@ -1,18 +1,52 @@
 @page "/mis_publicaciones"
-@* <!DOCTYPE html> *@
-@* *@
-@* <html> *@
-@* <head> *@
-@*     <title></title> *@
-@* </head> *@
-@* <body> *@
-@* <div> *@
-@*      *@
-@* </div> *@
-@* </body> *@
-@* </html> *@
-
-@code{
+@using YateMate.Components.Account
+@inject ListarMisPublicacionesUseCase ListarMisPublicaciones
+@rendermode InteractiveServer
+@inject IdentityUserAccessor UserAccessor
+@inject IDialogService Dialog
+@using YateMate.Components.Shared
+<MudDialogProvider></MudDialogProvider>
+<MudGrid Style="width: 70%">
+    @foreach (var publicacion in _lista)
+    {
+        <MudItem xs="10" sm="5" >
+            <MudCardMedia Image="@publicacion.Image" Width="250" Height="300"  />
+            <MudCardContent>
+                <MudText Typo="Typo.h5">@publicacion.Titulo</MudText>
+                <MudText Typo="Typo.body2">@publicacion.Descripcion</MudText>
+            </MudCardContent>
+            <MudCardActions Class="justify-space-between ">
+                @*
+                <MudButton Variant="Variant.Text" @onclick="()=>HandleClick(new Bien(publicacion.Titulo, publicacion.Descripcion, publicacion.Image, _userId))" Color="Color.Primary">Ver más</MudButton>
+            *@
+            </MudCardActions>
+        </MudItem>
     
+    }
+</MudGrid>
+@code{
+    List<Publicacion> _lista = new List<Publicacion>();
+    [CascadingParameter]
+    private Task<AuthenticationState>? _AuthenticationState { get; set; }   
+    string _userId;
+   
+    protected override async Task OnInitializedAsync()
+    {
+        if (_AuthenticationState is not null)
+        {
+            var authState = await _AuthenticationState;
+            var user = authState.User;
+            
+            _userId = user.Claims.FirstOrDefault()?.Value;
+            _lista = ListarMisPublicaciones.Ejecutar(_userId);
+        }
+    }
+
+    public void HandleClick(Bien bien)
+    {
+        var parameters = new DialogParameters<VerDatos>();
+        parameters.Add( x=>x.Bien,bien);
+        Dialog.Show<VerDatos>("Simple Dialog", parameters);
+    }
 
 }

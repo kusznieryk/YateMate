@@ -8,36 +8,40 @@
 
 <h3>Trueques disponibles</h3>
 
-<div style="overflow-x:@(!_tieneElementos ? "hidden" : "auto")">
+<div style="overflow-x:@(!_tieneElementos ? "hidden" : "inherit")">
     
         @if (!_tieneElementos) {
-        <p>No hay trueques disponibles en este momento.</p>
-        } else {
-            
+        <h2>No hay trueques disponibles en este momento.</h2>
+        }
+        else {
             <MudGrid>
                 <MudItem sm="12" md="6">
                     <h3>Eslora</h3>
                     <MudRadioGroup @bind-Value="@OpcionEslora">
-                        <MudRadio Value="@("0 - 5")"> &lt;5m </MudRadio>
-                        <MudRadio Value="@("5 - 10")"> &gt;5m - &lt;10m</MudRadio>
-                        <MudRadio Value="@("10 - 15")"> &gt;10m - &lt;15m</MudRadio>
-                        <MudRadio Value="@("15 - 20")"> &gt;15m</MudRadio>
+                        <MudRadio Value="@("0 - 5")"> &lt;5 </MudRadio>
+                        <MudRadio Value="@("5 -10 ")"> &gt;5 - &lt;10</MudRadio>
+                        <MudRadio Value="@("10 - 15")"> &gt;10 - &lt;15</MudRadio>
+                        <MudRadio Value="@("15 - 20")"> &gt;15</MudRadio>
                     </MudRadioGroup>
                 </MudItem>
                 <MudItem sm="12" md="6">
                     <h3>Calado</h3>
                     <MudRadioGroup @bind-Value="@OpcionCalado">
-                        <MudRadio Value="@("0 - 5")"> &lt;5m </MudRadio>
-                        <MudRadio Value="@("5 - 10")"> &gt;5m - &lt;10m</MudRadio>
-                        <MudRadio Value="@("10 - 15")"> &gt;10m - &lt;15m</MudRadio>
-                        <MudRadio Value="@("15 -" +int.MaxValue)"> &gt;15m</MudRadio>
+                        <MudRadio Value="@("0 - 5")"> &lt;5 </MudRadio>
+                        <MudRadio Value="@("5 -10 ")"> &gt;5 - &lt;10</MudRadio>
+                        <MudRadio Value="@("10 - 15")"> &gt;10 - &lt;15</MudRadio>
+                        <MudRadio Value="@("15 -" +int.MaxValue)"> &gt;15</MudRadio>
                     </MudRadioGroup>
                 </MudItem>
                 <MudItem sm="12" md="6">
                     <MudButton Variant="Variant.Filled" DisableElevation="true" Color="Color.Primary" OnClick="HandleClick">Aplicar filtros</MudButton>
                     <MudButton Variant="Variant.Outlined" DisableElevation="true" Color="Color.Primary" OnClick="HandleClickBorrar">Borrar filtros</MudButton>
                 </MudItem>
-                </MudGrid>
+            </MudGrid>
+            if (_mostrar.Count == 0)
+            {
+                <h2>No hay embarcaciones que cumplan con los requisitos</h2>
+            }
         <MudGrid Style="width: 70%">
             @foreach (var publicacion in _mostrar)
             {
@@ -94,7 +98,7 @@
         if (OpcionCalado !="")
         {
             var options = OpcionCalado.Split('-');
-            _mostrar = FiltrarPorCalado.Ejecutar(_lista, int.Parse(options[0]), int.Parse(options[1])); 
+            _mostrar = FiltrarPorCalado.Ejecutar(_mostrar, int.Parse(options[0]), int.Parse(options[1])); 
         }
     }
     protected void HandleClickBorrar()
