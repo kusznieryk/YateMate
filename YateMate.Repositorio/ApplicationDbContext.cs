@@ -25,6 +25,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasConversion(
                 v => v.ToString(),
                 v => (Genero)Enum.Parse(typeof(Genero), v));
+        modelBuilder.Entity<ApplicationUser>()
+            .Property(p => p.Nacionalidad)
+            .HasConversion(
+                v => v.ToString(),
+            v => (Nacionalidad)Enum.Parse(typeof(Nacionalidad), v));
     }
 
 #nullable disable

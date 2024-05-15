@@ -1,18 +1,28 @@
-@rendermode InteractiveServer
-
-@* <p>@Bien.Nombre</p> *@
-@* <p>@Bien.Descripcion</p> *@
-@* <img src=@Bien.Imagen/> *@
+@inject NavigationManager NavigationManager
 
 <MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
+            Ver datos
+        </MudText>
+    </TitleContent>
     <DialogContent>
-        <MudText> @Bien.Nombre</MudText>
-        <MudText>@Bien.Descripcion</MudText>
-        <MudImage Src="@Bien.Imagen"Style="width: 100%"></MudImage>
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">@Bien.Nombre</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudImage Fluid="true" Src="@Bien.Imagen" Alt="Image"/>
+                <MudText>@Bien.Descripcion</MudText>
+            </MudCardContent>
+        </MudCard>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel">Cancel</MudButton>
-        <MudButton Color="Color.Primary" OnClick="Submit">Ok</MudButton>
+        <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
+        <div style="flex-grow: 1;"></div>
+        <MudButton Variant="Variant.Filled" Href=""StartIcon="@Icons.Material.Filled.Edit" OnClick="@((e) => Editar(Bien.Id))" Color="Color.Info" Size="Size.Small">Editar</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -22,5 +32,12 @@
 
     void Submit() => MudDialog.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog.Cancel();
+
+    void Editar(int id)
+    {
+        Submit();
+        NavigationManager.NavigateTo($"bien/{id}");
+
+    }
 
 }

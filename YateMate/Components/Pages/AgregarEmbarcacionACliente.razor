@@ -1,4 +1,4 @@
-@page "/AgregarEmbarcacionACliente/{Id:int?}"
+@page "/AgregarEmbarcacionACliente/{Id}"
 @rendermode InteractiveServer
 @using YateMate.Aplicacion.UseCases.Embarcaciones
 @inject AgregarEmbarcacionUseCase AgregarEmbarcacionUseCase
@@ -27,14 +27,14 @@
 </div>
 @code 
 {
-    [Parameter] public int Id { get; set; }
+    [Parameter] public string Id { get; set; }
     [SupplyParameterFromForm]
     public Embarcacion Model { get; set; }= new ("", 0,0, "");
     
     
     public void OnValidSubmit()
     {
-        Model.ClienteId = Id.ToString();
+        Model.ClienteId = Id;
         AgregarEmbarcacionUseCase.Ejecutar(Model);
         Navegador.NavigateTo("/ListarApplicationUsers");
     }

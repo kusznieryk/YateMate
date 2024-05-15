@@ -7,6 +7,7 @@
 @using Microsoft.AspNetCore.WebUtilities
 @using YateMate.Aplicacion.Entidades;
 @using YateMate.Components.Account.Pages
+@using YateMate.Components.Account.Shared
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IUserStore<ApplicationUser> UserStore
@@ -25,12 +26,12 @@
 <div class="row">
     <div class="col-md-4">
         <StatusMessage Message="@Message"/>
-        <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
+        <EditForm EditContext="editContext" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
             <DataAnnotationsValidator/>
             <h2>Crea una nueva cuenta.</h2>
             <hr/>
             
-            <ValidationSummary class="text-danger" role="alert"/>
+            @* <ValidationSummary class="text-danger" role="alert"/> *@
             <div class="form-floating mb-3">
                 <InputText id="email" @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true" placeholder="name@example.com"/>
                 <label for="email">Email</label>
@@ -48,11 +49,17 @@
                 <label for="apellido">Apellido</label>
                 <ValidationMessage For="() => Input.Apellido" class="text-danger" />
             </div>
-            
+
             <div class="form-floating mb-3">
-                <InputText id="nacionalidad" @bind-Value="Input.Nacionalidad" class="form-control" aria-required="true" />
-                <label for="nacionalidad">Nacionalidad</label>
-                <ValidationMessage For="() => Input.Nacionalidad" class="text-danger" />
+                <InputSelect id="nacionalidad" @bind-Value="Input.Nacionalidad" class="form-select" aria-required="true" TValue="Nacionalidad">
+                    <ValidationMessage For="() => Input.Nacionalidad" class="text-danger"/>
+                    <option value=""></option>
+                    @foreach (Nacionalidad nacionalidad in Enum.GetValues(typeof(Nacionalidad)))
+                    {
+                    <option value=@nacionalidad> @nacionalidad </option>
+                    }
+                </InputSelect>
+                <label for="nacionalidad" class="text-muted">Nacionalidad</label>
             </div>
             
             <div class="form-floating mb-3">
@@ -92,12 +99,39 @@
 
     private string? Message => _identityErrors is null ? null : $"Error: {string.Join(", ", _identityErrors.Select(error => error.Description))}";
 
-    public async Task RegisterUser(EditContext editContext)
-    {
-        //var user = CreateUser();
-        //MailAddress address = new MailAddress(Input.Email);
-        //string userName = address.User;
+    private ValidationMessageStore? messageStore;
+    
+    private EditContext? editContext;
 
+    protected override void OnInitialized()
+    {
+        Input ??= new();
+        editContext = new(Input);
+        editContext.OnValidationRequested += HandleValidationRequested;
+        messageStore = new(editContext);
+    }
+    
+    private void HandleValidationRequested(object? sender,
+        ValidationRequestedEventArgs args)
+    {
+        Console.WriteLine("entre al handle");
+        // Custom validation logic
+        if ( DateTime.Compare(Input.FechaNacimiento, DateTime.Today.AddYears(-18)) > 0) 
+        {
+            messageStore?.Add(() => Input.FechaNacimiento, "La edad mínima permitida es 18 años");
+            Console.WriteLine("a1");
+
+        }
+        
+        if ( DateTime.Compare(Input.FechaNacimiento, DateTime.Today.AddYears(-120)) < 0) 
+        {
+            Console.WriteLine("a2");
+            messageStore?.Add(() => Input.FechaNacimiento, "La edad máxima permitida es 120 años");
+        }
+    }
+    
+    public async Task RegisterUser()
+    {
         var user = new ApplicationUser()
         {
             //UserName = userName,
@@ -118,7 +152,7 @@
         ////pongo una contrasenia por defecto porque es necesaria, no hay problema porque no confirmo email hasta cambiar la contrasenia por primera vez
         if (!result.Succeeded)
         {
-            _identityErrors = result.Errors;
+            _identityErrors = result.Errors.Where(error => error.Code != "DuplicateUserName"); 
             return;
         }
         await UserManager.AddToRoleAsync(user, "Cliente");
@@ -152,34 +186,43 @@
 
     private sealed class InputModel
     {
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "Ingresa un email")]
+        [EmailAddress(ErrorMessage = "La direccion de correo ingresada no es valida")]
         [Display(Name = "Email")]
         public string Email { get; set; } = "";
         
-        [Required]
+        [Required(ErrorMessage = "Ingresa un nombre")]
         [Display(Name = "Nombre")]
         public string Nombre { get; set; } = null!;
         
-        [Required]
+        [Required(ErrorMessage = "Ingresa un apellido")]
         [Display(Name = "Apellido")]
         public string Apellido { get; set; } = null!;
         
-        [Required]
+        [Required(ErrorMessage = "Ingresa un genero")]
         [Display(Name = "Genero")]
         public Genero Genero { get; set; }
-
-        [Required]
+        
+        [Required(ErrorMessage = "Ingresa una fecha de nacimiento")]
         [Display(Name = "Fecha de Nacimiento")]
         public DateTime FechaNacimiento { get; set; }
 
         [Required]
         [Display(Name = "Dni")]
+        [Range(1000000, 100000000, ErrorMessage = "El número de dni debe estar entre un millon (1.000.000) y cien millones (100.000.000)")]
         public int Dni { get; set; }
         
-        [Required]
+        [Required(ErrorMessage = "Ingresa una nacionalidad")]
         [Display(Name = "Nacionalidad")]
-        public string Nacionalidad { get; set; } = "";
+        public Nacionalidad Nacionalidad { get; set; }
     }
 
+    public void Dispose()
+    {
+        if (editContext is not null)
+        {
+            editContext.OnValidationRequested -= HandleValidationRequested;
+        }
+    }
+    
 }

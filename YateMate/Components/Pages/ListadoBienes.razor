@@ -14,6 +14,11 @@
 @inject NavigationManager Navegador;
 @inject IDialogService Dialog
 
+<MudDialogProvider  FullWidth="true"
+                    MaxWidth="MaxWidth.Small"
+                    Position="DialogPosition.CenterLeft"/>
+
+
 <h3>Mis bienes</h3>
 
 @if (!_tieneElementos) 
@@ -40,10 +45,10 @@ else
                                     <MudText Typo="Typo.body2" Style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">@bien.Descripcion</MudText>
                                 </MudCardContent>
                                 <MudCardActions Style="justify-content: space-between;">
-                                    <MudButton Variant="Variant.Text" @onclick="OpenDialog" Color="Color.Primary">Ver más</MudButton> @*Aca hay que crear un evento que rediriga/abra una ventana en la que podamos modificar/eliminar el bien y eso*@
+                                    <MudButton Variant="Variant.Text" @onclick="@((e) => OpenDialog(bien))" Color="Color.Primary">Ver más</MudButton> @*Aca hay que crear un evento que rediriga/abra una ventana en la que podamos modificar/eliminar el bien y eso*@
                                     @* <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Info"  Size="Size.Small">Editar</MudButton> *@
                                     <MudButton Variant="Variant.Text" OnClick="() => Eliminar(bien)" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error"> Borrar </MudButton>
-                                    </MudCardActions>
+                                </MudCardActions>
                             </MudCard>
                         </MudPaper>
                     </MudItem>
@@ -64,8 +69,6 @@ else
 
 @code {
     
-    
-    DialogoConfirmacion dialogo = null!;
     bool _tieneElementos;
     List<Bien> _lista = new();
     Bien? _BienParaEliminar;
@@ -114,9 +117,11 @@ else
             _tieneElementos = false;
     }
     
-    private void OpenDialog()
+    private void OpenDialog(Bien Bien)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
-        Dialog.Show<VerDatos>("Simple Dialog", options);
+        var parameters = new DialogParameters<VerDatos>();
+        parameters.Add(x => x.Bien, Bien);
+        Dialog.Show<VerDatos>("Ver Datos", parameters);
     }
 }

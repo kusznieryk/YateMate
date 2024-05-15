@@ -26,9 +26,9 @@
 @* <StatusMessage/> *@
 <div class="row">
     <div class="col-md-6">
-        <EditForm Model="Input" FormName="profile" OnValidSubmit="OnValidSubmitAsync" method="post">
+        <EditForm EditContext="editContext" FormName="profile" OnValidSubmit="OnValidSubmitAsync" method="post">
             <DataAnnotationsValidator/>
-            <ValidationSummary class="text-danger" role="alert"/>
+            @* <ValidationSummary class="text-danger" role="alert"/> *@
             
             <div class="form-floating mb-3">
                 <InputText id="email" @bind-Value="Input.EmailAModificar" class="form-control" aria-required="true" />
@@ -47,11 +47,17 @@
                 <label for="apellido">Apellido</label>
                 <ValidationMessage For="() => Input.Apellido" class="text-danger" />
             </div>
-            
+
             <div class="form-floating mb-3">
-                <InputText id="nacionalidad" @bind-Value="Input.Nacionalidad" class="form-control" aria-required="true" />
-                <label for="nacionalidad">Nacionalidad</label>
-                <ValidationMessage For="() => Input.Nacionalidad" class="text-danger" />
+                <InputSelect id="nacionalidad" @bind-Value="Input.Nacionalidad" class="form-select" aria-required="true" TValue="Nacionalidad?">
+                    <ValidationMessage For="() => Input.Nacionalidad" class="text-danger"/>
+                    <option value=""></option>
+                    @foreach (Nacionalidad nacionalidad in Enum.GetValues(typeof(Nacionalidad)))
+                    {
+                    <option value=@nacionalidad> @nacionalidad </option>
+                    }
+                </InputSelect>
+                <label for="nacionalidad" class="text-muted">Nacionalidad</label>
             </div>
 
             <div class="form-floating mb-3">
@@ -91,7 +97,7 @@
     private string? _apellido;
     private DateTime? _fechaNacimiento;
     private int? _dni;
-    private string? _nacionalidad;
+    private Nacionalidad _nacionalidad;
     private YateMate.Aplicacion.Entidades.Genero _genero;
 
     [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
@@ -100,8 +106,39 @@
 
     private string? message;
 
+    
+    private ValidationMessageStore? messageStore;
+    
+    private EditContext? editContext;
+    
+    
+    private void HandleValidationRequested(object? sender,
+        ValidationRequestedEventArgs args)
+    {
+        Console.WriteLine("entre al handle");
+        
+        // Custom validation logic
+        if (Input.FechaNacimiento is null)
+            return; 
+        
+        if ( DateTime.Compare((DateTime)Input.FechaNacimiento, DateTime.Today.AddYears(-18)) > 0) 
+        {
+            messageStore?.Add(() => Input.FechaNacimiento, "La edad mínima permitida es 18 años");
+
+        }
+        
+        if ( DateTime.Compare((DateTime)Input.FechaNacimiento, DateTime.Today.AddYears(-120)) < 0) 
+        {
+            messageStore?.Add(() => Input.FechaNacimiento, "La edad máxima permitida es 120 años");
+        }
+    }
     protected override async Task OnInitializedAsync()
     {
+        Input ??= new();
+        editContext = new(Input);
+        editContext.OnValidationRequested += HandleValidationRequested;
+        messageStore = new(editContext);
+        
         _user = await UserAccessor.GetRequiredUserAsync(HttpContext);
         _email = await UserManager.GetUserNameAsync(_user);
         _nombre = _user.Nombre;
@@ -119,7 +156,7 @@
         Input.Dni ??= _dni;
         Input.Genero ??= _genero;
         Input.Nacionalidad ??= _nacionalidad;
-        Input.EmailAModificar ??= _email;
+        Input.EmailAModificar = _email;
         
         Console.WriteLine($"Datos de los inputs {Input.EmailAModificar}" +
                           $" nom:{Input.Nombre}" +
@@ -130,6 +167,7 @@
                           $" nacionalidad:{Input.Nacionalidad}");
     }
 
+    
     private async Task OnValidSubmitAsync()
     {
         Console.WriteLine($"Datos de los inputs despues del form {Input.EmailAModificar}" +
@@ -145,7 +183,7 @@
         _user.FechaNacimiento = Input.FechaNacimiento;
         _user.Dni = Input.Dni;
         _user.Genero = (Genero) Input.Genero;
-        _user.Nacionalidad = Input.Nacionalidad;
+        _user.Nacionalidad = (Nacionalidad) Input.Nacionalidad;
         
         ModificarUser.Ejecutar(_user);
         
@@ -189,33 +227,43 @@
 
     private sealed class InputModel
     {
-        [Display(Name = "Email")] 
-        [Required]
-        public string? EmailAModificar { get; set; } = null;
+        [Required(ErrorMessage = "Ingresa un email")]
+        [EmailAddress(ErrorMessage = "La direccion de correo ingresada no es valida")]
+        [Display(Name = "Email")]
+        public string? EmailAModificar { get; set; } = "";
         
+        [Required(ErrorMessage = "Ingresa un nombre")]
         [Display(Name = "Nombre")]
-        [Required]
         public string? Nombre { get; set; } = null!;
         
+        [Required(ErrorMessage = "Ingresa un apellido")]
         [Display(Name = "Apellido")]
-        [Required]
         public string? Apellido { get; set; } = null!;
         
+        [Required(ErrorMessage = "Ingresa un genero")]
         [Display(Name = "Genero")]
-        [Required]
-        public Genero? Genero { get; set; } = null;
-
+        public Genero? Genero { get; set; }
+        
+        [Required(ErrorMessage = "Ingresa una fecha de nacimiento")]
         [Display(Name = "Fecha de Nacimiento")]
-        [Required]
-        public DateTime? FechaNacimiento { get; set; } = null;
-        
+        public DateTime? FechaNacimiento { get; set; }
+
+        [Required(ErrorMessage = "Ingresa un Dni")]
         [Display(Name = "Dni")]
-        [Required]
-        public int? Dni { get; set; } = null;
+        [Range(1000000, 100000000, ErrorMessage = "El número de dni debe estar entre un millon (1.000.000) y cien millones (100.000.000)")]
+        public int? Dni { get; set; }
         
+        [Required(ErrorMessage = "Ingresa una nacionalidad")]
         [Display(Name = "Nacionalidad")]
-        [Required]
-        public string? Nacionalidad { get; set; } = null;
+        public Nacionalidad? Nacionalidad { get; set; }
     }
 
+    public void Dispose()
+    {
+        if (editContext is not null)
+        {
+            editContext.OnValidationRequested -= HandleValidationRequested;
+        }
+    }
+    
 }
