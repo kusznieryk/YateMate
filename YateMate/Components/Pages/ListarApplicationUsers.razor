@@ -1,14 +1,18 @@
 @page "/ListarApplicationUsers"
 @using YateMate.Aplicacion.UseCases.ApplicationUser
 @using YateMate.Components.Account
+@using YateMate.Components.Account.Shared
 @inject IdentityUserAccessor UserAccessor
 @inject ObtenerClientesUseCase ObtenerClientesUseCase
 @inject EliminarApplicationUserUseCase EliminarApplicationUserUseCase
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
 
+<DialogoConfirmacion @ref="_dialogo" OnConfirmado="EliminarApplicationUser" />
+
 <h1>Listado de clientes</h1>
 <title>Listado de clientes</title>
+
 <MudContainer>
     <MudTable Items="@_lista" Class="mt-4" Dense="true" Outlined="true">
         <HeaderContent>
@@ -37,7 +41,7 @@
                     <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => AgregarEmbarcacion(context.Id))">Agregar Embarcación</MudButton>
                 </div>
                 <div class="button-container">
-                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => EliminarApplicationUser(context))">Eliminar Usuario</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => ConfirmarEliminacion(context))">Eliminar Usuario</MudButton>
                 </div>
             </MudTd>
         </RowTemplate>
@@ -65,11 +69,9 @@
     }
     
     ApplicationUser? _userAEliminar = null;
-    private void EliminarApplicationUser(ApplicationUser user)
+    private void EliminarApplicationUser()
     {
-        _userAEliminar = user;
-        
-        EliminarApplicationUserUseCase.Ejecutar(_userAEliminar.Id);
+        EliminarApplicationUserUseCase.Ejecutar(_userAEliminar!.Id);
         _lista = ObtenerClientesUseCase.Ejecutar();
         _tieneElementos = _lista.Count > 0;
     }
@@ -82,6 +84,14 @@
     private void ListarEmbarcaciones(string id)
     {
         NavigationManager.NavigateTo($"/listadoembarcaciones/{id}");
+    }
+    
+    DialogoConfirmacion _dialogo = null!;
+    void ConfirmarEliminacion(ApplicationUser user)
+    {
+        _userAEliminar = user;
+        _dialogo.Mensaje = $"Deseas eliminar al cliente {user.Nombre} ?";
+        _dialogo.Mostrar();
     }
         
 }

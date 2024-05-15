@@ -29,6 +29,7 @@
                            FilesChanged="UploadFiles"
                            Context="EditButtonContext"
                            Required="true"
+                           For="@(() => Model.FileVaciaWarning)"
                            Accept="image/jpeg, image/jpg, image/png, image/webp">
                 <ButtonTemplate >
                     <MudButton HtmlTag="label"
@@ -62,6 +63,7 @@
             var imagesrc = Convert.ToBase64String(buffer);
             reader.Close();
             Model.Image = $"data:{file.ContentType};base64,{imagesrc}";
+            Model.FileVaciaWarning = file;
     }
     
     public void OnValidSubmit()
@@ -76,12 +78,17 @@
 
     public class PublicacionForm
     {
-        [Required(ErrorMessage = "Cargar una imagen es obligatorio")]
         public string Image { get; set; } = null!;
+        
         [Required(ErrorMessage = "El Titulo es obligatorio")]
         [ MaxLength(50) ]
         public string Titulo { get; set; } = null!;
+        
         [Required(ErrorMessage = "La descripcion es obligatoria")]
         public string Descripcion { get; set; } = null!;
+
+        //agrego este solo para poder hacer el warning
+        [Required(ErrorMessage = "Cargar una imagen es obligatorio")]
+        public IBrowserFile FileVaciaWarning { get; set; } = null!; 
     }
 }

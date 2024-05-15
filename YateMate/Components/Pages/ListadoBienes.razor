@@ -120,8 +120,8 @@ else
     private void OpenDialog(Bien Bien)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
-        var parameters = new DialogParameters<VerDatos>();
+        var parameters = new DialogParameters<VerDatosBien>();
         parameters.Add(x => x.Bien, Bien);
-        Dialog.Show<VerDatos>("Ver Datos", parameters);
+        Dialog.Show<VerDatosBien>("Ver Datos", parameters);
     }
 }

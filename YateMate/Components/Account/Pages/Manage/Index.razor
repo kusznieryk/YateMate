@@ -52,7 +52,6 @@
             <div class="form-floating mb-3">
                 <InputSelect id="nacionalidad" @bind-Value="Input.Nacionalidad" class="form-select" aria-required="true" TValue="Nacionalidad?">
                     <ValidationMessage For="() => Input.Nacionalidad" class="text-danger"/>
-                    <option value=""></option>
                     @foreach (Nacionalidad nacionalidad in Enum.GetValues(typeof(Nacionalidad)))
                     {
                     <option value=@nacionalidad> @nacionalidad </option>
@@ -115,12 +114,12 @@
         {
             var value = property.GetValue(Input);
             // Console.WriteLine(property.Name);
-            if (String.IsNullOrEmpty(value?.ToString()))
+            if (String.IsNullOrWhiteSpace(value?.ToString()))
             {
                 errors.Add(property.Name, new List<string>() {"Este campo es obligatorio"});
             }
         }
-
+        
         if (Input.Dni is not null)
         {
             if(Input.Dni.Value.CompareTo(1000000) < 0 || Input.Dni.Value.CompareTo(100000000) > 0) 
@@ -143,7 +142,7 @@
             }
         }
 
-        if (!String.IsNullOrEmpty(Input.EmailAModificar))
+        if (!String.IsNullOrWhiteSpace(Input.EmailAModificar))
         {
             var mail = new MailAddress("hola@hola.com");
             var valido = MailAddress.TryCreate(Input.EmailAModificar, out mail);
@@ -221,7 +220,10 @@
             if (otroUserConEseMail is not null)
             {
                 message+= ", excepto el email, que ya esta en uso";
+                //var errors = new Dictionary<string, List<string>>();
+                //errors.Add(nameof(Input.EmailAModificar), new List<string>() { "La direccion de email ya esta en uso" });
                 Input.EmailAModificar = _email;
+                //customValidator.DisplayErrors(errors);
             }
             else
             {
