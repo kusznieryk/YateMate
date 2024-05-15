@@ -4,7 +4,7 @@
 @inject AgregarEmbarcacionUseCase AgregarEmbarcacionUseCase
 @inject NavigationManager Navegador;
 
-<h3>Agregar Embarcacion</h3>
+<h1>Agregar Embarcacion</h1>
 
 <EditForm OnSubmit="OnValidSubmit" Model="Model" Enhance >
     <div class="form-group">
@@ -27,7 +27,8 @@
 </div>
 @code 
 {
-    [Parameter] public string Id { get; set; }
+    [Parameter] public string Id { get; set; } = null!;
+
     [SupplyParameterFromForm]
     public Embarcacion Model { get; set; }= new ("", 0,0, "");
     

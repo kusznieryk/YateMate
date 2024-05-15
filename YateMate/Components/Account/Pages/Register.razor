@@ -155,7 +155,7 @@
             //lo saco porque ya hay un error por doble email y en la pagina email y usuario son lo mismo
 
             
-            Console.WriteLine(_identityErrors.FirstOrDefault().Code);
+            Console.WriteLine(_identityErrors.FirstOrDefault()!.Code);
             return;
         }
         await UserManager.AddToRoleAsync(user, "Cliente");

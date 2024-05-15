@@ -16,26 +16,31 @@
 }
 @if (_esNuevoBien)
 {
-    <h3>Agregando un nuevo bien</h3>
+    <h1>Agregando un nuevo bien</h1>
 }
 else
 {
-    <h3>Modificando al bien con id "@Id"</h3>
+    <h1>Modificando al bien con nombre "@bien.Nombre"</h1>
 }
 
 
-<EditForm OnSubmit="Aceptar" Model="Input" Enhance>
+<EditForm OnValidSubmit="Aceptar" Model="Input" Enhance>
+    <DataAnnotationsValidator/>
+
     <MudCard>
         <MudCardContent>
-            <MudTextField HelperText="Titulo de la Publicacion"
+            <MudTextField HelperText="Nombre del bien"
                           @bind-Value="Input.Nombre" For="@(() => Input.Nombre)" Required="true"/>
-            <MudTextField T="string" HelperText="Descripcion de la Embarcacion" Variant="Variant.Text" Text="@Input.Descripcion" @bind-Value="Input.Descripcion" AutoGrow Lines="1" Required="true"/>
+            <MudTextField T="string" HelperText="Descripcion del bien" Variant="Variant.Text" 
+                          Text="@Input.Descripcion" @bind-Value="Input.Descripcion" AutoGrow Lines="1"
+                          For="@(()=>Input.Descripcion)"/>
             <br/>
             @if (@Input.Imagen != "")
             {
-            <MudImage src="@Input.Imagen"  Height="400" Style="object-fit: contain;"></MudImage>
+                <MudImage src="@Input.Imagen" Height="400" Style="object-fit: contain;"></MudImage>
             }
-            <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Context="EditButtonContext" Required="true" Accept="image/jpeg, image/jpg, image/png, image/webp" >
+            <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Context="EditButtonContext" Accept="image/jpeg, image/jpg, image/png, image/webp"
+                           >
                 <ButtonTemplate >
                     <MudButton HtmlTag="label"
                                Variant="Variant.Filled"
@@ -87,9 +92,9 @@ else
     }
     
     bool _esNuevoBien = true;
-    Bien Input = new Bien("", "", "", "");
+    InputModel Input = new ();
+    Bien bien = new Bien("","","","");
     string _err = "";
-    
     
     
     [Parameter] public int? Id { get; set; }
@@ -100,29 +105,33 @@ else
             var bienHallado = ObtenerBienUseCase.Ejecutar(Id.Value);
             if (bienHallado != null)
             {
-                Input = bienHallado;
+                bien = bienHallado;
                 _esNuevoBien = false;
+                Input.Imagen = bien.Imagen;
+                Input.Nombre = bien.Nombre;
+                Input.Descripcion = bien.Descripcion;
             }
         }
     }
     
-    async void Aceptar()
+     void Aceptar()
     {
-           
-            Input.UsuarioId = _userId;
-            
+            bien.UsuarioId = _userId!;
+            bien.Nombre = Input.Nombre;
+            bien.Imagen = Input.Imagen;
+            bien.Descripcion = Input.Descripcion;
             if(_userId is null)
                 Console.WriteLine("user id es null, no se q decirte");
-            
             // Console.WriteLine(Input.Nombre);
             if (_esNuevoBien)
             {
                 // Console.WriteLine("Entro al if");
-                AgregarBienUseCase.Ejecutar(Input);
+                
+                AgregarBienUseCase.Ejecutar(bien);
             }
             else
             {
-                ModificarBienUseCase.Ejecutar(Input);
+                ModificarBienUseCase.Ejecutar(bien);
             }
             Navegador.NavigateTo("/ListarMisBienes");
             
@@ -130,14 +139,15 @@ else
 
     private sealed class InputModel
     {
-        [Required]
-        public string Nombre;
+        [Required(ErrorMessage = "Cargar una imagen es obligatorio")]
+        public string Imagen { get; set; } = null!;
+        [Required(ErrorMessage = "El nombre es obligatorio")]
+        [ MaxLength(50) ]
+        public string Nombre { get; set; } = null!;
         
-        [Required]
-        public string Descripcion;
-        
-        [Required]
-        public string? Imagen;
+        [Required(ErrorMessage = "La descripción es obligatoria")]
+        public string Descripcion { get; set; } = null!;
     }
+    
 
 }

@@ -182,8 +182,8 @@
         _user.Apellido = Input.Apellido;
         _user.FechaNacimiento = Input.FechaNacimiento;
         _user.Dni = Input.Dni;
-        _user.Genero = (Genero) Input.Genero;
-        _user.Nacionalidad = (Nacionalidad) Input.Nacionalidad;
+        _user.Genero = (Genero) Input.Genero!;
+        _user.Nacionalidad = (Nacionalidad) Input.Nacionalidad!;
         
         ModificarUser.Ejecutar(_user);
         

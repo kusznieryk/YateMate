@@ -1,3 +1,5 @@
+@using YateMate.Components.Pages
+
 @inject NavigationManager NavigationManager
 
 <MudDialog>
@@ -10,24 +12,24 @@
         <MudCard>
             <MudCardHeader>
                 <CardHeaderContent>
-                    <MudText Typo="Typo.h6">@Bien!.Nombre</MudText>
+                    <MudText Typo="Typo.h6">@Publicacion!.Titulo</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
             <MudCardContent>
-                <MudImage Fluid="true" Src="@Bien!.Imagen" Alt="Image"/>
-                <MudText>@Bien.Descripcion</MudText>
+                <MudImage Fluid="true" Src="@Publicacion!.Image" Alt="Image"/>
+                <MudText>@Publicacion!.Descripcion</MudText>
             </MudCardContent>
         </MudCard>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
         <div style="flex-grow: 1;"></div>
-        <MudButton Variant="Variant.Filled" Href=""StartIcon="@Icons.Material.Filled.Edit" OnClick="@((e) => Editar(Bien!.Id))" Color="Color.Info" Size="Size.Small">Editar</MudButton>
+        @*<MudButton Variant="Variant.Filled" Href=""StartIcon="@Icons.Material.Filled.Edit" OnClick="@((e) => Editar(Bien!.Id))" Color="Color.Info" Size="Size.Small">Editar</MudButton>*@
     </DialogActions>
 </MudDialog>
 
 @code {
-    [Parameter] public Bien? Bien { get; set; }
+    [Parameter] public Publicacion? Publicacion { get; set; }
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
 
     void Submit() => MudDialog!.Close(DialogResult.Ok(true));
@@ -35,7 +37,7 @@
     void Editar(int id)
     {
         Submit();
-        NavigationManager.NavigateTo($"bien/{id}");
+        NavigationManager.NavigateTo($"publicacion/{id}");
 
     }
 

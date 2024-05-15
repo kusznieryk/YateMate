@@ -10,7 +10,7 @@
 
     @if (!_tieneElementos)
     {
-    <MudTypography Typo="Typo.h6">No hay elementos</MudTypography>
+    <MudText Typo="Typo.h6">No hay elementos</MudText>
     }
     else
     {
@@ -41,17 +41,17 @@
     {
     <div>
         <h3>Modificar Embarcación</h3>
-        <MudTextField Label="Nombre" @bind-Value="_embarcacionAModificar.Nombre" />
-        <MudNumericField Label="Eslora" @bind-Value="_embarcacionAModificar.Eslora" />
-        <MudNumericField Label="Calado" @bind-Value="_embarcacionAModificar.Calado" />
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ModificarEmbarcacion(_embarcacionAModificar))">Guardar</MudButton>
+        <MudTextField Label="Nombre" @bind-Value="_embarcacionAModificar!.Nombre" />
+        <MudNumericField Label="Eslora" @bind-Value="_embarcacionAModificar!.Eslora" />
+        <MudNumericField Label="Calado" @bind-Value="_embarcacionAModificar!.Calado" />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ModificarEmbarcacion(_embarcacionAModificar!))">Guardar</MudButton>
     </div>
     }
     }
 </MudContainer>
 @code {
-    [Parameter] public string Id { get; set; }
-    
+    [Parameter] public string Id { get; set; } = null!;
+
     List<Embarcacion> _lista = new List<Embarcacion>();
     bool _tieneElementos = false;
     protected override void OnInitialized()
