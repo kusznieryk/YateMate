@@ -4,60 +4,51 @@
 @inject ModificarEmbarcacionUseCase ModificarEmbarcacionUseCase
 @inject NavigationManager NavigationManager
 @rendermode InteractiveServer
-<h3>Listado de embarcaciones</h3>
 
-    @if (!_tieneElementos) 
+<MudContainer>
+    <h3>Listado de embarcaciones</h3>
+
+    @if (!_tieneElementos)
     {
-        <p>No hay elementos</p>
+    <MudTypography Typo="Typo.h6">No hay elementos</MudTypography>
     }
     else
     {
-        <table id="table" class="table">    
-            <thead>
-            <tr>
-                <th>NOMBRE</th>
-                <th>ESLORA</th>
-                <th>CALADO</th>
-                <th>ACCIÓN</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var embarcacion in _lista)
-            {
-                <tr>
-                    <td>@embarcacion.Nombre</td>
-                    <td>@embarcacion.Eslora</td>
-                    <td>@embarcacion.Calado</td>
-                    <td>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <EditForm Model="new()" FormName="@($"Mostrar-formulario-{embarcacion.Id}")" OnValidSubmit="() => MostrarFormularioEdicion(embarcacion)" method="post">
-                                    <button type="submit" class="btn btn-lg btn-primary btn-block">Modificar</button>
-                                </EditForm>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-        @if (_mostrandoFormularioEdicion)
-        {
-            <div>
-                <h3>Modificar Embarcación</h3>
-                <input type="text" @bind="_embarcacionAModificar.Nombre" />
-                <input type="number" step="0.1" @bind="_embarcacionAModificar.Eslora" />
-                <input type="number" step="0.1" @bind="_embarcacionAModificar.Calado" />
-                <div class="row">
-                    <div class="col-md-6">
-                        <EditForm Model="new()" FormName="@($"Modificar-embarcacion-{_embarcacionAModificar.Id}")" OnValidSubmit="() => ModificarEmbarcacion(_embarcacionAModificar)" method="post">
-                            <button type="submit" class="btn btn-lg btn-primary btn-block">Guardar</button>
-                        </EditForm>
-                    </div>
-                </div>
-            </div>
-        }
+    <MudTable Items="_lista" Class="mt-4" Dense="true" Outlined="true">
+        <HeaderContent>
+            <MudTh>NOMBRE</MudTh>
+            <MudTh>ESLORA</MudTh>
+            <MudTh>CALADO</MudTh>
+            <MudTh>ACCIÓN</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                @context.Nombre
+            </MudTd>
+            <MudTd>
+                @context.Eslora
+            </MudTd>
+            <MudTd>
+                @context.Calado
+            </MudTd>
+            <MudTd>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => MostrarFormularioEdicion(context))">Modificar</MudButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+
+    @if (_mostrandoFormularioEdicion)
+    {
+    <div>
+        <h3>Modificar Embarcación</h3>
+        <MudTextField Label="Nombre" @bind-Value="_embarcacionAModificar.Nombre" />
+        <MudNumericField Label="Eslora" @bind-Value="_embarcacionAModificar.Eslora" />
+        <MudNumericField Label="Calado" @bind-Value="_embarcacionAModificar.Calado" />
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ModificarEmbarcacion(_embarcacionAModificar))">Guardar</MudButton>
+    </div>
     }
+    }
+</MudContainer>
 @code {
     [Parameter] public string Id { get; set; }
     
@@ -82,8 +73,7 @@
     {
         ModificarEmbarcacionUseCase.Ejecutar(embarcacion);
         _mostrandoFormularioEdicion = false;
-        StateHasChanged();
-        NavigationManager.Refresh(true);
+        NavigationManager.Refresh();
     }
     
     
