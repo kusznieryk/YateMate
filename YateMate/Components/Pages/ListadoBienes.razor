@@ -46,7 +46,7 @@ else
                                     <MudButton Variant="Variant.Text" @onclick="@((e) => OpenDialog(bien))" Color="Color.Primary">Ver más</MudButton> @*Aca hay que crear un evento que rediriga/abra una ventana en la que podamos modificar/eliminar el bien y eso*@
                                     @* <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Info"  Size="Size.Small">Editar</MudButton> *@
                                     <MudButton Variant="Variant.Text" OnClick="() => Eliminar(bien)" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error"> Borrar </MudButton>
-                                    </MudCardActions>
+                                </MudCardActions>
                             </MudCard>
                         </MudPaper>
                     </MudItem>
@@ -67,8 +67,6 @@ else
 
 @code {
     
-    
-    DialogoConfirmacion dialogo = null!;
     bool _tieneElementos;
     List<Bien> _lista = new();
     Bien? _BienParaEliminar;
