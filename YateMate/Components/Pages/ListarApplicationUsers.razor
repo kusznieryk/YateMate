@@ -8,7 +8,7 @@
 
 <h3>Listado de Clientes</h3>
     @if (!_tieneElementos) {
-        <p>No hay elementos</p>
+        <p>No hay clientes para mostrar</p>
     } 
     else 
     {
@@ -95,18 +95,14 @@
         _tieneElementos = _lista.Count > 0;
     }
 
-    private void AgregarEmbarcacion(String id)
+    private void AgregarEmbarcacion(string id)
     {
-        int _id;
-        Int32.TryParse(id, out _id);
-        NavigationManager.NavigateTo($"/AgregarEmbarcacionACliente/{_id}");
+        NavigationManager.NavigateTo($"/AgregarEmbarcacionACliente/{id}");
     }
 
     private void ListarEmbarcaciones(string id)
     {
-        int _id;
-        Int32.TryParse(id, out _id);
-        NavigationManager.NavigateTo($"/listadoembarcaciones/{_id}");
+        NavigationManager.NavigateTo($"/listadoembarcaciones/{id}");
     }
         
 }

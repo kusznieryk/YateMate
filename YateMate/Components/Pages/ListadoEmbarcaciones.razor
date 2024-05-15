@@ -1,4 +1,4 @@
-@page "/listadoembarcaciones/{Id:int?}"
+@page "/listadoembarcaciones/{Id}"
 @using YateMate.Aplicacion.UseCases.Embarcaciones
 @inject ObtenerEmbarcacionesDeUseCase ObtenerEmbarcacionesDeUseCase
 @inject ModificarEmbarcacionUseCase ModificarEmbarcacionUseCase
@@ -59,13 +59,13 @@
         }
     }
 @code {
-    [Parameter] public int Id { get; set; }
+    [Parameter] public string Id { get; set; }
     
     List<Embarcacion> _lista = new List<Embarcacion>();
     bool _tieneElementos = false;
     protected override void OnInitialized()
     {
-        string clienteId = Id.ToString();
+        string clienteId = Id;
         _lista = ObtenerEmbarcacionesDeUseCase.Ejecutar(clienteId);
     }
 
