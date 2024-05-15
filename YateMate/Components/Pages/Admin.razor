@@ -9,9 +9,9 @@
 
 @rendermode InteractiveServer
 
-<DialogoConfirmacion @ref="dialogo" OnConfirmado="EliminarApplicationUser" />
+<DialogoConfirmacion @ref="_dialogo" OnConfirmado="EliminarApplicationUser" />
 
-<h3>Admin</h3>
+<h1>Admin</h1>
     @if (!_tieneElementos) {
         <p>No hay empleados para mostrar</p>
     } 
@@ -78,18 +78,18 @@
         }
     }
 
-    DialogoConfirmacion dialogo = null!;
+    DialogoConfirmacion _dialogo = null!;
     void ConfirmarEliminacion(ApplicationUser user)
     {
         _userAEliminar = user;
-        dialogo.Mensaje = $"Deseas eliminar al empleado {user.Nombre} ?";
-        dialogo.Mostrar();
+        _dialogo.Mensaje = $"Deseas eliminar al empleado {user.Nombre} ?";
+        _dialogo.Mostrar();
     }
 
     ApplicationUser? _userAEliminar = null;
     private void EliminarApplicationUser()
     {
-        EliminarApplicationUserUseCase.Ejecutar(_userAEliminar.Id);
+        EliminarApplicationUserUseCase.Ejecutar(_userAEliminar!.Id);
         _lista = ObtenerEmpleadosUseCase.Ejecutar();
         
         if(_lista.Count == 0)

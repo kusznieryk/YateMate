@@ -5,6 +5,9 @@
 @inject IdentityUserAccessor UserAccessor
 @inject IDialogService Dialog
 @using YateMate.Components.Shared
+
+<h1>Mis publicaciones</h1>
+<title>Mis publicaciones</title>
 <MudDialogProvider></MudDialogProvider>
 <MudGrid Style="width: 70%">
     @foreach (var publicacion in _lista)
@@ -16,9 +19,7 @@
                 <MudText Typo="Typo.body2">@publicacion.Descripcion</MudText>
             </MudCardContent>
             <MudCardActions Class="justify-space-between ">
-                @*
-                <MudButton Variant="Variant.Text" @onclick="()=>HandleClick(new Bien(publicacion.Titulo, publicacion.Descripcion, publicacion.Image, _userId))" Color="Color.Primary">Ver más</MudButton>
-            *@
+                <MudButton Variant="Variant.Text" @onclick="()=>HandleClick(new Publicacion(publicacion.Image, publicacion.Titulo, publicacion.Descripcion,publicacion.EmbarcacionId))" Color="Color.Primary">Ver más</MudButton>
             </MudCardActions>
         </MudItem>
     
@@ -28,7 +29,7 @@
     List<Publicacion> _lista = new List<Publicacion>();
     [CascadingParameter]
     private Task<AuthenticationState>? _AuthenticationState { get; set; }   
-    string _userId;
+    string _userId=null!;
    
     protected override async Task OnInitializedAsync()
     {
@@ -37,16 +38,16 @@
             var authState = await _AuthenticationState;
             var user = authState.User;
             
-            _userId = user.Claims.FirstOrDefault()?.Value;
+            _userId = user.Claims.FirstOrDefault()?.Value!;
             _lista = ListarMisPublicaciones.Ejecutar(_userId);
         }
     }
 
-    public void HandleClick(Bien bien)
+    public void HandleClick(Publicacion publicacion)
     {
-        var parameters = new DialogParameters<VerDatos>();
-        parameters.Add( x=>x.Bien,bien);
-        Dialog.Show<VerDatos>("Simple Dialog", parameters);
+        var parameters = new DialogParameters<VerDatosEmbarcacion>();
+        parameters.Add( x=>x.Publicacion, publicacion);
+        Dialog.Show<VerDatosEmbarcacion>("Simple Dialog", parameters);
     }
 
 }

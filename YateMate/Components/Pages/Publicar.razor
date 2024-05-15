@@ -1,22 +1,26 @@
 @page "/publicar/{Id:int}"
+@using System.ComponentModel.DataAnnotations
+@using Microsoft.CodeAnalysis
 @rendermode InteractiveServer
 @inject PublicarEmbarcacionUseCase PublicarEmbarcacion
 @inject NavigationManager Navegador;
 
-
-<EditForm OnValidSubmit="OnValidSubmit" Model="Model" Enhance>
+<h1>Publicando embarcacion</h1>
+<title>Publicando embarcacion</title>
+<EditForm OnValidSubmit="OnValidSubmit"  Model="Model" Enhance>
+<DataAnnotationsValidator/>
     <MudCard>
         <MudCardContent>
             <MudTextField HelperText="Titulo de la Publicacion"
                           @bind-Value="Model.Titulo"
-                          For="@(() => Model.Titulo)" Required="true"
-                          RequiredError="El Titulo es obligatorio"/>
+                          For="@(() => Model.Titulo)" 
+                          />
             <MudTextField T="string"
                           HelperText="Descripcion de la Embarcacion"
                           Variant="Variant.Text" Text="@Model.Descripcion"
                           @bind-Value="Model.Descripcion"
-                          AutoGrow Lines="4" Required="true"
-                          RequiredError="La descripcion es obligatoria"/>
+                          For="@(()=>Model.Descripcion)"
+                          AutoGrow Lines="4" />
             @if (@Model.Image != "")
             {
                 <MudImage src="@Model.Image" Style="max-height: 500px"></MudImage>
@@ -25,7 +29,6 @@
                            FilesChanged="UploadFiles"
                            Context="EditButtonContext"
                            Required="true"
-                           RequiredError="Cargar una imagen es obligatorio"
                            Accept="image/jpeg, image/jpg, image/png, image/webp">
                 <ButtonTemplate >
                     <MudButton HtmlTag="label"
@@ -48,8 +51,9 @@
 {
     [Parameter] public int Id { get; set; }
     [SupplyParameterFromForm]
-    public Publicacion Model { get; set; }= new ("", "","", 0);
-    
+    public PublicacionForm Model { get; set; }= new ();
+    public Publicacion ModelSubir { get; set; }= new ("", "","", 0);
+
     private async Task UploadFiles(IBrowserFile file)
     {
             var buffer = new byte[file.Size];
@@ -62,8 +66,22 @@
     
     public void OnValidSubmit()
     {
-        Model.EmbarcacionId = Id;
-        PublicarEmbarcacion.Ejecutar(Model);
+        ModelSubir.EmbarcacionId = Id;
+        ModelSubir.Titulo = Model.Titulo;
+        ModelSubir.Descripcion = Model.Descripcion;
+        ModelSubir.Image = Model.Image;
+        PublicarEmbarcacion.Ejecutar(ModelSubir);
         Navegador.NavigateTo("embarcaciones");
+    }
+
+    public class PublicacionForm
+    {
+        [Required(ErrorMessage = "Cargar una imagen es obligatorio")]
+        public string Image { get; set; } = null!;
+        [Required(ErrorMessage = "El Titulo es obligatorio")]
+        [ MaxLength(50) ]
+        public string Titulo { get; set; } = null!;
+        [Required(ErrorMessage = "La descripcion es obligatoria")]
+        public string Descripcion { get; set; } = null!;
     }
 }

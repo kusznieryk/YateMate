@@ -4,33 +4,37 @@
 @inject NavigationManager Navegador;
 @inject FiltrarPublicacionesPorEsloraUseCase FiltrarPorEslora
 @inject FiltrarPublicacionesPorCaladoUseCase FiltrarPorCalado
+@inject IDialogService Dialog
+@using YateMate.Components.Shared
 @rendermode InteractiveServer
 
-<h3>Trueques disponibles</h3>
+<h1>Trueques disponibles</h1>
+<title>Trueques disponibles</title>
+<MudDialogProvider></MudDialogProvider>
 
 <div style="overflow-x:@(!_tieneElementos ? "hidden" : "inherit")">
     
         @if (!_tieneElementos) {
-        <h2>No hay trueques disponibles en este momento.</h2>
+        <h4>No hay trueques disponibles en este momento.</h4>
         }
         else {
             <MudGrid>
                 <MudItem sm="12" md="6">
-                    <h3>Eslora</h3>
+                    <h5>Filtrar por eslora</h5>
                     <MudRadioGroup @bind-Value="@OpcionEslora">
-                        <MudRadio Value="@("0 - 5")"> &lt;5 </MudRadio>
-                        <MudRadio Value="@("5 -10 ")"> &gt;5 - &lt;10</MudRadio>
-                        <MudRadio Value="@("10 - 15")"> &gt;10 - &lt;15</MudRadio>
-                        <MudRadio Value="@("15 - 20")"> &gt;15</MudRadio>
+                        <MudRadio Value="@("0 - 5")"> &lt;5m </MudRadio>
+                        <MudRadio Value="@("5 -10 ")"> &gt;5m - &lt;10m</MudRadio>
+                        <MudRadio Value="@("10 - 15")"> &gt;10m - &lt;15m</MudRadio>
+                        <MudRadio Value="@("15 -" + int.MaxValue)"> &gt;15m</MudRadio>
                     </MudRadioGroup>
                 </MudItem>
                 <MudItem sm="12" md="6">
-                    <h3>Calado</h3>
+                    <h5>Filtrar por calado</h5>
                     <MudRadioGroup @bind-Value="@OpcionCalado">
-                        <MudRadio Value="@("0 - 5")"> &lt;5 </MudRadio>
-                        <MudRadio Value="@("5 -10 ")"> &gt;5 - &lt;10</MudRadio>
-                        <MudRadio Value="@("10 - 15")"> &gt;10 - &lt;15</MudRadio>
-                        <MudRadio Value="@("15 -" +int.MaxValue)"> &gt;15</MudRadio>
+                        <MudRadio Value="@("0 - 5")"> &lt;5m </MudRadio>
+                        <MudRadio Value="@("5 -10 ")"> &gt;5m - &lt;10m</MudRadio>
+                        <MudRadio Value="@("10 - 15")"> &gt;10m - &lt;15m</MudRadio>
+                        <MudRadio Value="@("15 -" +int.MaxValue)"> &gt;15m</MudRadio>
                     </MudRadioGroup>
                 </MudItem>
                 <MudItem sm="12" md="6">
@@ -40,7 +44,7 @@
             </MudGrid>
             if (_mostrar.Count == 0)
             {
-                <h2>No hay embarcaciones que cumplan con los requisitos</h2>
+                <h4>No hay embarcaciones que cumplan con los requisitos</h4>
             }
         <MudGrid Style="width: 70%">
             @foreach (var publicacion in _mostrar)
@@ -54,7 +58,9 @@
                         @*<MudCardActions Class="justify-space-between ">*@
                             @* <MudButton Variant="Variant.Text" Color="Color.Primary"> ❤️</MudButton> *@
                             @* <MudButton Variant="Variant.Text" Color="Color.Primary">Enviar mensaje</MudButton> *@
-                        @* </MudCardActions> *@
+                            @* </MudCardActions> *@
+                        <MudButton Variant="Variant.Text" @onclick="()=>HandleClick(new Publicacion(publicacion.Image, publicacion.Titulo, publicacion.Descripcion,publicacion.EmbarcacionId))" Color="Color.Primary">Ver más</MudButton>
+
                     </MudItem>
                 
             }
@@ -106,5 +112,12 @@
         OpcionEslora = "";
         OpcionCalado = "";
         _mostrar = _lista;
+    }
+    
+    public void HandleClick(Publicacion publicacion)
+    {
+        var parameters = new DialogParameters<VerDatosEmbarcacion>();
+        parameters.Add( x=>x.Publicacion, publicacion);
+        Dialog.Show<VerDatosEmbarcacion>("Simple Dialog", parameters);
     }
 }

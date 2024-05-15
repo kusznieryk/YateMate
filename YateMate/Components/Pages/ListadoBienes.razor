@@ -18,8 +18,8 @@
                     MaxWidth="MaxWidth.Small"
                     Position="DialogPosition.CenterLeft"/>
 
-
-<h3>Mis bienes</h3>
+<title>Mis bienes</title>
+<h1>Mis bienes</h1>
 
 @if (!_tieneElementos) 
 {
@@ -91,7 +91,7 @@ else
             Console.WriteLine("Authstate es null, no se que decirte");
         }
 
-        _lista = ListarBienesDeUseCase.Ejecutar(_userId);
+        _lista = ListarBienesDeUseCase.Ejecutar(_userId!);
     }
     
     
@@ -112,7 +112,7 @@ else
     {
         _BienParaEliminar = bien;
         EliminarBienUseCase.Ejecutar(_BienParaEliminar.Id);
-        _lista = ListarBienesDeUseCase.Ejecutar(_userId);
+        _lista = ListarBienesDeUseCase.Ejecutar(_userId!);
         if (_lista.Count == 0)
             _tieneElementos = false;
     }
