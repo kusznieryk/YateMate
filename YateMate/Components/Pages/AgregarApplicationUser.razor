@@ -48,11 +48,17 @@
                 <label for="apellido">Apellido</label>
                 <ValidationMessage For="() => Input.Apellido" class="text-danger" />
             </div>
-            
+
             <div class="form-floating mb-3">
-                <InputText id="nacionalidad" @bind-Value="Input.Nacionalidad" class="form-control" aria-required="true" />
-                <label for="nacionalidad">Nacionalidad</label>
-                <ValidationMessage For="() => Input.Nacionalidad" class="text-danger" />
+                <InputSelect id="nacionalidad" @bind-Value="Input.Nacionalidad" class="form-select" aria-required="true" TValue="Nacionalidad">
+                    <ValidationMessage For="() => Input.Nacionalidad" class="text-danger"/>
+                    <option value=""></option>
+                    @foreach (Nacionalidad nacionalidad in Enum.GetValues(typeof(Nacionalidad)))
+                    {
+                    <option value=@nacionalidad> @nacionalidad </option>
+                    }
+                </InputSelect>
+                <label for="nacionalidad" class="text-muted">Nacionalidad</label>
             </div>
             
             <div class="form-floating mb-3">
@@ -179,7 +185,7 @@
         
         [Required]
         [Display(Name = "Nacionalidad")]
-        public string Nacionalidad { get; set; } = "";
+        public Nacionalidad Nacionalidad { get; set; }
     }
 
 }
