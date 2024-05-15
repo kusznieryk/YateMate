@@ -32,7 +32,7 @@ else
             <MudTextField HelperText="Nombre del bien"
                           @bind-Value="Input.Nombre" For="@(() => Input.Nombre)" Required="true"/>
             <MudTextField T="string" HelperText="Descripcion del bien" Variant="Variant.Text" 
-                          Text="@Input.Descripcion" @bind-Value="Input.Descripcion" AutoGrow Lines="1"
+                          Text="@Input.Descripcion" @bind-Value="Input.Descripcion" AutoGrow Lines="4"
                           For="@(()=>Input.Descripcion)"/>
             <br/>
             @if (@Input.Imagen != "")
