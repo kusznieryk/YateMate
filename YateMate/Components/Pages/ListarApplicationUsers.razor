@@ -5,65 +5,42 @@
 @inject ObtenerClientesUseCase ObtenerClientesUseCase
 @inject EliminarApplicationUserUseCase EliminarApplicationUserUseCase
 @inject NavigationManager NavigationManager
+@rendermode InteractiveServer
 
-<h3>Listado de Clientes</h3>
-    @if (!_tieneElementos) {
-        <p>No hay clientes para mostrar</p>
-    } 
-    else 
-    {
-        <table id="table" class="table">
-            <thead>
-            <tr>
-                <th>EMAIL</th>
-                <th>NOMBRE</th>
-                <th>APELLIDO</th>
-                <th>NACIONALIDAD</th>
-                <th>GENERO</th>
-                <th>DNI</th>
-                <th>FECHA DE NACIMIENTO</th>
-                <th>ACCIÓN</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var applicationUser in _lista)
-            {
-                <tr>
-                    <td>@applicationUser.Email</td>
-                    <td>@applicationUser.Nombre</td>
-                    <td>@applicationUser.Apellido</td>
-                    <td>@applicationUser.Nacionalidad</td>
-                    <td>@applicationUser.Genero</td>
-                    <td>@applicationUser.Dni</td>
-                    <td>@applicationUser.FechaNacimiento</td>
-                    <td>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <EditForm Model="new()" FormName="@($"Eliminar-cliente-{applicationUser.Id}")" OnValidSubmit="() => EliminarApplicationUser(applicationUser)" method="post">
-                                    <button type="submit" class="btn btn-lg btn-danger btn-block">Eliminar</button>
-                                </EditForm>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <EditForm Model="new()" FormName="@($"Agregar-embarcacion-{applicationUser.Id}")" OnValidSubmit="() => AgregarEmbarcacion(applicationUser.Id)" method="post">
-                                    <button type="submit" class="btn btn-lg btn-primary btn-block" >Agregar Embarcacion</button>
-                                </EditForm>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <EditForm Model="new()" FormName="@($"Listar-embarcaciones-{applicationUser.Id}")" OnValidSubmit="() => ListarEmbarcaciones(applicationUser.Id)" method="post">
-                                    <button type="submit" class="btn btn-lg btn-primary btn-block" >Listar Embarcaciones</button>
-                                </EditForm>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>    
-        }
+<MudContainer>
+    <MudTable Items="@_lista" Class="mt-4" Dense="true" Outlined="true">
+        <HeaderContent>
+            <MudTh>Email</MudTh>
+            <MudTh>Nombre</MudTh>
+            <MudTh>Apellido</MudTh>
+            <MudTh>Nacionalidad</MudTh>
+            <MudTh>Genero</MudTh>
+            <MudTh>DNI</MudTh>
+            <MudTh>Fecha de nacimiento</MudTh>
+            <MudTh>Acciones</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Email</MudTd>
+            <MudTd>@context.Nombre</MudTd>
+            <MudTd>@context.Apellido</MudTd>
+            <MudTd>@context.Nacionalidad</MudTd>
+            <MudTd>@context.Genero</MudTd>
+            <MudTd>@context.Dni</MudTd>
+            <MudTd>@context.FechaNacimiento</MudTd>
+            <MudTd>
+                <div class="button-container">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ListarEmbarcaciones(context.Id))">Listar embarcaciones</MudButton>
+                </div>
+                <div class="button-container">
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => AgregarEmbarcacion(context.Id))">Agregar Embarcación</MudButton>
+                </div>
+                <div class="button-container">
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => EliminarApplicationUser(context))">Eliminar Usuario</MudButton>
+                </div>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudContainer>
 
     
 
@@ -106,3 +83,9 @@
     }
         
 }
+
+<style>
+    .button-container {
+        margin-bottom: 10px;
+    }
+</style>
