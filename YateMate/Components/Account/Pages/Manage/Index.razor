@@ -1,6 +1,7 @@
 ﻿@page "/Account/Manage"
 
 @using System.ComponentModel.DataAnnotations
+@using System.Net.Mail
 @using System.Text
 @using System.Text.Encodings.Web
 @using Microsoft.AspNetCore.Authorization
@@ -26,8 +27,8 @@
 @* <StatusMessage/> *@
 <div class="row">
     <div class="col-md-6">
-        <EditForm EditContext="editContext" FormName="profile" OnValidSubmit="OnValidSubmitAsync" method="post">
-            <DataAnnotationsValidator/>
+        <EditForm EditContext="editContext" FormName="profile" OnSubmit="SubmitPelado" method="post">
+            <CustomValidator @ref="customValidator"></CustomValidator>
             @* <ValidationSummary class="text-danger" role="alert"/> *@
             
             <div class="form-floating mb-3">
@@ -93,69 +94,93 @@
 @code {
     private ApplicationUser _user = default!;
     private string? _email;
-    private string? _nombre; 
-    private string? _apellido;
-    private DateTime? _fechaNacimiento;
-    private int? _dni;
-    private Nacionalidad _nacionalidad;
-    private YateMate.Aplicacion.Entidades.Genero _genero;
-
+    
     [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
 
     [SupplyParameterFromForm] private InputModel Input { get; set; } = new();
 
     private string? message;
-
-    
-    private ValidationMessageStore? messageStore;
     
     private EditContext? editContext;
-    
-    
-    private void HandleValidationRequested(object? sender,
-        ValidationRequestedEventArgs args)
-    {
-        Console.WriteLine("entre al handle");
-        
-        // Custom validation logic
-        if (Input.FechaNacimiento is null)
-            return; 
-        
-        if ( DateTime.Compare((DateTime)Input.FechaNacimiento, DateTime.Today.AddYears(-18)) > 0) 
-        {
-            messageStore?.Add(() => Input.FechaNacimiento, "La edad mínima permitida es 18 años");
 
+    public CustomValidator customValidator;
+    
+    
+    private async Task SubmitPelado()
+    {
+        Console.WriteLine($" email de usuario que puso es {Input.EmailAModificar}");
+        var errors = new Dictionary<string, List<string>>();
+        
+        foreach (var property in Input.GetType().GetProperties()) //me cago en microsoft
+        {
+            var value = property.GetValue(Input);
+            // Console.WriteLine(property.Name);
+            if (String.IsNullOrEmpty(value?.ToString()))
+            {
+                errors.Add(property.Name, new List<string>() {"Este campo es obligatorio"});
+            }
+        }
+
+        if (Input.Dni is not null)
+        {
+            if(Input.Dni.Value.CompareTo(1000000) < 0 || Input.Dni.Value.CompareTo(100000000) > 0) 
+                errors.Add(nameof(Input.Dni), new List<string>(){"El número de dni debe estar entre un millon (1.000.000) y cien millones (100.000.000)"});
         }
         
-        if ( DateTime.Compare((DateTime)Input.FechaNacimiento, DateTime.Today.AddYears(-120)) < 0) 
+        if (Input.FechaNacimiento is not null)
         {
-            messageStore?.Add(() => Input.FechaNacimiento, "La edad máxima permitida es 120 años");
+            if (DateTime.Compare((DateTime)Input.FechaNacimiento, DateTime.Today.AddYears(-18)) > 0)
+            {
+                errors.Add(nameof(Input.FechaNacimiento), new List<string>(){"La edad mínima permitida es 18 años"});
+                Console.WriteLine("a1");
+
+            }
+
+            if (DateTime.Compare((DateTime)Input.FechaNacimiento, DateTime.Today.AddYears(-120)) < 0)
+            {
+                Console.WriteLine("a2");
+                errors.Add(nameof(Input.FechaNacimiento), new List<string>(){"La edad máxima permitida es 120 años"});
+            }
         }
+
+        if (!String.IsNullOrEmpty(Input.EmailAModificar))
+        {
+            var mail = new MailAddress("hola@hola.com");
+            var valido = MailAddress.TryCreate(Input.EmailAModificar, out mail);
+            if (!valido)
+            {
+                errors.Add(nameof(Input.EmailAModificar), new List<string>() { "La direccion de email no es valida" });
+            }
+        }
+
+        if (errors.Count > 0)
+        {
+            customValidator.DisplayErrors(errors);
+            return;
+        }
+        
+        await OnValidSubmitAsync();
     }
+    
     protected override async Task OnInitializedAsync()
     {
         Input ??= new();
         editContext = new(Input);
-        editContext.OnValidationRequested += HandleValidationRequested;
-        messageStore = new(editContext);
         
         _user = await UserAccessor.GetRequiredUserAsync(HttpContext);
         _email = await UserManager.GetUserNameAsync(_user);
-        _nombre = _user.Nombre;
-        _apellido = _user.Apellido;
-        _fechaNacimiento = _user.FechaNacimiento;
-        _dni = _user.Dni;
-        _genero = _user.Genero;
-        _nacionalidad = _user.Nacionalidad;
+
+        // foreach (var elem in _user.GetType().GetProperties())
+        // {
+        //     Console.WriteLine($"propiedad sacada de la bd {elem.GetValue()}");
+        // }
         
-        Console.WriteLine($"Datos sacados de la base de datos {_email} {_nombre} {_apellido} nacimiento:{_fechaNacimiento} dni:{_dni} genero:{_genero} nacionalidad:{_nacionalidad}");
-        
-        Input.Nombre ??= _nombre;
-        Input.Apellido ??= _apellido;
-        Input.FechaNacimiento ??= _fechaNacimiento;
-        Input.Dni ??= _dni;
-        Input.Genero ??= _genero;
-        Input.Nacionalidad ??= _nacionalidad;
+        Input.Nombre ??= _user.Nombre;
+        Input.Apellido ??= _user.Apellido;
+        Input.FechaNacimiento ??= _user.FechaNacimiento;
+        Input.Dni ??= _user.Dni;
+        Input.Genero ??= _user.Genero;
+        Input.Nacionalidad ??= _user.Nacionalidad;
         Input.EmailAModificar = _email;
         
         Console.WriteLine($"Datos de los inputs {Input.EmailAModificar}" +
@@ -243,27 +268,19 @@
         [Required(ErrorMessage = "Ingresa un genero")]
         [Display(Name = "Genero")]
         public Genero? Genero { get; set; }
-        
+
         [Required(ErrorMessage = "Ingresa una fecha de nacimiento")]
         [Display(Name = "Fecha de Nacimiento")]
-        public DateTime? FechaNacimiento { get; set; }
+        public DateTime? FechaNacimiento { get; set; } = null;
 
         [Required(ErrorMessage = "Ingresa un Dni")]
         [Display(Name = "Dni")]
         [Range(1000000, 100000000, ErrorMessage = "El número de dni debe estar entre un millon (1.000.000) y cien millones (100.000.000)")]
-        public int? Dni { get; set; }
-        
+        public int? Dni { get; set; } = null;
+
         [Required(ErrorMessage = "Ingresa una nacionalidad")]
         [Display(Name = "Nacionalidad")]
-        public Nacionalidad? Nacionalidad { get; set; }
-    }
-
-    public void Dispose()
-    {
-        if (editContext is not null)
-        {
-            editContext.OnValidationRequested -= HandleValidationRequested;
-        }
+        public Nacionalidad? Nacionalidad { get; set; } = null;
     }
     
 }

@@ -46,6 +46,13 @@
                          Ver Mis Bienes
                     </NavLink>
                 </div>
+
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="mis_publicaciones">
+                        ⛵
+                        Ver mis publicaciones
+                    </NavLink>
+                </div>
                 
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="ListadoTruequesDisponibles">
@@ -94,16 +101,7 @@
         <AuthorizeView>
             
             <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="embarcaciones">
-                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Ver mis embarcaciones
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="mis_publicaciones">
-                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Ver mis publicaciones
-                    </NavLink>
-                </div>
+                
                 
                 <div class="nav-item px-3">
                     <form action="Account/Logout" method="post"  style="display: inline-block">
