@@ -36,7 +36,7 @@
         <ValidationMessage For="() => Model.Manga" class="text-danger" />
     </div>
     <div class="form-floating mb-3">
-        <InputSelect step="0.1" class="form-control" id="bandera" @bind-Value="Model.Bandera"  TValue="Nacionalidad?">
+        <InputSelect step="0.1" class="form-control" id="bandera" @bind-Value="Model.Bandera"  TValue="Nacionalidad?" aria-required="true">
         <option value=""></option>
         @foreach (Nacionalidad nacionalidad in Enum.GetValues(typeof(Nacionalidad)))
         {
@@ -142,8 +142,9 @@
         [Display(Name = "Manga")]
         public double? Manga { get; set; }
         
-        [Required(ErrorMessage = "Ingresa una bandera")]
-        public Nacionalidad? Bandera;
+        [Required(ErrorMessage = "Ingresa una bandera")]        
+        [Display(Name = "Bandera")]
+        public Nacionalidad? Bandera { get; set; }
 
         [Required(ErrorMessage = "Ingresa una matricula")]
         [Display(Name = "Matricula")]
