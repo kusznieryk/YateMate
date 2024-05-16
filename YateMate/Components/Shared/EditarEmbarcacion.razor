@@ -136,8 +136,9 @@
     public void ValidSubmit()
     {
         Model.ClienteId = barco.ClienteId;
-        var barcoQueVaABaseDeDatos = new Embarcacion(Model.Nombre, Model.Eslora.Value, Model.Calado.Value, Model.ClienteId, Model.Matricula);
+        var barcoQueVaABaseDeDatos = new Embarcacion(Model.Nombre, Model.Eslora.Value, Model.Calado.Value, Model.ClienteId, Model.Matricula, Model.Manga.Value);
         barcoQueVaABaseDeDatos.Id = barco.Id;
+        barcoQueVaABaseDeDatos.Bandera = Model.Bandera.Value;
         ModificarEmbarcacionUseCase.Ejecutar(barcoQueVaABaseDeDatos);
         // Navegador.NavigateTo("/ListarApplicationUsers");
         Submit();
@@ -160,7 +161,7 @@
 
         // [Required(ErrorMessage = "Ingresa una manga")]
         // [Display(Name = "Manga")]
-        // public double? Manga { get; set; }
+        public double? Manga { get; set; }
 
         // [Required(ErrorMessage = Ingresa una manga)]
         public Nacionalidad? Bandera;
