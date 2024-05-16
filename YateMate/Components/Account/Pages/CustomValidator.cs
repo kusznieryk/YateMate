@@ -21,6 +21,11 @@ public class CustomValidator : ComponentBase
         CurrentEditContext.OnValidationRequested += (s, e) => _messageStore.Clear();
         CurrentEditContext.OnFieldChanged += (s, e) => _messageStore.Clear(e.FieldIdentifier);
     }
+    public void ClearErrors()
+    {
+        _messageStore.Clear();
+        CurrentEditContext.NotifyValidationStateChanged();
+    }
 
     public void DisplayErrors(Dictionary<string, List<string>> errors)
     {

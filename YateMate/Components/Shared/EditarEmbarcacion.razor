@@ -14,7 +14,7 @@
     </TitleContent>
     <DialogContent>
         <EditForm OnSubmit="HandleSubmit" EditContext="editContext" FormName="EditarEmbarcacion">
-            <CustomValidator @ref="customValidator"></CustomValidator>
+            <CustomValidator @ref="customValidator" ></CustomValidator>
             <div class="form-floating mb-3">
                 <InputText class="form-control" id="nombre" @bind-Value="Model.Nombre" />
                 <label for="nombre">Nombre</label>
@@ -84,11 +84,13 @@
     public CustomValidator customValidator;
 
     protected override void OnInitialized()
-    {
+    {        
         Model ??= new ();
         Model.Calado ??= barco.Calado;
         Model.Eslora ??= barco.Eslora;
-        Model.Nombre ??= barco.Nombre;
+        Model.Manga ??= barco.Manga;
+    Model.Nombre ??= barco.Nombre;
+    Model.Bandera ??= barco.Bandera;
         Model.Matricula ??= barco.Matricula;
         Model.ClienteId = barco.ClienteId;
         editContext = new(Model);
@@ -96,26 +98,26 @@
 
     public void HandleSubmit()
     {
-        var errors = new Dictionary<string, List<string>>();
+        customValidator.ClearErrors();
         Model.ClienteId = barco.ClienteId;
+        var errors = new Dictionary<string, List<string>>();
         foreach (var property in Model.GetType().GetProperties()) //me cago en microsoft
         {
-            // Console.WriteLine(property.Name);
             var value = property.GetValue(Model);
-            // Console.WriteLine(property.Name);
             if (String.IsNullOrWhiteSpace(value?.ToString()))
             {
                 Console.WriteLine($"el campo {property.Name} estaba vacio");
                 errors.Add(property.Name, new List<string>() {"Este campo es obligatorio"});
             }
-
-            // if (property.GetValue(Model)?.GetType().ToString() != "System.String")
-            // {
-            //
-            // }
-
         }
 
+        if (barco.Matricula != Model.Matricula && ObtenerEmbarcacionPorMatriculaUseCase.Ejecutar(Model.Matricula) is not null)
+        {
+            errors.Add("Matricula", new List<string>(){"Esta matricula ya esta en uso"});
+            customValidator.DisplayErrors(errors);
+            return;
+        }
+        
         if (errors.Count > 0)
         {
             Console.WriteLine($"hay {errors.Count} errores");
@@ -127,13 +129,6 @@
             return;
         }
 
-        if (barco.Matricula != Model.Matricula && ObtenerEmbarcacionPorMatriculaUseCase.Ejecutar(Model.Matricula) is not null)
-        {
-
-            errors.Add("Matricula", new List<string>(){"Esta matricula ya esta en uso"});
-            customValidator.DisplayErrors(errors);
-            return;
-        }
 
         ValidSubmit();
     }
