@@ -40,7 +40,7 @@ else
                 <MudImage src="@Input.Imagen" Height="400" Style="object-fit: contain;"></MudImage>
             }
             <MudFileUpload T="IBrowserFile" FilesChanged="UploadFiles" Context="EditButtonContext" Accept="image/jpeg, image/jpg, image/png, image/webp"
-                           >
+            >
                 <ButtonTemplate >
                     <MudButton HtmlTag="label"
                                Variant="Variant.Filled"
@@ -51,6 +51,7 @@ else
                     </MudButton>
                 </ButtonTemplate>
             </MudFileUpload>
+            <MudTextField hidden="true" For="@(() => Input.Imagen)"></MudTextField>
         </MudCardContent>
         <MudCardActions>
             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Publicar</MudButton>

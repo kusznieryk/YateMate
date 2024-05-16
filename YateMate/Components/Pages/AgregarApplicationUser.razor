@@ -7,12 +7,14 @@
 @using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 @using YateMate.Aplicacion.Entidades;
+@using YateMate.Components.Account
 @using YateMate.Components.Account.Pages
 @using YateMate.Components.Account.Shared
 
 @inject UserManager<ApplicationUser> UserManager
 @inject IUserStore<ApplicationUser> UserStore
 @inject SignInManager<ApplicationUser> SignInManager
+@inject IdentityRedirectManager RedirectManager
 @*dice que no se usa pero es mentira, si lo sacas se creashea la pagina*@
 
 @inject IEmailSender<ApplicationUser> EmailSender
@@ -176,7 +178,8 @@
             Apellido = Input.Apellido,
             Nacionalidad = (Nacionalidad)Input.Nacionalidad!,
             Genero = (Genero)Input.Genero!, 
-            Dni = Input.Dni
+            Dni = Input.Dni,
+            FechaNacimiento =Input.FechaNacimiento
                 
         };
         //Input.Password = "Falso123,";
@@ -207,6 +210,7 @@
         
         //Console.WriteLine($"La url para poner tu contrasenia es {callbackUrl}");
         await EmailSender.SendPasswordResetLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
+        RedirectManager.RedirectTo("Account/EmpleadoPasswordConfirmation");
     }
 
     private IUserEmailStore<ApplicationUser> GetEmailStore()

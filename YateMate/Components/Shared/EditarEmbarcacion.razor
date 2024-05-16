@@ -20,19 +20,19 @@
                 <ValidationMessage For="() => Model.Nombre" class="text-danger" />
             </div>
             <div class="form-floating mb-3">
-                <InputNumber step="0.1" class="form-control" id="eslora" @bind-Value="Model.Eslora" />
+                <InputNumber class="form-control" id="eslora" min="0.1"  step="0.1" @bind-Value="Model.Eslora" />
                 <label for="eslora">Eslora</label>
                 <ValidationMessage For="() => Model.Eslora" class="text-danger" />
 
             </div>
             <div class="form-floating mb-3">
-                <InputNumber step="0.1" class="form-control" id="calado" @bind-Value="Model.Calado" />
+                <InputNumber  class="form-control" id="calado" min="0.1" step="0.1" @bind-Value="Model.Calado" />
                 <label for="calado">Calado</label>
                 <ValidationMessage For="() => Model.Calado" class="text-danger" />
             </div>
             
             <div class="form-floating mb-3">
-                <InputNumber type="number" class="form-control" id="manga" @bind-Value="Model.Manga" />
+                <InputNumber type="number" class="form-control" id="manga" min="0.1" step="0.1" @bind-Value="Model.Manga" />
                 <label for="manga">Manga</label>
                 <ValidationMessage For="() => Model.Manga" class="text-danger" />
             </div>
@@ -157,11 +157,11 @@
         [Display(Name = "Calado")]
         public double? Calado { get; set; } = null!;
 
-        // [Required(ErrorMessage = "Ingresa una manga")]
-        // [Display(Name = "Manga")]
+        [Required(ErrorMessage = "Ingresa una manga")]
+        [Display(Name = "Manga")]
         public double? Manga { get; set; }
 
-        // [Required(ErrorMessage = Ingresa una manga)]
+        [Required(ErrorMessage = "Ingresa una bandera")]
         public Nacionalidad? Bandera;
 
         [Required(ErrorMessage = "Ingresa una matricula")]
