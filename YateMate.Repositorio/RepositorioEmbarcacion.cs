@@ -25,9 +25,13 @@ public class RepositorioEmbarcacion:IRepositorioEmbarcacion
     {
         using ( var context = ApplicationDbContext.CrearContexto())        {
             var embarcacionVieja = context.Embarcaciones.FirstOrDefault(e => e.Id == embarcacion.Id);
-            embarcacionVieja.Nombre = embarcacion.Nombre;
+            embarcacionVieja!.Nombre = embarcacion.Nombre;
             embarcacionVieja.Eslora = embarcacion.Eslora;
             embarcacionVieja.Calado = embarcacion.Calado;
+            embarcacionVieja.Matricula = embarcacion.Matricula;
+            embarcacionVieja.Manga = embarcacion.Manga;
+            embarcacionVieja.Bandera = embarcacion.Bandera;
+            //TODO: descomentar esto
             context.SaveChanges();
         }
     }
@@ -50,6 +54,15 @@ public class RepositorioEmbarcacion:IRepositorioEmbarcacion
         using (var context = ApplicationDbContext.CrearContexto())
         {
             return context.Embarcaciones.FirstOrDefault(e => e.Id == embarcacionId);
+        }
+    }
+
+   
+    public Embarcacion? ObtenerEmbarcacionPorMatricula(string matricula)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Embarcaciones.FirstOrDefault(e => e.Matricula == matricula);
         }
     }
 

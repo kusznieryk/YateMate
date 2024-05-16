@@ -14,6 +14,7 @@ using YateMate.Aplicacion.UseCases.Embarcaciones;
 using YateMate.Aplicacion.UseCases.Oferta;
 using YateMate.Components.Pages;
 
+
 namespace YateMate;
 
 public class Program
@@ -33,6 +34,7 @@ public class Program
         builder.Services.AddTransient<ModificarEmbarcacionUseCase>();
         builder.Services.AddTransient<ObtenerEmbarcacionUseCase>();
         builder.Services.AddTransient<ObtenerEmbarcacionesDeUseCase>();
+        builder.Services.AddTransient<ObtenerEmbarcacionPorMatriculaUseCase>();
         builder.Services.AddScoped<IRepositorioEmbarcacion, RepositorioEmbarcacion>();
         
         builder.Services.AddTransient<EliminarApplicationUserUseCase>();
@@ -95,11 +97,11 @@ public class Program
             // User settings.
             options.User.RequireUniqueEmail = true;
         });
+        
         builder.Services.AddMudServices();
         builder.Services.Configure<AuthMessageSenderOptions>(builder.Configuration); //esto es para guardar secretos
         
         // Consolw.WriteLine("Secretos:);
-        // Console.WriteLine(builder.Configuration["ActualEmail"]);
         // Console.WriteLine(builder.Configuration["EmailAuthKey"]);
         // Console.WriteLine();
         
@@ -126,8 +128,8 @@ public class Program
         //     var email = "admin@admin.com";
         //     var password = "Test123,";
         //     string[] roles = ["Admin", "Empleado", "Cliente"];
+        // var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
         //     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        //     var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
             // foreach (var role in roles)
             // {
             //     if (!await roleManager.RoleExistsAsync(role))
@@ -136,16 +138,16 @@ public class Program
             //         await roleManager.CreateAsync(roleRole);
             //     }
             // }
-            // if (await userManager.FindByNameAsync(email) == null)
-            // {
-            //     var user = new ApplicationUser();
-            //     user.UserName = email;
-            //     user.Email = email;
-            //     user.EmailConfirmed = true;
-            //     var result = await userManager.CreateAsync(user, password);
-            //     await userManager.AddToRoleAsync(user, "Admin");
-            // }
-            
+        //     if (await userManager.FindByNameAsync(email) == null)
+        //     {
+        //         var user = new ApplicationUser();
+        //         user.UserName = email;
+        //         user.Email = email;
+        //         user.EmailConfirmed = true;
+        //         var result = await userManager.CreateAsync(user, password);
+        //         await userManager.AddToRoleAsync(user, "Admin");
+        //     }
+        //     
         //     email = "empleado1@empleado.com";
         //     password = "Empleado123,";
         //     
@@ -155,13 +157,13 @@ public class Program
         //         user.UserName = email;
         //         user.Email = email;
         //         user.EmailConfirmed = true;
-
+        //
         //         user.Genero = Genero.Masculino;
-
+        //
         //         var result = await userManager.CreateAsync(user, password);
         //         await userManager.AddToRoleAsync(user, "Empleado");
         //     }
-
+        //
         //     
         //     email = "empleado1@empleado.com";
         //     password = "Empleado123,";
@@ -172,11 +174,11 @@ public class Program
         //         user.UserName = email;
         //         user.Email = email;
         //         user.EmailConfirmed = true;
-
+        //
         //         user.Nombre = "Jose";
         //         user.Apellido = "tapa";
         //         user.Genero = Genero.Femenino;
-        //         user.Nacionalidad = "Argentina";
+        //         user.Nacionalidad = Nacionalidad.Argentina;
         //         user.Dni = 1234567;
         //         user.FechaNacimiento = DateTime.Now;
         //
@@ -198,7 +200,7 @@ public class Program
         //         user.Nombre = "Josefina";
         //         user.Apellido = "tapita";
         //         user.Genero = Genero.Femenino;
-        //         user.Nacionalidad = "Argentina";
+        //         user.Nacionalidad = Nacionalidad.Argentina;
         //         user.Dni = 1234567;
         //         user.FechaNacimiento = DateTime.Now;
         //

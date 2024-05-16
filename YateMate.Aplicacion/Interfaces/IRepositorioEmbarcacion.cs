@@ -11,4 +11,6 @@ public interface IRepositorioEmbarcacion
     Embarcacion ObtenerEmbarcacion(int embarcacionId);
     void EliminarEmbarcacion(int idEmbarcacion);
 
+    Embarcacion? ObtenerEmbarcacionPorMatricula(string matricula);
+
 }
