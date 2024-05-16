@@ -14,38 +14,45 @@
 <title>Listado de clientes</title>
 
 <MudContainer>
-    <MudTable Items="@_lista" Class="mt-4" Dense="true" Outlined="true">
-        <HeaderContent>
-            <MudTh>Email</MudTh>
-            <MudTh>Nombre</MudTh>
-            <MudTh>Apellido</MudTh>
-            <MudTh>Nacionalidad</MudTh>
-            <MudTh>Genero</MudTh>
-            <MudTh>DNI</MudTh>
-            <MudTh>Fecha de nacimiento</MudTh>
-            <MudTh>Acciones</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd>@context.Email</MudTd>
-            <MudTd>@context.Nombre</MudTd>
-            <MudTd>@context.Apellido</MudTd>
-            <MudTd>@context.Nacionalidad</MudTd>
-            <MudTd>@context.Genero</MudTd>
-            <MudTd>@context.Dni</MudTd>
-            <MudTd>@context.FechaNacimiento</MudTd>
-            <MudTd>
-                <div class="button-container">
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ListarEmbarcaciones(context.Id))">Listar embarcaciones</MudButton>
-                </div>
-                <div class="button-container">
-                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => AgregarEmbarcacion(context.Id))">Agregar Embarcación</MudButton>
-                </div>
-                <div class="button-container">
-                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => ConfirmarEliminacion(context))">Eliminar Usuario</MudButton>
-                </div>
-            </MudTd>
-        </RowTemplate>
-    </MudTable>
+    @if (!_tieneElementos)
+    {
+        <MudText Typo="Typo.h6">No hay elementos</MudText>
+    }
+    else
+    {
+        <MudTable Items="@_lista" Class="mt-4" Dense="true" Outlined="true">
+            <HeaderContent>
+                <MudTh>Email</MudTh>
+                <MudTh>Nombre</MudTh>
+                <MudTh>Apellido</MudTh>
+                <MudTh>Nacionalidad</MudTh>
+                <MudTh>Genero</MudTh>
+                <MudTh>DNI</MudTh>
+                <MudTh>Fecha de nacimiento</MudTh>
+                <MudTh>Acciones</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>@context.Email</MudTd>
+                <MudTd>@context.Nombre</MudTd>
+                <MudTd>@context.Apellido</MudTd>
+                <MudTd>@context.Nacionalidad</MudTd>
+                <MudTd>@context.Genero</MudTd>
+                <MudTd>@context.Dni</MudTd>
+                <MudTd>@context.FechaNacimiento</MudTd>
+                <MudTd>
+                    <div class="button-container">
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ListarEmbarcaciones(context.Id))">Listar embarcaciones</MudButton>
+                    </div>
+                    <div class="button-container">
+                        <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => AgregarEmbarcacion(context.Id))">Agregar Embarcación</MudButton>
+                    </div>
+                    <div class="button-container">
+                        <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => ConfirmarEliminacion(context))">Eliminar Usuario</MudButton>
+                    </div>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
 </MudContainer>
 
     
