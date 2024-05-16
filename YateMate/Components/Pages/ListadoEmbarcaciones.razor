@@ -1,54 +1,77 @@
 @page "/listadoembarcaciones/{Id}"
 @using YateMate.Aplicacion.UseCases.Embarcaciones
+@using YateMate.Components.Shared
 @inject ObtenerEmbarcacionesDeUseCase ObtenerEmbarcacionesDeUseCase
 @inject ModificarEmbarcacionUseCase ModificarEmbarcacionUseCase
 @inject NavigationManager NavigationManager
+@inject IDialogService Dialog
+
 @rendermode InteractiveServer
+
+<MudDialogProvider  FullWidth="true"
+                    MaxWidth="MaxWidth.Small"
+                    Position="DialogPosition.CenterLeft"/>
 
 <MudContainer>
     <h1>Listado de embarcaciones</h1>
 
     @if (!_tieneElementos)
     {
-    <MudText Typo="Typo.h6">No hay elementos</MudText>
+        <MudText Typo="Typo.h6">No hay elementos</MudText>
     }
     else
     {
-    <MudTable Items="_lista" Class="mt-4" Dense="true" Outlined="true">
-        <HeaderContent>
-            <MudTh>NOMBRE</MudTh>
-            <MudTh>ESLORA</MudTh>
-            <MudTh>CALADO</MudTh>
-            <MudTh>ACCIÓN</MudTh>
-        </HeaderContent>
-        <RowTemplate>
-            <MudTd>
-                @context.Nombre
-            </MudTd>
-            <MudTd>
-                @context.Eslora
-            </MudTd>
-            <MudTd>
-                @context.Calado
-            </MudTd>
-            <MudTd>
-                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => MostrarFormularioEdicion(context))">Modificar</MudButton>
-            </MudTd>
-        </RowTemplate>
-    </MudTable>
+        <MudTable Items="_lista" Class="mt-4" Dense="true" Outlined="true">
+            <HeaderContent>
+                <MudTh>NOMBRE</MudTh>
+                <MudTh>ESLORA</MudTh>
+                <MudTh>CALADO</MudTh>
+                <MudTh>MATRÍCULA</MudTh>
+                <MudTh>ACCIÓN</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    @context.Nombre
+                </MudTd>
+                <MudTd>
+                    @context.Eslora
+                </MudTd>
+                <MudTd>
+                    @context.Calado
+                </MudTd>
+                @* TODO: descomentar esto cuando este hecha la migracion *@
+                @* <MudTd> *@
+                @*     @context.Manga *@
+                @* </MudTd> *@
+                @* <MudTd> *@
+                @*     @context.Bandera *@
+                @* </MudTd> *@
+                <MudTd>
+                    @context.Matricula
+                </MudTd>
+                <MudTd>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ModificarEmbarcacion(@context))">Modificar</MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
 
-    @if (_mostrandoFormularioEdicion)
-    {
-    <div>
-        <h3>Modificar Embarcación</h3>
-        <MudTextField Label="Nombre" @bind-Value="_embarcacionAModificar!.Nombre" />
-        <MudNumericField Label="Eslora" @bind-Value="_embarcacionAModificar!.Eslora" />
-        <MudNumericField Label="Calado" @bind-Value="_embarcacionAModificar!.Calado" />
-        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ModificarEmbarcacion(_embarcacionAModificar!))">Guardar</MudButton>
-    </div>
-    }
+        @* @if (_mostrandoFormularioEdicion) *@
+        @* { *@
+        @*     <div> *@
+        @*         <h3>Modificar Embarcación</h3> *@
+        @*         <MudTextField Label="Nombre" @bind-Value="_embarcacionAModificar!.Nombre" /> *@
+        @*         <MudNumericField Label="Eslora" @bind-Value="_embarcacionAModificar!.Eslora" /> *@
+        @*         <MudNumericField Label="Calado" @bind-Value="_embarcacionAModificar!.Calado" /> *@
+        @*         $1$ <MudNumericField Label="Manga" @bind-Value="_embarcacionAModificar!.Manga" /> #1# *@
+        @*         $1$ <MudNumericField Label="Bandera" @bind-Value="_embarcacionAModificar!.Bandera" /> #1# *@
+        @*         <MudTextField Label="Matricula" @bind-Value="_embarcacionAModificar!.Matricula" /> *@
+        @* *@
+        @*         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ModificarEmbarcacion(_embarcacionAModificar!))">Guardar</MudButton> *@
+        @*     </div> *@
+        @* } *@
     }
 </MudContainer>
+
 @code {
     [Parameter] public string Id { get; set; } = null!;
 
@@ -71,10 +94,11 @@
     }
     public void ModificarEmbarcacion(Embarcacion embarcacion)
     {
-        ModificarEmbarcacionUseCase.Ejecutar(embarcacion);
-        _mostrandoFormularioEdicion = false;
-        NavigationManager.Refresh();
+        var parameters = new DialogParameters<EditarEmbarcacion>();
+        parameters.Add(x => x.barco, embarcacion);
+        Dialog.Show<EditarEmbarcacion>("Ver Datos", parameters);
+        //ModificarEmbarcacionUseCase.Ejecutar(embarcacion);
     }
-    
-    
+
+
 }

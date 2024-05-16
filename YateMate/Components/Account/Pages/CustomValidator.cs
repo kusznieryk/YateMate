@@ -26,7 +26,6 @@ public class CustomValidator : ComponentBase
     {
         foreach (var error in errors)
         {
-            _messageStore.Add(CurrentEditContext.Field("a"), "b");
             _messageStore.Add(CurrentEditContext.Field(error.Key), error.Value);
         }
         CurrentEditContext.NotifyValidationStateChanged();

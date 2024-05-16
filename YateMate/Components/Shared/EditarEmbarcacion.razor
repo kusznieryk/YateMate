@@ -1,0 +1,177 @@
+@using System.ComponentModel.DataAnnotations
+@using YateMate.Aplicacion.UseCases.Embarcaciones
+@using YateMate.Components.Account.Pages
+@inject NavigationManager NavigationManager
+@inject ModificarEmbarcacionUseCase ModificarEmbarcacionUseCase
+@inject ObtenerEmbarcacionPorMatriculaUseCase ObtenerEmbarcacionPorMatriculaUseCase
+
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
+            Editar embarcacion
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <EditForm OnSubmit="HandleSubmit" EditContext="editContext" FormName="EditarEmbarcacion">
+            <CustomValidator @ref="customValidator"></CustomValidator>
+            <div class="form-floating mb-3">
+                <InputText class="form-control" id="nombre" @bind-Value="Model.Nombre" required/>
+                <label for="nombre">Nombre</label>
+                <ValidationMessage For="() => Model.Nombre" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputNumber step="0.1" class="form-control" id="eslora" @bind-Value="Model.Eslora" required/>
+                <label for="eslora">Eslora</label>
+                <ValidationMessage For="() => Model.Eslora" class="text-danger" />
+
+            </div>
+            <div class="form-floating mb-3">
+                <InputNumber step="0.1" class="form-control" id="calado" @bind-Value="Model.Calado" required/>
+                <label for="calado">Calado</label>
+                <ValidationMessage For="() => Model.Calado" class="text-danger" />
+            </div>
+
+            @* TODO: descomentar esto *@
+            @* <div class="form-floating mb-3"> *@
+            @*     <InputNumber type="number" step="0.1" class="form-control" id="manga" @bind-Value="Model.Manga" required/> *@
+            @*     <label for="manga">Manga</label> *@
+            @*     <ValidationMessage For="() => Model.Manga" class="text-danger" /> *@
+            @* </div> *@
+            @* <div class="form-floating mb-3"> *@
+            @*     <InputNumber step="0.1" class="form-control" id="bandera" @bind-Value="Model.Bandera" required/> *@
+            @*     <label for="bandera">Bandera</label> *@
+            @*     <ValidationMessage For="() => Model.Bandera" class="text-danger" /> *@
+            @* </div> *@
+
+            <div class="form-floating mb-3">
+                <InputText class="form-control" id="matricula" @bind-Value="Model.Matricula" required />
+                <label for="matricula">Matricula</label>
+                <ValidationMessage For="() => Model.Matricula" class="text-danger" />
+            </div>
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Cargar embarcacion</button>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+@code
+{
+    // [Parameter] public string IdCliente { get; set; } = null!;
+    [Parameter] public Embarcacion barco { get; set; }
+
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+
+    void Submit()
+    {
+        MudDialog!.Close(DialogResult.Ok(true));
+    }
+
+    void Cancel() => MudDialog!.Cancel();
+
+    [SupplyParameterFromForm] private InputModel Model { get; set; } = new();
+
+    private EditContext? editContext;
+
+    public CustomValidator customValidator;
+
+    protected override void OnInitialized()
+    {
+        Model ??= new ();
+        Model.Calado ??= barco.Calado;
+        Model.Eslora ??= barco.Eslora;
+        Model.Nombre ??= barco.Nombre;
+        Model.Matricula ??= barco.Matricula;
+        Model.ClienteId = barco.ClienteId;
+        editContext = new(Model);
+    }
+
+    public void HandleSubmit()
+    {
+        var errors = new Dictionary<string, List<string>>();
+        Model.ClienteId = barco.ClienteId;
+        foreach (var property in Model.GetType().GetProperties()) //me cago en microsoft
+        {
+            // Console.WriteLine(property.Name);
+            var value = property.GetValue(Model);
+            // Console.WriteLine(property.Name);
+            if (String.IsNullOrWhiteSpace(value?.ToString()))
+            {
+                Console.WriteLine($"el campo {property.Name} estaba vacio");
+                errors.Add(property.Name, new List<string>() {"Este campo es obligatorio"});
+            }
+
+            // if (property.GetValue(Model)?.GetType().ToString() != "System.String")
+            // {
+            //
+            // }
+
+        }
+
+        if (errors.Count > 0)
+        {
+            Console.WriteLine($"hay {errors.Count} errores");
+            foreach (var error in errors)
+            {
+                Console.WriteLine($"error {error.Key} {error.Value}");
+            }
+            customValidator.DisplayErrors(errors);
+            return;
+        }
+
+        if (ObtenerEmbarcacionPorMatriculaUseCase.Ejecutar(Model.Matricula) is not null)
+        {
+
+            errors.Add("Matricula", new List<string>(){"Esta matricula ya esta en uso"});
+            customValidator.DisplayErrors(errors);
+            return;
+        }
+
+        ValidSubmit();
+    }
+
+    public void ValidSubmit()
+    {
+        Model.ClienteId = barco.ClienteId;
+        var barcoQueVaABaseDeDatos = new Embarcacion(Model.Nombre, Model.Eslora.Value, Model.Calado.Value, Model.ClienteId, Model.Matricula, Model.Manga.Value);
+        barcoQueVaABaseDeDatos.Id = barco.Id;
+        barcoQueVaABaseDeDatos.Bandera = Model.Bandera.Value;
+        ModificarEmbarcacionUseCase.Ejecutar(barcoQueVaABaseDeDatos);
+        // Navegador.NavigateTo("/ListarApplicationUsers");
+        Submit();
+        // Navegador.NavigateTo($"/listadoembarcaciones/{barco.Id}");
+    }
+
+    private sealed class InputModel
+    {
+        [Required(ErrorMessage = "Ingresa un nombre")]
+        [Display(Name = "Nombre")]
+        public string? Nombre { get; set; } = null;
+
+        [Required(ErrorMessage = "Ingresa una eslora")]
+        [Display(Name = "Eslora")]
+        public double? Eslora { get; set; } = null!;
+
+        [Required(ErrorMessage = "Ingresa un calado")]
+        [Display(Name = "Calado")]
+        public double? Calado { get; set; } = null!;
+
+        // [Required(ErrorMessage = "Ingresa una manga")]
+        // [Display(Name = "Manga")]
+        public double? Manga { get; set; }
+
+        // [Required(ErrorMessage = Ingresa una manga)]
+        public Nacionalidad? Bandera;
+
+        [Required(ErrorMessage = "Ingresa una matricula")]
+        [Display(Name = "Matricula")]
+        public string? Matricula { get; set; } = null;
+
+        public string? ClienteId { get; set; } = null;
+
+    }
+
+}
