@@ -34,7 +34,7 @@
     [Parameter] public string Id { get; set; } = null!;
 
     [SupplyParameterFromForm]
-    public Embarcacion Model { get; set; }= new ("", 0,0, "", "");
+    public Embarcacion Model { get; set; }= new ("", 0,0, "", "", 0.0);
     
     
     public void OnValidSubmit()

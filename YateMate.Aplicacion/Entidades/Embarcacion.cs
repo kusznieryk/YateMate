@@ -2,7 +2,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace YateMate.Aplicacion.Entidades;
 
-public class Embarcacion(string nombre, double eslora, double calado, string clienteId, string matricula, Nacionalidad nacionalidad, double manga)
+public class Embarcacion(string nombre, double eslora, double calado, string clienteId, string matricula,  double manga)
 {
     public int Id { get; set; } = Guid.NewGuid().GetHashCode();
     [MaxLength(50)]
@@ -15,6 +15,6 @@ public class Embarcacion(string nombre, double eslora, double calado, string cli
     [MaxLength(50)]
     public string Matricula { get; set; } = matricula;
     
-    public Nacionalidad Bandera { get; set; } = nacionalidad;
+    public Nacionalidad Bandera { get; set; }
     public double Manga { get; set; } = manga;
 }
