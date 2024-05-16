@@ -120,7 +120,7 @@
     public void ValidSubmit()
     {
         Model.ClienteId = barco.ClienteId;
-        AgregarEmbarcacionUseCase.Ejecutar( new Embarcacion(Model.Nombre, Model.Eslora.Value, Model.Calado.Value, Model.ClienteId, Model.Matricula));
+        AgregarEmbarcacionUseCase.Ejecutar( new Embarcacion(Model.Nombre, Model.Eslora.Value, Model.Calado.Value, Model.ClienteId, Model.Matricula, Model.Manga.Value));
         // Navegador.NavigateTo("/ListarApplicationUsers");
         Navegador.NavigateTo($"/listadoembarcaciones/{barco.Id}");
     }
@@ -139,9 +139,9 @@
         [Display(Name = "Calado")]
         public double? Calado { get; set; } = null!;
 
-        // [Required(ErrorMessage = "Ingresa una manga")]
-        // [Display(Name = "Manga")]
-        // public double? Manga { get; set; }
+        [Required(ErrorMessage = "Ingresa una manga")]
+        [Display(Name = "Manga")]
+        public double? Manga { get; set; }
 
         // [Required(ErrorMessage = Ingresa una manga)]
         public Nacionalidad? Bandera;

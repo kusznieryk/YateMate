@@ -26,6 +26,8 @@
                 <MudTh>NOMBRE</MudTh>
                 <MudTh>ESLORA</MudTh>
                 <MudTh>CALADO</MudTh>
+                <MudTh>MANGA</MudTh>
+                <MudTh>BANDERA</MudTh>
                 <MudTh>MATRÍCULA</MudTh>
                 <MudTh>ACCIÓN</MudTh>
             </HeaderContent>
@@ -40,12 +42,12 @@
                     @context.Calado
                 </MudTd>
                 @* TODO: descomentar esto cuando este hecha la migracion *@
-                @* <MudTd> *@
-                @*     @context.Manga *@
-                @* </MudTd> *@
-                @* <MudTd> *@
-                @*     @context.Bandera *@
-                @* </MudTd> *@
+                <MudTd>
+                    @context.Manga
+                </MudTd>
+                <MudTd>
+                    @context.Bandera
+                </MudTd>
                 <MudTd>
                     @context.Matricula
                 </MudTd>
