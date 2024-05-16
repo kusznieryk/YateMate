@@ -30,16 +30,22 @@
     </div>
 
     @* TODO: descomentar esto *@
-    @* <div class="form-floating mb-3"> *@
-    @*     <InputNumber type="number" step="0.1" class="form-control" id="manga" @bind-Value="Model.Manga" required/> *@
-    @*     <label for="manga">Manga</label> *@
-    @*     <ValidationMessage For="() => Model.Manga" class="text-danger" /> *@
-    @* </div> *@
-    @* <div class="form-floating mb-3"> *@
-    @*     <InputNumber step="0.1" class="form-control" id="bandera" @bind-Value="Model.Bandera" required/> *@
-    @*     <label for="bandera">Bandera</label> *@
-    @*     <ValidationMessage For="() => Model.Bandera" class="text-danger" /> *@
-    @* </div> *@
+    <div class="form-floating mb-3">
+        <InputNumber type="number" step="0.1" class="form-control" id="manga" @bind-Value="Model.Manga" required/>
+        <label for="manga">Manga</label>
+        <ValidationMessage For="() => Model.Manga" class="text-danger" />
+    </div>
+    <div class="form-floating mb-3">
+        <InputSelect step="0.1" class="form-control" id="bandera" @bind-Value="Model.Bandera"  TValue="Nacionalidad?">
+        <option value=""></option>
+        @foreach (Nacionalidad nacionalidad in Enum.GetValues(typeof(Nacionalidad)))
+        {
+        <option value=@nacionalidad> @nacionalidad </option>
+        }
+        </InputSelect>
+        <label for="bandera">Bandera</label>
+        <ValidationMessage For="() => Model.Bandera" class="text-danger" />
+    </div>
     
     <div class="form-floating mb-3">
         <InputText class="form-control" id="matricula" @bind-Value="Model.Matricula" required />
@@ -114,7 +120,7 @@
     public void ValidSubmit()
     {
         Model.ClienteId = Id;
-        AgregarEmbarcacionUseCase.Ejecutar( new Embarcacion(Model.Nombre, Model.Eslora.Value, Model.Calado.Value, Id, Model.Matricula));
+        AgregarEmbarcacionUseCase.Ejecutar( new Embarcacion(Model.Nombre, Model.Eslora.Value, Model.Calado.Value, Id, Model.Matricula, Model.Manga.Value));
         Navegador.NavigateTo("/ListarApplicationUsers");
     }
 
@@ -132,12 +138,12 @@
         [Display(Name = "Calado")]
         public double? Calado { get; set; } = null!;
         
-        // [Required(ErrorMessage = "Ingresa una manga")]
-        // [Display(Name = "Manga")]
-        // public double? Manga { get; set; }
+        [Required(ErrorMessage = "Ingresa una manga")]
+        [Display(Name = "Manga")]
+        public double? Manga { get; set; }
         
-        // [Required(ErrorMessage = Ingresa una manga)]
-        // public Nacionalidad? Bandera;
+        [Required(ErrorMessage = "Ingresa una bandera")]
+        public Nacionalidad? Bandera;
 
         [Required(ErrorMessage = "Ingresa una matricula")]
         [Display(Name = "Matricula")]
