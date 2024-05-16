@@ -14,4 +14,8 @@ public class Embarcacion(string nombre, double eslora, double calado, string cli
     public double Calado { get; set; } = calado;
     [MaxLength(50)]
     public string Matricula { get; set; } = matricula;
+
+    // public double Manga { get; set; } = manga;
+
+    // public Nacionalidad bandera { get; set; } = nacionalidad;
 }
