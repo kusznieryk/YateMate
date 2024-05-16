@@ -16,8 +16,8 @@ public class RepositorioEmbarcacion:IRepositorioEmbarcacion
 
     public List<Embarcacion> ObtenerEmbarcacionesDe(string clienteId)
     {
-        using ( var context = ApplicationDbContext.CrearContexto())        {
-            return context.Embarcaciones.Where(embarcacion => embarcacion.ClienteId.Equals(clienteId) ).ToList();
+        using ( var context = ApplicationDbContext.CrearContexto()){
+            return context.Embarcaciones.Where(embarcacion => embarcacion.ClienteId.Equals(clienteId)).ToList();
         }
     }
 
@@ -53,18 +53,16 @@ public class RepositorioEmbarcacion:IRepositorioEmbarcacion
         }
     }
 
-    public bool EliminarEmbarcacion(int embarcacionId)
+    public void EliminarEmbarcacion(int embarcacionId)
     {
-        using ( var context = ApplicationDbContext.CrearContexto())
+        using (var context = ApplicationDbContext.CrearContexto())
         {
             var embarcacion = context.Embarcaciones.FirstOrDefault((emb => emb.Id == embarcacionId));
             if (embarcacion != null)
             {
                 context.Remove(embarcacion);
-                return true;
+                context.SaveChanges();
             }
         }
-
-        return false;
     }
 }
