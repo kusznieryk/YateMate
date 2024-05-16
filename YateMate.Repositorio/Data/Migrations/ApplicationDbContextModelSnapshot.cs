@@ -274,6 +274,10 @@ namespace YateMate.Migrations
                     b.Property<string>("ApplicationUserId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Bandera")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<double>("Calado")
                         .HasColumnType("REAL");
 
@@ -283,6 +287,9 @@ namespace YateMate.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<double>("Eslora")
+                        .HasColumnType("REAL");
+
+                    b.Property<double>("Manga")
                         .HasColumnType("REAL");
 
                     b.Property<string>("Matricula")
