@@ -1,64 +1,78 @@
 ﻿@page "/"
-
 <PageTitle>Inicio</PageTitle>
 
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="py-12">
-        <div class="text-center">
-            <h1 class="text-4xl font-bold">YateMate</h1>
-            <p class="mt-2 text-lg">Tu brújula en el mar de los trueques</p>
-            
-        </div>
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-16 position-relative">
 
-        <div class="mt-16">
-            <h2 class="text-center text-3xl font-bold">Cómo funciona?</h2>
-            <div class="flex flex-wrap justify-center gap-10 mt-8">
-                <div class="text-center">
-                    <img src="https://placehold.co/100x100" alt="Build your box" />
-                    <h3 class="mt-2 font-semibold">Crea una cuenta</h3>
-                    <p>Presiona registrar y crea una cuenta. Luego, inicia sesión</p>
-                </div>
-                <div class="text-center">
-                    <img src="https://placehold.co/100x100" alt="Check your doorstep" />
-                    <h3 class="mt-2 font-semibold">Sube algún bien</h3>
-                    <p>Sube algún bien que estes dispuesto a cambiar. Tienes que elegir un nombre, una descripción y una imagen</p>
-                </div>
-                <div class="text-center">
-                    <img src="https://placehold.co/100x100" alt="Enjoy in seconds" />
-                    <h3 class="mt-2 font-semibold">Elije el barco que más se acomode a tus intereses</h3>
-                    <p>Ves un barco publicado el cuál te gusta? Hazle una oferta! Le ofrecés uno de tus bienes y si hay "match" van a tener un chat en el cual podran coordinar el intercambio</p>
-                </div>
-            </div>
-        </div>
+    <MudGrid Justify="Justify.Center" Class="mb-16">
+            <MudItem xs="12" sm="8" md="6">
+            <MudPaper Elevation="25" Class="pa-8">
+                <MudText Typo="Typo.h4" GutterBottom="true" Align="Align.Center">YateMate</MudText>
+                <MudText Align="Align.Center" Class="mb-4">Tu brújula en el mar de los trueques</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
 
-        <div class="mt-16 bg-zinc-100 dark:bg-zinc-700 py-12">
-            <h2 class="text-center text-3xl font-bold">Por que elegir YateMate?</h2>
-            <div class="flex flex-wrap justify-center items-center gap-10 mt-8">
-                <p class="font-semibold mt-2">- Uso </p>
-                <div class="max-w-sm">
-                    <p>
-                        Nuestra plataforma es intuitiva y te permite encontrar lo que buscas en poco tiempo.
-                    </p>
-                    <p>
-                        Tienes múltiples filtros para usar, como por eslora y calado
-                    </p>
-                    <p class="font-semibold mt-2">- Seguridad</p>
-                </div>
-                <div class="max-w-sm">
-                    <p>"Los datos de cualquier embarcación son subidos por nuestros empleados, por lo que no te encontrarás con sorpresas al hacer el intercambio"</p>
-                    <p class="font-semibold mt-2">- Comunidad</p>
-                </div>
-                <div class="max-w-sm">
-                    <p>
-                        Somos una comunidad apasionada por los barcos, teniendo una de las comunidades más grandes de Argentina
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    <MudGrid Justify="Justify.Center" Class="mb-16 align-center" >
+        <MudItem xs="12">
+            <MudText Typo="Typo.h5" GutterBottom="true" Align="Align.Center">¿Cómo funciona?</MudText>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudPaper Elevation="25" Class="pa-4 d-flex flex-column align-center">
+                <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Size="Size.Large" Class="mb-4" />
+                <MudText Typo="Typo.h6" GutterBottom="true">Crea una cuenta</MudText>
+                <MudText Align="Align.Center">Presiona registrar y crea una cuenta. Luego, inicia sesión</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudPaper Elevation="25" Class="pa-4 d-flex flex-column align-center">
+                <MudIcon Icon="@Icons.Material.Filled.Upload" Size="Size.Large" Class="mb-4" />
+                <MudText Typo="Typo.h6" GutterBottom="true">Sube algún bien</MudText>
+                <MudText Align="Align.Center">Sube algún bien que estes dispuesto a cambiar. Tienes que elegir un nombre, una descripción y una imagen</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudPaper Elevation="25" Class="pa-4 d-flex flex-column align-center">
+                <MudIcon Icon="@Icons.Material.Filled.SwapHoriz" Size="Size.Large" Class="mb-4" />
+                <MudText Typo="Typo.h6" GutterBottom="true">Elije el barco que más te interese</MudText>
+                <MudText Align="Align.Center">Ves un barco publicado que te gusta? Hazle una oferta! Le ofrecés uno de tus bienes. Si hay "match" van a tener un chat para coordinar el intercambio</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
 
+        
+</MudContainer>
 
-<footer>
-    <p>&copy; 2024 YateMate. Todos los derechos reservados.</p>
-</footer>
+<MudPaper Elevation="25" Class="pa-4" Style="background-color: #eee">
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="12">
+            <MudText Typo="Typo.h5" GutterBottom="true" Align="Align.Center">¿Por qué elegir YateMate?</MudText>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudText Typo="Typo.subtitle1" GutterBottom="true" Class="font-weight-bold">- Uso</MudText>
+            <MudText>Nuestra plataforma es intuitiva y te permite encontrar lo que buscas en poco tiempo.</MudText>
+            <MudText>Tienes múltiples filtros para usar, como por eslora y calado</MudText>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudText Typo="Typo.subtitle1" GutterBottom="true" Class="font-weight-bold">- Seguridad</MudText>
+            <MudText>"Los datos de cualquier embarcación son subidos por nuestros empleados, por lo que no te encontrarás con sorpresas al hacer el intercambio"</MudText>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudText Typo="Typo.subtitle1" GutterBottom="true" Class="font-weight-bold">- Comunidad</MudText>
+            <MudText>Somos una comunidad apasionada por los barcos, teniendo una de las comunidades más grandes de Argentina</MudText>
+        </MudItem>
+    </MudGrid>
+
+    <MudText Align="Align.Center">&copy; 2024 YateMate. Todos los derechos reservados.</MudText>
+</MudPaper>
+
+<style>
+    .video-background {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        z-index: -1;
+    }
+</style>
