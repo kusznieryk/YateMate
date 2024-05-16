@@ -1,7 +1,8 @@
+@using YateMate.Aplicacion.UseCases.Embarcaciones
 @using YateMate.Components.Pages
 
 @inject NavigationManager NavigationManager
-
+@inject ObtenerEmbarcacionUseCase ObtenerEmbarcacion
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
@@ -12,12 +13,23 @@
         <MudCard>
             <MudCardHeader>
                 <CardHeaderContent>
-                    <MudText Typo="Typo.h6">@Publicacion!.Titulo</MudText>
+                    <MudText Typo="Typo.h4">@Publicacion.Titulo</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
             <MudCardContent>
-                <MudImage Fluid="true" Src="@Publicacion!.Image" Alt="Image"/>
-                <MudText>@Publicacion!.Descripcion</MudText>
+                <MudText Typo="Typo.h5"  GutterBottom="true">Descripción</MudText>
+                <MudText>@Publicacion.Descripcion</MudText>
+
+                <MudText Typo="Typo.h5" GutterBottom="true">Calado</MudText>
+                <MudText>@(Original.Calado)m</MudText>
+
+                <MudText Typo="Typo.h5" GutterBottom="true">Eslora</MudText>
+                <MudText>@(Original.Eslora)m</MudText>
+
+                <MudText Typo="Typo.h5" GutterBottom="true">Bandera</MudText> 
+                <MudText>@Original.Bandera</MudText>
+
+                <MudImage Fluid="true" Src="@Publicacion.Image" Alt="Imagen de la publicación" Style="max-height: 300px;"/>
             </MudCardContent>
         </MudCard>
     </DialogContent>
@@ -29,8 +41,13 @@
 </MudDialog>
 
 @code {
-    [Parameter] public Publicacion? Publicacion { get; set; }
+    [Parameter] public Publicacion Publicacion { get; set; } = null!;
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    Embarcacion Original { get; set; } = null!;
+    protected override void OnInitialized()
+    {
+        Original = ObtenerEmbarcacion.Ejecutar(Publicacion.EmbarcacionId);
+    }
 
     void Submit() => MudDialog!.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog!.Cancel();
