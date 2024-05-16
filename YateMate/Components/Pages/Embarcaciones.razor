@@ -23,15 +23,27 @@
         <MudTable Items="_lista" Hover="true" Breakpoint="Breakpoint.Sm">
             <HeaderContent>
                 <MudTh>Nombre</MudTh>
-                <MudTh>Eslora (m)</MudTh>
-                <MudTh>Calado (m)</MudTh>
-                <MudTh>Publicar</MudTh>
+                <MudTh>Calado(m)</MudTh>
+                <MudTh>Eslora(m)</MudTh>
+                <MudTh>Manga(m)</MudTh>
+                <MudTh>Bandera</MudTh>
+                <MudTh>Matrícula</MudTh>
+                <MudTh> Publicar</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd DataLabel="Nombre">@context.Nombre</MudTd>
                 <MudTd DataLabel="Calado">@context.Calado</MudTd>
                 <MudTd DataLabel="Eslora">@context.Eslora</MudTd>
-                    <MudTd DataLabel="Publicar button">
+                <MudTd DataLabel="Manga">
+                    @context.Manga
+                </MudTd>
+                <MudTd DataLabel="Bandera">
+                    @context.Bandera
+                </MudTd>
+                <MudTd DataLabel="Matricula">
+                    @context.Matricula
+                </MudTd>
+                <MudTd DataLabel="Publicar button">
                 @if (!EstaPublicado(@context.Id))
                 {
                         <MudLink href="@("/publicar/" + context.Id)"> Publicar</MudLink>
