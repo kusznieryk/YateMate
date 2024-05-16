@@ -5,7 +5,6 @@
 @inject ModificarEmbarcacionUseCase ModificarEmbarcacionUseCase
 @inject ObtenerEmbarcacionPorMatriculaUseCase ObtenerEmbarcacionPorMatriculaUseCase
 
-
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
@@ -72,6 +71,7 @@
 
     void Submit()
     {
+        NavigationManager.Refresh(forceReload: true);
         MudDialog!.Close(DialogResult.Ok(true));
     }
 
@@ -140,9 +140,7 @@
         barcoQueVaABaseDeDatos.Id = barco.Id;
         barcoQueVaABaseDeDatos.Bandera = Model.Bandera.Value;
         ModificarEmbarcacionUseCase.Ejecutar(barcoQueVaABaseDeDatos);
-        // Navegador.NavigateTo("/ListarApplicationUsers");
         Submit();
-        // Navegador.NavigateTo($"/listadoembarcaciones/{barco.Id}");
     }
 
     private sealed class InputModel
