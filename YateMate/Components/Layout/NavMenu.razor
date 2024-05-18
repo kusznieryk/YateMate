@@ -1,131 +1,108 @@
-﻿@implements IDisposable
+﻿@using System.Runtime.CompilerServices
+@implements IDisposable
 
 @inject NavigationManager NavigationManager
-@* @inject AuthenticationStateProvider AuthenticationStateProvider  *@
+@rendermode InteractiveServer
 
-<div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        @* <img src="logo_yatemate.png" alt="logo empresa" class="logo-empresa" /> *@
-        <a class="navbar-brand" href="">YateMate</a>
-    </div>
-</div>
+<AuthorizeView>
+    <Authorized>
+        <MudAppBar Elevation="0" Color="Color.Secondary" Style="position: fixed">
+            <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())"/>
+            <MudText Typo="Typo.h5" Class="ml-3">YateMate</MudText>
+            <MudSpacer/>
+            @*<MudIconButton Icon="@Icons.Material.Filled.MoreVert" Color="Color.Inherit" Edge="Edge.End"/>*@
+        </MudAppBar>
+        <MudDrawer @bind-Open="_drawerOpen"  ClipMode="DrawerClipMode.Always" Elevation="1">
+            <MudDrawerHeader>
+                <MudText Typo="Typo.h5" Class="mt-1">Application</MudText>
+            </MudDrawerHeader>
+        <MudNavMenu Rounded="true" Color="Color.Secondary" Class="pa-1 flex-column justify-center" >
+                <MudNavLink class="nav-link" href="" Match="NavLinkMatch.All">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-house" viewBox="0 0 16 16">
+                        <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L2 8.207V13.5A1.5 1.5 0 0 0 3.5 15h9a1.5 1.5 0 0 0 1.5-1.5V8.207l.646.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293zM13 7.207V13.5a.5.5 0 0 1-.5.5h-9a.5.5 0 0 1-.5-.5V7.207l5-5z"/>
+                    </svg> Inicio
+                </MudNavLink>
 
-<input type="checkbox" title="Navigation menu" class="navbar-toggler"/>
+            <AuthorizeView Roles="Cliente">
+                <Authorized Context="cliente">
+                        <MudNavLink class="nav-link" Href="/Account/Manage">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-vcard-fill" viewBox="0 0 16 16">
+                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm9 1.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1h-4a.5.5 0 0 0-.5.5M9 8a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1h-4A.5.5 0 0 0 9 8m1 2.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 0-1h-3a.5.5 0 0 0-.5.5m-1 2C9 10.567 7.21 9 5 9c-2.086 0-3.8 1.398-3.984 3.181A1 1 0 0 0 2 13h6.96q.04-.245.04-.5M7 6a2 2 0 1 0-4 0 2 2 0 0 0 4 0"/>
+                            </svg>
+                            Mi perfil
+                        </MudNavLink>
+                        <MudNavLink class="nav-link" Href="/ListarMisBienes">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-briefcase" viewBox="0 0 16 16">
+                                <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
+                            </svg>
+                            Ver mis Bienes
+                        </MudNavLink>
+                        <MudNavLink class="nav-link" Href="/mis_publicaciones">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+                                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                            </svg> Ver mis publicaciones
+                        </MudNavLink>
+                        <MudNavLink class="nav-link" Href="/ListadoPublicacionesDisponibles">
+                            🚢
+                            Publicaciones
+                        </MudNavLink>
+                        <MudNavLink class="nav-link" Href="/embarcaciones">
+                            ⛵
+                            Ver mis embarcaciones
+                        </MudNavLink>
 
-<div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
-    <nav class="flex-column">
-    <div class="nav-item px-3">
-        <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-            <span class="bi bi-house-door-fill-nav-menu" aria-hidden="true"></span> Inicio
-        </NavLink>
-    </div>
-        
-            @* <AuthorizeView Roles="Cliente, Empleado"> *@
-        <AuthorizeView Roles="Cliente">
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Manage">
-                        @* <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> *@
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-vcard-fill" viewBox="0 0 16 16">
-                            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm9 1.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1h-4a.5.5 0 0 0-.5.5M9 8a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1h-4A.5.5 0 0 0 9 8m1 2.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 0-1h-3a.5.5 0 0 0-.5.5m-1 2C9 10.567 7.21 9 5 9c-2.086 0-3.8 1.398-3.984 3.181A1 1 0 0 0 2 13h6.96q.04-.245.04-.5M7 6a2 2 0 1 0-4 0 2 2 0 0 0 4 0"/>
-                        </svg>
-                        Mi perfil
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="ListarMisBienes">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-briefcase" viewBox="0 0 16 16">
-                            <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
-                        </svg>
-                         Ver mis Bienes
-                    </NavLink>
-                </div>
+                </Authorized>
+            </AuthorizeView>
 
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="mis_publicaciones">
-                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Ver mis publicaciones
-                    </NavLink>
-                </div>
-                
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="ListadoPublicacionesDisponibles">
-                        🚢
-                        Publicaciones
-                    </NavLink>
-                </div>
+            <AuthorizeView Roles="Empleado">
+                <Authorized Context="Empleado">
+                    <div class="nav-item px-3">
+                        <MudNavLink class="nav-link" Href="/agregarApplicationUser">
+                            <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Agregar cliente
+                        </MudNavLink>
+                    </div>
+                    <div class="nav-item px-3">
+                        <MudNavLink class="nav-link" Href="/ListarApplicationUsers">
+                            <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Listar clientes
+                        </MudNavLink>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
 
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="embarcaciones">
-                        ⛵
-                        Ver mis embarcaciones
-                    </NavLink>
-                </div>
-                
-            </Authorized>
-        </AuthorizeView>
-        
-        <AuthorizeView Roles="Empleado">
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="/agregarApplicationUser">
-                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Agregar cliente
-                    </NavLink>
-                </div>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="ListarApplicationUsers">
-                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Listar clientes
-                    </NavLink>
-                </div>
-            </Authorized>
-        </AuthorizeView>
-        
-        <AuthorizeView Roles="Admin">
-            <Authorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="admin">
-                        <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Administrar
-                    </NavLink>
-                </div>
-            </Authorized>
-        </AuthorizeView>
-        
-        <AuthorizeView>
-            
-            <Authorized>
-                
-                
-                <div class="nav-item px-3">
-                    <form action="Account/Logout" method="post"  style="display: inline-block">
-                        <AntiforgeryToken/>
-                        <input type="hidden" name="ReturnUrl"/>
-                        <button type="submit" class="nav-link">
-                            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Cerrar sesión
-                        </button>
-                    </form>
-                </div>
-            </Authorized>
+            <AuthorizeView Roles="Admin">
+                <Authorized Context="Admin">
+                    <div class="nav-item px-3">
+                        <MudNavLink class="nav-link" Href="/admin">
+                            <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Administrar
+                        </MudNavLink>
+                    </div>
+                </Authorized>
+            </AuthorizeView>
+            <MudNavLink  class="nav-link" Href="/"> 
+            <form action="Account/Logout" method="post">
+                <AntiforgeryToken/>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Outlined" Color="Color.Secondary">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">
+                        <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0z"/>
+                        <path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708z"/>
+                    </svg> Cerrar sesión
+                </MudButton>
+            </form>
+            </MudNavLink>
+        </MudNavMenu>
+        </MudDrawer>
 
-            <NotAuthorized>
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Register">
-                        <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Registrarse
-                    </NavLink>
-                    @* <MudNavLink  Href="Account/Register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Register</MudNavLink> *@
-                </div>
-                
-                <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Login">
-                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Iniciar sesión
-                    </NavLink>
-                </div>
-            </NotAuthorized>
-            
-        </AuthorizeView>
-    </nav>
-</div>
+    </Authorized>
+</AuthorizeView>
 
 
 @code {
+    bool _drawerOpen = true;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
     private string? _currentUrl;
 
     protected override void OnInitialized()

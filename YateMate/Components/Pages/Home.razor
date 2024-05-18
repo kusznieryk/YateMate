@@ -1,17 +1,33 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Components.Authorization
 <PageTitle>Inicio</PageTitle>
 
 <MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-16 position-relative">
 
     <MudGrid Justify="Justify.Center" Class="mb-16">
-            <MudItem xs="12" sm="8" md="6">
+        <MudItem xs="12" sm="8" md="6">
             <MudPaper Elevation="25" Class="pa-8">
                 <MudText Typo="Typo.h4" GutterBottom="true" Align="Align.Center">YateMate</MudText>
                 <MudText Align="Align.Center" Class="mb-4">Tu brújula en el mar de los trueques</MudText>
             </MudPaper>
         </MudItem>
     </MudGrid>
+    <AuthorizeView>
+        <NotAuthorized>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="Account/Register">
+                    <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Registrarse
+                </NavLink>
+                @* <MudNavLink  Href="Account/Register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Register</MudNavLink> *@
+            </div>
 
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="Account/Login">
+                    <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Iniciar sesión
+                </NavLink>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
     <MudGrid Justify="Justify.Center" Class="mb-16 align-center" >
         <MudItem xs="12">
             <MudText Typo="Typo.h5" GutterBottom="true" Align="Align.Center">¿Cómo funciona?</MudText>
