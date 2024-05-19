@@ -53,20 +53,19 @@
                     <td>
                         <div class="row">
                             <div class="col-md-6">
-                                <EditForm Model="new()" FormName="@($"Eliminar-cliente-{empleado.Id}")" OnValidSubmit="() => ConfirmarEliminacion(empleado)" method="post">
-                                    <button type="submit" class="w-200 btn btn-lg btn-primary">Eliminar</button>
-                                </EditForm>
+                                <button type="submit" @onclick="() => ConfirmarEliminacion(empleado)" class="w-200 btn btn-lg btn-primary">Eliminar</button>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-md-6">
-                                <EditForm Model="new()" FormName="@($"Editar-empleado-{empleado.Id}")" OnValidSubmit="() => EditarEmpleado(empleado)" method="post">
-                                    <button type="submit" class="w-200 btn btn-lg btn-primary">Modificar</button>
-                                </EditForm>
+                                <button type="submit" @onclick="() => EditarEmpleado(empleado)" class="w-200 btn btn-lg btn-primary">Modificar</button>
                             </div>
                         </div>
-                        
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="submit" @onclick="() => VerEmpleado(empleado)" class="w-200 btn btn-lg btn-primary">Ver Datos</button>
+                            </div>
+                        </div>
                     </td>
                 </tr>
                     
@@ -112,7 +111,7 @@
         ActualizarLista();
     }
 
-    private void EditarEmpleado(ApplicationUser? empleado)
+    private async void EditarEmpleado(ApplicationUser? empleado)
     {
         string mensaje = empleado is null ? "Agregando empleado" : "Modificando empleado";
         string textoBoton = empleado is null ? "Agregar" : "Modificar";
@@ -120,7 +119,17 @@
         parameters.Add(x => x.Empleado, empleado);
         parameters.Add(x => x.textoBoton, textoBoton);
         parameters.Add(x => x.agregando, empleado is null);
-        Dialog.Show<EditarEmpleado>(mensaje, parameters);
+        var _ = Dialog.Show<EditarEmpleado>(mensaje, parameters);
+        await _.Result;
+        _lista = ObtenerEmpleadosUseCase.Ejecutar(); //lo mas eficiente seria definir un callback en el que el hijo me pase el valor actualizado y uso ese en vez de consultar la bd
+        StateHasChanged();
+    }
+
+    private void VerEmpleado(ApplicationUser empleado)
+    {
+        var parameters = new DialogParameters<VerDatosEmpleado>();
+        parameters.Add(x => x.Empleado, empleado);
+        Dialog.Show<VerDatosEmpleado>($"Viendo al empleado {empleado.Nombre}", parameters);
     }
 
     private void ActualizarLista()

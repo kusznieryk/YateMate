@@ -1,0 +1,105 @@
+<MudDialog>
+    <DialogContent>
+        @* <MudCard> *@
+        @*      *@
+        @*     <MudCardContent> *@
+        @*         <div class="form-floating mb-3"> *@
+        @*             <input id="email" value="@Empleado.Nombre" class="form-control" disabled/> *@
+        @*             <label for="email">Email</label> *@
+        @*         </div> *@
+        @*         <div class="form-floating mb-3"> *@
+        @*             <input id="email" value="@Empleado.Apellido" class="form-control" disabled/> *@
+        @*             <label for="email">Email</label> *@
+        @*         </div> *@
+        @*          *@
+        @*     </MudCardContent> *@
+        @* </MudCard> *@
+
+        @* <MudPaper Elevation="4" Class="pa-4" > *@
+        @*     <MudCard> *@
+        @*         <MudCardHeader> *@
+        @*             <CardHeaderContent> *@
+        @*                 <MudText Typo="Typo.h6">Información Personal</MudText> *@
+        @*             </CardHeaderContent> *@
+        @*         </MudCardHeader> *@
+        @*         <MudCardContent> *@
+        @*             <MudGrid> *@
+        @*                 <MudItem xs="6"> *@
+        @*                     <MudText Typo="Typo.body2" Style="font-weight: 500;">Nombre</MudText> *@
+        @*                     <MudText Typo="Typo.body1">@Empleado.Nombre</MudText> *@
+        @*                 </MudItem> *@
+        @*                 <MudItem xs="6"> *@
+        @*                     <MudText Typo="Typo.body2" Style="font-weight: 500;">Apellido</MudText> *@
+        @*                     <MudText Typo="Typo.body1">@Empleado.Apellido</MudText> *@
+        @*                 </MudItem> *@
+        @*                 <MudItem xs="12"> *@
+        @*                     <MudText Typo="Typo.body2" Style="font-weight: 500;">Email</MudText> *@
+        @*                     <MudText Typo="Typo.body1">@Empleado.Email</MudText> *@
+        @*                 </MudItem> *@
+        @*                 <MudItem xs="6"> *@
+        @*                     <MudText Typo="Typo.body2" Style="font-weight: 500;">Fecha de Nacimiento</MudText> *@
+        @*                     <MudText Typo="Typo.body1">@Empleado.FechaNacimiento?.ToString("dd/MM/yyyy")</MudText> *@
+        @*                 </MudItem> *@
+        @*                 <MudItem xs="6"> *@
+        @*                     <MudText Typo="Typo.body2" Style="font-weight: 500;">Género</MudText> *@
+        @*                     <MudText Typo="Typo.body1">@Empleado.Genero</MudText> *@
+        @*                 </MudItem> *@
+        @*                 <MudItem xs="6"> *@
+        @*                     <MudText Typo="Typo.body2" Style="font-weight: 500;">DNI</MudText> *@
+        @*                     <MudText Typo="Typo.body1">@Empleado.Dni</MudText> *@
+        @*                 </MudItem> *@
+        @*                 <MudItem xs="6"> *@
+        @*                     <MudText Typo="Typo.body2" Style="font-weight: 500;">Nacionalidad</MudText> *@
+        @*                     <MudText Typo="Typo.body1">@Empleado.Nacionalidad</MudText> *@
+        @*                 </MudItem> *@
+        @*             </MudGrid> *@
+        @*         </MudCardContent> *@
+        @*     </MudCard> *@
+        @* </MudPaper> *@
+
+        <MudPaper Elevation="4" Class="pa-4">
+            <MudGrid>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudText Typo="Typo.body2" Style="font-weight: 500;">Nombre</MudText>
+                    <MudText Typo="Typo.body1">@Empleado.Nombre</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudText Typo="Typo.body2" Style="font-weight: 500;">Apellido</MudText>
+                    <MudText Typo="Typo.body1">@Empleado.Apellido</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudText Typo="Typo.body2" Style="font-weight: 500;">Email</MudText>
+                    <MudText Typo="Typo.body1">@Empleado.Email</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudText Typo="Typo.body2" Style="font-weight: 500;">Fecha de Nacimiento</MudText>
+                    <MudText Typo="Typo.body1">@Empleado.FechaNacimiento?.ToString("dd/MM/yyyy")</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudText Typo="Typo.body2" Style="font-weight: 500;">Género</MudText>
+                    <MudText Typo="Typo.body1">@Empleado.Genero</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudText Typo="Typo.body2" Style="font-weight: 500;">DNI</MudText>
+                    <MudText Typo="Typo.body1">@Empleado.Dni</MudText>
+                </MudItem>
+                <MudItem xs="12" sm="6" md="4">
+                    <MudText Typo="Typo.body2" Style="font-weight: 500;">Nacionalidad</MudText>
+                    <MudText Typo="Typo.body1">@Empleado.Nacionalidad</MudText>
+                </MudItem>
+            </MudGrid>
+            </MudPaper>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+[Parameter] public ApplicationUser Empleado { get; set; }
+[CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+
+// void Submit() => MudDialog!.Close(DialogResult.Ok(true));
+void Cancel() => MudDialog!.Cancel();
+
+}
