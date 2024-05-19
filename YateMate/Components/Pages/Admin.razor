@@ -12,6 +12,7 @@
 
 @rendermode InteractiveServer
 
+<PageTitle> Admin </PageTitle>
 <MudDialogProvider  FullWidth="true"
                     MaxWidth="MaxWidth.Small"
                     Position="DialogPosition.CenterLeft"/>
@@ -93,10 +94,7 @@
     }
     protected override void OnParametersSet()
     {
-        if(_lista.Count > 0) 
-        {
-            _tieneElementos = true;
-        }
+        _tieneElementos = _lista.Count > 0;
     }
 
     DialogoConfirmacion _dialogo = null!;
@@ -111,19 +109,25 @@
     private void EliminarApplicationUser()
     {
         EliminarApplicationUserUseCase.Ejecutar(_userAEliminar!.Id);
-        _lista = ObtenerEmpleadosUseCase.Ejecutar();
-        
-        if(_lista.Count == 0)
-        {
-            _tieneElementos = false;
-        }
+        ActualizarLista();
     }
 
     private void EditarEmpleado(ApplicationUser? empleado)
     {
+        string mensaje = empleado is null ? "Agregando empleado" : "Modificando empleado";
+        string textoBoton = empleado is null ? "Agregar" : "Modificar";
         var parameters = new DialogParameters<EditarEmpleado>();
-        parameters.Add(x => x.Input, empleado);
-        Dialog.Show<EditarEmpleado>("Editar empleado", parameters);
+        parameters.Add(x => x.Empleado, empleado);
+        parameters.Add(x => x.textoBoton, textoBoton);
+        parameters.Add(x => x.agregando, empleado is null);
+        Dialog.Show<EditarEmpleado>(mensaje, parameters);
+    }
+
+    private void ActualizarLista()
+    {
+        _lista = ObtenerEmpleadosUseCase.Ejecutar();
+
+        _tieneElementos = _lista.Count > 0;
     }
     
 }
