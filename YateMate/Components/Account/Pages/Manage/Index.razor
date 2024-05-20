@@ -51,25 +51,24 @@
 
             <div class="form-floating mb-3">
                 <InputSelect id="nacionalidad" @bind-Value="Input.Nacionalidad" class="form-select" aria-required="true" TValue="Nacionalidad?">
-                    <ValidationMessage For="() => Input.Nacionalidad" class="text-danger"/>
                     @foreach (Nacionalidad nacionalidad in Enum.GetValues(typeof(Nacionalidad)))
                     {
-                    <option value=@nacionalidad> @nacionalidad </option>
+                        <option value=@nacionalidad> @nacionalidad </option>
                     }
                 </InputSelect>
+                <ValidationMessage For="() => Input.Nacionalidad" class="text-danger"/>
                 <label for="nacionalidad" class="text-muted">Nacionalidad</label>
             </div>
 
             <div class="form-floating mb-3">
                 
                 <InputSelect id="genero" @bind-Value="Input.Genero" class="form-select" aria-required="true" TValue="Genero?">
-                    <ValidationMessage For="() => Input.Genero" class="text-danger"/>
-
                     @foreach (Genero genero in Enum.GetValues(typeof(Genero)))
                     {
                         <option value=@genero> @genero </option>
                     }
                 </InputSelect>
+                <ValidationMessage For="() => Input.Genero" class="text-danger"/>
                 <label for="genero" class="text-muted">Género</label>
             </div>
 

@@ -56,21 +56,6 @@
                 </MudTd>
             </RowTemplate>
         </MudTable>
-
-        @* @if (_mostrandoFormularioEdicion) *@
-        @* { *@
-        @*     <div> *@
-        @*         <h3>Modificar Embarcación</h3> *@
-        @*         <MudTextField Label="Nombre" @bind-Value="_embarcacionAModificar!.Nombre" /> *@
-        @*         <MudNumericField Label="Eslora" @bind-Value="_embarcacionAModificar!.Eslora" /> *@
-        @*         <MudNumericField Label="Calado" @bind-Value="_embarcacionAModificar!.Calado" /> *@
-        @*         $1$ <MudNumericField Label="Manga" @bind-Value="_embarcacionAModificar!.Manga" /> #1# *@
-        @*         $1$ <MudNumericField Label="Bandera" @bind-Value="_embarcacionAModificar!.Bandera" /> #1# *@
-        @*         <MudTextField Label="Matricula" @bind-Value="_embarcacionAModificar!.Matricula" /> *@
-        @* *@
-        @*         <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ModificarEmbarcacion(_embarcacionAModificar!))">Guardar</MudButton> *@
-        @*     </div> *@
-        @* } *@
     }
 </MudContainer>
 
@@ -99,7 +84,6 @@
         var parameters = new DialogParameters<EditarEmbarcacion>();
         parameters.Add(x => x.barco, embarcacion);
         Dialog.Show<EditarEmbarcacion>("Ver Datos", parameters);
-        //ModificarEmbarcacionUseCase.Ejecutar(embarcacion);
     }
 
 
