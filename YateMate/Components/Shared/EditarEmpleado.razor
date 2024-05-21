@@ -1,0 +1,290 @@
+@using System.Net.Mail
+@using System.Text
+@using System.Text.Encodings.Web
+@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.WebUtilities
+@using YateMate.Aplicacion.UseCases.ApplicationUser
+@using YateMate.Components.Account.Pages
+@using YateMate.Components.Account.Shared @*No usamos este como en el resto*@
+
+@inject UserManager<ApplicationUser> UserManager
+@inject ModificarApplicationUserUseCase ModificarUser;
+@inject IEmailSender<ApplicationUser> EmailSender
+@inject NavigationManager NavigationManager
+@inject IUserStore<ApplicationUser> UserStore
+
+<MudDialog>
+    <DialogContent>
+        <StatusMessageSinHttpContext Message="@message"/>
+        <EditForm EditContext="editContext" FormName="profile" OnSubmit="SubmitPelado" method="post">
+            <CustomValidator @ref="customValidator"></CustomValidator>
+
+            <div class="form-floating mb-3">
+                <InputText id="email" @bind-Value="Input.Email" class="form-control" aria-required="true"/>
+                <label for="email">Email</label>
+                <ValidationMessage For="() => Input.Email" class="text-danger"/>
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputText id="nombre" @bind-Value="Input.Nombre" class="form-control" aria-required="true"/>
+                <label for="nombre">Nombre</label>
+                <ValidationMessage For="() => Input.Nombre" class="text-danger"/>
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputText id="apellido" @bind-Value="Input.Apellido" class="form-control" aria-required="true"/>
+                <label for="apellido">Apellido</label>
+                <ValidationMessage For="() => Input.Apellido" class="text-danger"/>
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputSelect id="nacionalidad" @bind-Value="Input.Nacionalidad" class="form-select" aria-required="true">
+                    @foreach (Nacionalidad nacionalidad in Enum.GetValues(typeof(Nacionalidad)))
+                    {
+                        <option value=@nacionalidad> @nacionalidad </option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Input.Nacionalidad" class="text-danger"/>
+                <label for="nacionalidad" class="text-muted">Nacionalidad</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputSelect id="genero" @bind-Value="Input.Genero" class="form-select" aria-required="true" >
+                    @* <option selected disabled value="Elige un genero"> Elige un género</option> *@
+                    @foreach (Genero genero in Enum.GetValues(typeof(Genero)))
+                    {
+                        <option value=@genero> @genero </option>
+                    }
+                </InputSelect>
+                <ValidationMessage For="() => Input.Genero" class="text-danger"/>
+                <label for="genero" class="text-muted">Género</label>
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputNumber id="dni" @bind-Value="Input.Dni" class="form-control" aria-required="true"/>
+                <label for="dni">Dni</label>
+                <ValidationMessage For="() => Input.Dni" class="text-danger"/>
+            </div>
+
+            <div class="form-floating mb-3">
+                <InputDate id="fechaNacimiento" @bind-Value="Input.FechaNacimiento" class="form-control" aria-required="true"/>
+                <label for="dni">Fecha de nacimiento</label>
+                <ValidationMessage For="() => Input.FechaNacimiento" class="text-danger"/>
+            </div>
+
+            <button type="submit" class="w-100 btn btn-lg btn-primary">@textoBoton</button>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code 
+{
+     InputModel? Input { get; set; }
+     
+     [Parameter] public ApplicationUser? Empleado { get; set; }
+
+     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+        
+     private EditContext? editContext;
+
+     public CustomValidator customValidator;
+
+     public string? _emailPrevio;
+     
+     private string? message;
+     
+     [Parameter] public string textoBoton { get; set; }
+     
+     [Parameter] public bool agregando { get; set; }
+     
+     void Cancel() => MudDialog!.Cancel();
+
+     protected override void OnInitialized()
+     {
+         Input ??= new();
+         Empleado ??= new ApplicationUser();
+         editContext = new(Input);
+         _emailPrevio = Empleado.Email;
+         
+         Input.Nombre ??= Empleado.Nombre;
+         Input.Apellido ??= Empleado.Apellido;
+         Input.FechaNacimiento ??= Empleado.FechaNacimiento;
+         Input.Dni ??= Empleado.Dni;
+         Input.Genero ??= Empleado.Genero;
+         Input.Nacionalidad ??= Empleado.Nacionalidad;
+         Input.Email ??= Empleado.Email;
+     }
+     
+     private async Task SubmitPelado()
+    {
+        Console.WriteLine($" email de empleado que puso es {Input?.Email}");
+        Console.WriteLine($" nacionalidad de empleado que puso es {Input?.Nacionalidad}");
+        var errors = new Dictionary<string, List<string>>();
+        
+        foreach (var property in Input!.GetType().GetProperties()!) //me cago en microsoft
+        {
+            var value = property.GetValue(Input);
+            // Console.WriteLine(property.Name);
+            if (String.IsNullOrWhiteSpace(value?.ToString()))
+            {
+                errors.Add(property.Name, new List<string>() {"Este campo es obligatorio"});
+                Console.WriteLine(property.Name);
+            }
+        }
+        
+        if (Input.Dni is not null)
+        {
+            if(Input.Dni.Value.CompareTo(1000000) < 0 || Input.Dni.Value.CompareTo(100000000) > 0) 
+                errors.Add(nameof(Input.Dni), new List<string>(){"El número de dni debe estar entre un millon (1.000.000) y cien millones (100.000.000)"});
+        }
+        
+        if (Input.FechaNacimiento is not null)
+        {
+            if (DateTime.Compare((DateTime)Input.FechaNacimiento, DateTime.Today.AddYears(-18)) > 0)
+            {
+                errors.Add(nameof(Input.FechaNacimiento), new List<string>(){"La edad mínima permitida es 18 años"});
+            }
+
+            if (DateTime.Compare((DateTime)Input.FechaNacimiento, DateTime.Today.AddYears(-120)) < 0)
+            {
+                errors.Add(nameof(Input.FechaNacimiento), new List<string>(){"La edad máxima permitida es 120 años"});
+            }
+        }
+
+        if (!String.IsNullOrWhiteSpace(Input.Email))
+        {
+            var _ = new MailAddress("hola@hola.com");
+            var valido = MailAddress.TryCreate(Input.Email, out _);
+            if (!valido)
+            {
+                errors.Add(nameof(Input.Email), new List<string>() { "La direccion de email no es valida" });
+            }
+        }
+
+        if (errors.Count > 0)
+        {
+            customValidator.DisplayErrors(errors);
+            return;
+        }
+        
+        await OnValidSubmitAsync();
+    }
+    
+    private async Task OnValidSubmitAsync()
+    {
+        Console.WriteLine($"Datos de los inputs despues del form {Input?.Email}" +
+                          $" nom:{Input.Nombre}" +
+                          $" ap:{Input.Apellido}" +
+                          $" nacimiento:{Input.FechaNacimiento}" +
+                          $" dni:{Input.Dni}" +
+                          $" Genero:{Input.Genero}" +
+                          $" nacionalidad:{Input.Nacionalidad}");
+        
+        Empleado.Nombre = Input!.Nombre;
+        Empleado.Apellido = Input.Apellido;
+        Empleado.FechaNacimiento = Input.FechaNacimiento;
+        Empleado.Dni = Input.Dni;
+        Empleado.Genero = (Genero) Input.Genero!;
+        Empleado.Nacionalidad = (Nacionalidad) Input.Nacionalidad!;
+        Empleado.Email = Input.Email;
+
+        string code = ""; //agregar y modificar envian mails pero ambos con distinto codigo y callbackUrl
+        string callbackUrl = "";
+        
+        if (agregando)
+        {
+            await UserStore.SetUserNameAsync(Empleado, Empleado.Email, CancellationToken.None);
+            var emailStore = GetEmailStore();
+            await emailStore.SetEmailAsync(Empleado, Input.Email, CancellationToken.None);
+            var result = await UserManager.CreateAsync(Empleado, "Falso123,"); //tenes un overload sin contrasenia pero tira error
+            //var result = await UserManager.CreateAsync(user);
+            ////pongo una contrasenia por defecto porque es necesaria, no hay problema porque no confirmo email hasta cambiar la contrasenia por primera vez
+            if (!result.Succeeded)
+            {
+                var identityErrors = result.Errors.Where(error => error.Code != "DuplicateUserName");
+                message = identityErrors is null? null : $"Error: {identityErrors.Select(error => error.Description)} "; 
+                return;
+            }
+            await UserManager.AddToRoleAsync(Empleado, "Empleado");
+            
+            code = await UserManager.GeneratePasswordResetTokenAsync(Empleado);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            callbackUrl = NavigationManager.GetUriWithQueryParameters(
+                NavigationManager.ToAbsoluteUri("Account/ResetPassword").AbsoluteUri,
+                new Dictionary<string, object?> { ["code"] = code, ["email"] = Input.Email });
+        }
+        else
+        {
+            ModificarUser.Ejecutar(Empleado);
+        
+            message = "Tus cambios se han guardado";
+        
+            if (Input?.Email is not null && Input.Email != _emailPrevio)
+            {
+                var otroUserConEseMail = await UserManager.FindByEmailAsync(Input.Email);
+                if (otroUserConEseMail is not null)
+                {
+                    message+= ", excepto el email, que ya esta en uso";
+                    //var errors = new Dictionary<string, List<string>>();
+                    //errors.Add(nameof(Input.Email), new List<string>() { "La direccion de email ya esta en uso" });
+                    Input.Email = _emailPrevio;
+                    //customValidator.DisplayErrors(errors);
+                    return;
+                }
+
+            }
+            else
+            {
+                Console.WriteLine($"No se mando mail porq el mail era igual {Input.Email} {_emailPrevio}");
+                return;
+            }
+            
+            var userId = await UserManager.GetUserIdAsync(Empleado);
+            code = await UserManager.GenerateChangeEmailTokenAsync(Empleado, Empleado.Email);
+            code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
+            callbackUrl = NavigationManager.GetUriWithQueryParameters(
+                NavigationManager.ToAbsoluteUri("Account/ConfirmEmailChange").AbsoluteUri,
+                new Dictionary<string, object?> { ["userId"] = userId, ["email"] = Empleado.Email, ["code"] = code });
+        }
+        
+        
+
+        Console.WriteLine($"email enviado onValidSubmit Async con el link {callbackUrl}");
+
+        //await EmailSender.SendConfirmationLinkAsync(Empleado, Empleado.Email, HtmlEncoder.Default.Encode(callbackUrl));
+
+        message = "Hemos enviado un link de confirmación para el cambio de correo";
+        
+        
+    }
+
+    private IUserEmailStore<ApplicationUser> GetEmailStore()
+    {
+        if (!UserManager.SupportsUserEmail)
+        {
+            throw new NotSupportedException("The default UI requires a user store with email support.");
+        }
+
+        return (IUserEmailStore<ApplicationUser>)UserStore;
+    }
+    
+    private sealed class InputModel
+    {
+        public string? Email { get; set; } = null;
+        
+        public string? Nombre { get; set; } = null!;
+        
+        public string? Apellido { get; set; } = null!;
+        
+        public Genero? Genero { get; set; }
+       
+        public DateTime? FechaNacimiento { get; set; } = null;
+        
+        public int? Dni { get; set; } = null;
+        
+        public Nacionalidad? Nacionalidad { get; set; }
+    }
+}

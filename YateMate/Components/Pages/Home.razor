@@ -1,57 +1,82 @@
 ﻿@page "/"
-
+@using Microsoft.AspNetCore.Components.Authorization
 <PageTitle>Inicio</PageTitle>
 
-<section class="hero">
-    @* <p>¿Tienes un barco que no estás utilizando?</p> *@
-    @* <p>¿Buscas un barco pero no quieres pa?</p>  *@
-    @* <p>¡YateMate es tu solución perfecta!</p> *@
-    
-</section>
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-16 position-relative">
 
-<br/>
-@* <section class="benefits"> *@
-@*             <h2>¿Por qué usar YateMate?</h2> *@
-@* *@
-@*             <ul> *@
-@*                 <li> *@
-@*                     <h3>Optimiza tu inversión</h3> *@
-@*                     <p>Intercambia tu barco por uno que se ajuste mejor a tus necesidades y ahorra en tarifas de alquiler.</p> *@
-@*                 </li> *@
-@*                 <li> *@
-@*                     <h3>Amplía tu red náutica</h3> *@
-@*                     <p>Conoce a otros usuarios de las marinas YateMate y haz crecer tu comunidad.</p> *@
-@*                 </li> *@
-@*                 <li> *@
-@*                     <h3>Fácil y rápido</h3> *@
-@*                     <p>Nuestra plataforma es intuitiva y te permite encontrar lo que buscas en poco tiempo.</p> *@
-@*                 </li> *@
-@*             </ul> *@
-@*         </section> *@
-@* *@
-@*         <section class="how-it-works"> *@
-@*             <h2>¿Cómo funciona YateMate?</h2> *@
-@* *@
-@*             <ol> *@
-@*                 <li> *@
-@*                     <h3>Crea tu perfil</h3> *@
-@*                     <p>Indica tus datos.</p> *@
-@*                 </li> *@
-@*                 <li> *@
-@*                     <h3>Publica tus barcos o bienes disponibles</h3> *@
-@*                     <p>Describe tus barcos, incluyendo ubicación, tamaño, tipo de embarcación y precio.</p> *@
-@*                 </li> *@
-@*                 <li> *@
-@*                     <h3>Busca barcos</h3> *@
-@*                     <p>Filtra por ubicación, tamaño de calado, tamaño de eslora y tipo de embarcación para encontrar el barco perfecto.</p> *@
-@*                 </li> *@
-@*                 <li> *@
-@*                     <h3>Contacta con otros usuarios</h3> *@
-@*                     <p>Envía mensajes directos a otros usuarios para negociar el intercambio.</p> *@
-@*                 </li> *@
-@*             </ol> *@
-@*         </section> *@
+    <MudGrid Justify="Justify.Center" Class="mb-16">
+        <MudItem xs="12" sm="8" md="6">
+            <MudPaper Elevation="25" Class="pa-8">
+                <MudText Typo="Typo.h4" GutterBottom="true" Align="Align.Center">YateMate</MudText>
+                <MudText Align="Align.Center" Class="mb-4">Tu brújula en el mar de los trueques</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+    <AuthorizeView>
+        <NotAuthorized>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="Account/Register">
+                    <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Registrarse
+                </NavLink>
+                @* <MudNavLink  Href="Account/Register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Register</MudNavLink> *@
+            </div>
 
-<footer>
-    <p>&copy; 2024 YateMate. Todos los derechos reservados.</p>
-</footer>
+            <div class="nav-item px-3">
+                <NavLink class="nav-link" href="Account/Login">
+                    <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Iniciar sesión
+                </NavLink>
+            </div>
+        </NotAuthorized>
+    </AuthorizeView>
+    <MudGrid Justify="Justify.Center" Class="mb-16 align-center" >
+        <MudItem xs="12">
+            <MudText Typo="Typo.h5" GutterBottom="true" Align="Align.Center">¿Cómo funciona?</MudText>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudPaper Elevation="25" Class="pa-4 d-flex flex-column align-center">
+                <MudIcon Icon="@Icons.Material.Filled.AccountCircle" Size="Size.Large" Class="mb-4" />
+                <MudText Typo="Typo.h6" GutterBottom="true">Crea una cuenta</MudText>
+                <MudText Align="Align.Center">Presiona registrar y crea una cuenta. Luego, inicia sesión</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudPaper Elevation="25" Class="pa-4 d-flex flex-column align-center">
+                <MudIcon Icon="@Icons.Material.Filled.Upload" Size="Size.Large" Class="mb-4" />
+                <MudText Typo="Typo.h6" GutterBottom="true">Sube algún bien</MudText>
+                <MudText Align="Align.Center">Sube algún bien que estes dispuesto a cambiar. Tienes que elegir un nombre, una descripción y una imagen</MudText>
+            </MudPaper>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudPaper Elevation="25" Class="pa-4 d-flex flex-column align-center">
+                <MudIcon Icon="@Icons.Material.Filled.SwapHoriz" Size="Size.Large" Class="mb-4" />
+                <MudText Typo="Typo.h6" GutterBottom="true">Elije el barco que más te interese</MudText>
+                <MudText Align="Align.Center">Ves un barco publicado que te gusta? Hazle una oferta! Le ofrecés uno de tus bienes. Si hay "match" van a tener un chat para coordinar el intercambio</MudText>
+            </MudPaper>
+        </MudItem>
+    </MudGrid>
+
+        
+</MudContainer>
+
+<MudPaper Elevation="25" Class="pa-4" Style="background-color: #eee">
+    <MudGrid Justify="Justify.Center">
+        <MudItem xs="12">
+            <MudText Typo="Typo.h5" GutterBottom="true" Align="Align.Center">¿Por qué elegir YateMate?</MudText>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudText Typo="Typo.subtitle1" GutterBottom="true" Class="font-weight-bold">- Uso</MudText>
+            <MudText>Nuestra plataforma es intuitiva y te permite encontrar lo que buscas en poco tiempo.</MudText>
+            <MudText>Tienes múltiples filtros para usar, como por eslora y calado</MudText>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudText Typo="Typo.subtitle1" GutterBottom="true" Class="font-weight-bold">- Seguridad</MudText>
+            <MudText>"Los datos de cualquier embarcación son subidos por nuestros empleados, por lo que no te encontrarás con sorpresas al hacer el intercambio"</MudText>
+        </MudItem>
+        <MudItem xs="12" sm="4">
+            <MudText Typo="Typo.subtitle1" GutterBottom="true" Class="font-weight-bold">- Comunidad</MudText>
+            <MudText>Somos una comunidad apasionada por los barcos, teniendo una de las comunidades más grandes de Argentina</MudText>
+        </MudItem>
+    </MudGrid>
+
+    <MudText Align="Align.Center">&copy; 2024 YateMate. Todos los derechos reservados.</MudText>
+</MudPaper>

@@ -1,9 +1,13 @@
 ﻿@page "/Account/Register"
 
+@using System.Collections
 @using System.ComponentModel.DataAnnotations
+@using System.Net.Mail
 @using System.Text
 @using System.Text.Encodings.Web
+@using Humanizer
 @using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Mvc.ModelBinding.Validation
 @using Microsoft.AspNetCore.WebUtilities
 @using YateMate.Aplicacion.Entidades;
 
@@ -24,12 +28,13 @@
 <div class="row">
     <div class="col-md-4">
         <StatusMessage Message="@Message"/>
-        <EditForm Model="Input" asp-route-returnUrl="@ReturnUrl" method="post" OnValidSubmit="RegisterUser" FormName="register">
-            <DataAnnotationsValidator/>
-            <h2>Crea una nueva cuenta.</h2>
-            <hr/>
+        <EditForm EditContext="editContext" asp-route-returnUrl="@ReturnUrl" method="post" OnSubmit="SubmitPelado" FormName="register">
+            <CustomValidator @ref="customValidator"></CustomValidator>
+            @* <ValidationSummary></ValidationSummary> *@
             
-            <ValidationSummary class="text-danger" role="alert"/>
+            <h2>Crea una nueva cuenta.</h2>
+            
+            @* <ValidationSummary class="text-danger" role="alert"/> *@
             <div class="form-floating mb-3">
                 <InputText id="email" @bind-Value="Input.Email" class="form-control" autocomplete="username" aria-required="true"/>
                 <label for="email">Email</label>
@@ -49,8 +54,7 @@
             </div>
 
             <div class="form-floating mb-3">
-                <InputSelect id="nacionalidad" @bind-Value="Input.Nacionalidad" class="form-select" aria-required="true" TValue="Nacionalidad">
-                    <ValidationMessage For="() => Input.Nacionalidad" class="text-danger"/>
+                <InputSelect id="nacionalidad" @bind-Value="Input.Nacionalidad" class="form-select" aria-required="true" TValue="Nacionalidad?">
                     <option value=""></option>
                     @foreach (Nacionalidad nacionalidad in Enum.GetValues(typeof(Nacionalidad)))
                     {
@@ -58,16 +62,17 @@
                     }
                 </InputSelect>
                 <label for="nacionalidad" class="text-muted">Nacionalidad</label>
+                <ValidationMessage For="() => Input.Nacionalidad" class="text-danger"/>
             </div>
             
             <div class="form-floating mb-3">
                 <InputSelect id="genero" @bind-Value="Input.Genero" class="form-control" aria-required="true">
-                    <ValidationMessage For="() => Input.Genero" class="text-danger"/>
                     <option value=""></option> @* tiene que estar en blanco porque si no muestra Masculino re feo *@
                     <option value="Masculino">Masculino</option>
                     <option value="Femenino">Femenino</option>
                 </InputSelect>
                 <label for="genero" class="text-muted">Género</label>
+                <ValidationMessage For="() => Input.Genero" class="text-danger"/>
             </div>
 
             <div class="form-floating mb-3">
@@ -96,21 +101,84 @@
     [SupplyParameterFromQuery] private string? ReturnUrl { get; set; }
 
     private string? Message => _identityErrors is null ? null : $"Error: {string.Join(", ", _identityErrors.Select(error => error.Description))}";
+    
+    private EditContext? editContext;
 
-    public async Task RegisterUser(EditContext editContext)
+    public CustomValidator customValidator;
+    
+    protected override void OnInitialized()
     {
-        //var user = CreateUser();
-        //MailAddress address = new MailAddress(Input.Email);
-        //string userName = address.User;
+        Input ??= new();
+        editContext = new(Input);
+    }
+    
+    
+    private async Task SubmitPelado()
+    {
+        var errors = new Dictionary<string, List<string>>();
+        
+        foreach (var property in Input.GetType().GetProperties()) //me cago en microsoft
+        {
+            var value = property.GetValue(Input);
+            Console.WriteLine(property.Name);
+            if (String.IsNullOrWhiteSpace(value?.ToString()))
+            {
+                errors.Add(property.Name, new List<string>() {"Este campo es obligatorio"});
+            }
+        }
 
+        if (Input.Dni is not null)
+        {
+            if(Input.Dni.Value.CompareTo(1000000) < 0 || Input.Dni.Value.CompareTo(100000000) > 0) 
+                errors.Add(nameof(Input.Dni), new List<string>(){"El número de dni debe estar entre un millon (1.000.000) y cien millones (100.000.000)"});
+        }
+        
+        if (Input.FechaNacimiento is not null)
+        {
+            if (DateTime.Compare((DateTime)Input.FechaNacimiento, DateTime.Today.AddYears(-18)) > 0)
+            {
+                errors.Add(nameof(Input.FechaNacimiento), new List<string>(){"La edad mínima permitida es 18 años"});
+                Console.WriteLine("a1");
+
+            }
+
+            if (DateTime.Compare((DateTime)Input.FechaNacimiento, DateTime.Today.AddYears(-120)) < 0)
+            {
+                Console.WriteLine("a2");
+                errors.Add(nameof(Input.FechaNacimiento), new List<string>(){"La edad máxima permitida es 120 años"});
+            }
+        }
+
+        if (!String.IsNullOrWhiteSpace(Input.Email))
+        {
+            var mail = new MailAddress("hola@hola.com");
+            var valido = MailAddress.TryCreate(Input.Email, out mail);
+            if (!valido)
+            {
+                errors.Add(nameof(Input.Email), new List<string>() { "La direccion de email no es valida" });
+            }
+        }
+
+        if (errors.Count > 0)
+        {
+            customValidator.DisplayErrors(errors);
+            return;
+        }
+        
+        await RegisterUser();
+    }
+    
+    public async Task RegisterUser()
+    {
+        
         var user = new ApplicationUser()
         {
             //UserName = userName,
             Email = Input.Email,
             Nombre = Input.Nombre,
             Apellido = Input.Apellido,
-            Nacionalidad = Input.Nacionalidad,
-            Genero = Input.Genero, 
+            Nacionalidad = (Nacionalidad)Input.Nacionalidad!, //si estamos en valid submit esto no puede ser null
+            Genero = (Genero)Input.Genero!, 
             Dni = Input.Dni,
             FechaNacimiento = Input.FechaNacimiento
                 
@@ -120,15 +188,13 @@
         var emailStore = GetEmailStore();
         await emailStore.SetEmailAsync(user, Input.Email, CancellationToken.None);
         var result = await UserManager.CreateAsync(user, "Falso123,"); //tenes un overload sin contrasenia pero tira error
-        //var result = await UserManager.CreateAsync(user);
+        
         ////pongo una contrasenia por defecto porque es necesaria, no hay problema porque no confirmo email hasta cambiar la contrasenia por primera vez
         if (!result.Succeeded)
         {
             _identityErrors = result.Errors.Where(error => error.Code != "DuplicateUserName"); 
             //lo saco porque ya hay un error por doble email y en la pagina email y usuario son lo mismo
-
-            
-            Console.WriteLine(_identityErrors.FirstOrDefault().Code);
+            // Console.WriteLine(_identityErrors.FirstOrDefault().Code);
             return;
         }
         await UserManager.AddToRoleAsync(user, "Cliente");
@@ -145,7 +211,7 @@
         //aca se pasa como parametro de la url un codigo usado para validar por Identity y el email del usuario asi no lo tiene que tipear despues
         //capaz se puede que con el codigo saque el email pero asi es mas facil
         
-        Console.WriteLine($"La url para poner tu contrasenia es {callbackUrl}");
+        //Console.WriteLine($"La url para poner tu contrasenia es {callbackUrl}");
         
         await EmailSender.SendPasswordResetLinkAsync(user, Input.Email, HtmlEncoder.Default.Encode(callbackUrl));
         
@@ -162,37 +228,42 @@
 
         return (IUserEmailStore<ApplicationUser>)UserStore;
     }
+    
+    // min=@DateMin.ToString("yyyy-MM-dd") //se puede agregar esto al html en inputDate
 
-    private sealed class InputModel
+    private sealed class InputModel 
     {
-        [Required]
-        [EmailAddress]
+     
+        //Todoes estos required no sirven de nada
+        [Required(ErrorMessage = "Ingresa un email")]
+        [EmailAddress(ErrorMessage = "La direccion de correo ingresada no es valida")]
         [Display(Name = "Email")]
         public string Email { get; set; } = "";
         
-        [Required]
+        [Required(ErrorMessage = "Ingresa un nombre")]
         [Display(Name = "Nombre")]
         public string Nombre { get; set; } = null!;
         
-        [Required]
+        [Required(ErrorMessage = "Ingresa un apellido")]
         [Display(Name = "Apellido")]
         public string Apellido { get; set; } = null!;
         
-        [Required]
+        [Required(ErrorMessage = "Ingresa un genero")]
         [Display(Name = "Genero")]
-        public Genero Genero { get; set; }
+        public Genero? Genero { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Ingresa una fecha de nacimiento")]
         [Display(Name = "Fecha de Nacimiento")]
-        public DateTime FechaNacimiento { get; set; }
+        public DateTime? FechaNacimiento { get; set; } = null;
 
         [Required]
         [Display(Name = "Dni")]
-        public int Dni { get; set; }
-        
-        [Required]
-        [Display(Name = "Nacionalidad")]
-        public Nacionalidad Nacionalidad { get; set; }
-    }
+        [Range(1000000, 100000000, ErrorMessage = "El número de dni debe estar entre un millon (1.000.000) y cien millones (100.000.000)")]
+        public int? Dni { get; set; } = null;
 
+        [Required(ErrorMessage = "Ingresa una nacionalidad")]
+        [Display(Name = "Nacionalidad")]
+        public Nacionalidad? Nacionalidad { get; set; } = null;
+    }
+    
 }

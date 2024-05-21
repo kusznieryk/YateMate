@@ -1,6 +1,7 @@
 ﻿@page "/Account/Manage"
 
 @using System.ComponentModel.DataAnnotations
+@using System.Net.Mail
 @using System.Text
 @using System.Text.Encodings.Web
 @using Microsoft.AspNetCore.Authorization
@@ -26,9 +27,9 @@
 @* <StatusMessage/> *@
 <div class="row">
     <div class="col-md-6">
-        <EditForm Model="Input" FormName="profile" OnValidSubmit="OnValidSubmitAsync" method="post">
-            <DataAnnotationsValidator/>
-            <ValidationSummary class="text-danger" role="alert"/>
+        <EditForm EditContext="editContext" FormName="profile" OnSubmit="SubmitPelado" method="post">
+            <CustomValidator @ref="customValidator"></CustomValidator>
+            @* <ValidationSummary class="text-danger" role="alert"/> *@
             
             <div class="form-floating mb-3">
                 <InputText id="email" @bind-Value="Input.EmailAModificar" class="form-control" aria-required="true" />
@@ -50,26 +51,24 @@
 
             <div class="form-floating mb-3">
                 <InputSelect id="nacionalidad" @bind-Value="Input.Nacionalidad" class="form-select" aria-required="true" TValue="Nacionalidad?">
-                    <ValidationMessage For="() => Input.Nacionalidad" class="text-danger"/>
-                    <option value=""></option>
                     @foreach (Nacionalidad nacionalidad in Enum.GetValues(typeof(Nacionalidad)))
                     {
-                    <option value=@nacionalidad> @nacionalidad </option>
+                        <option value=@nacionalidad> @nacionalidad </option>
                     }
                 </InputSelect>
+                <ValidationMessage For="() => Input.Nacionalidad" class="text-danger"/>
                 <label for="nacionalidad" class="text-muted">Nacionalidad</label>
             </div>
 
             <div class="form-floating mb-3">
                 
                 <InputSelect id="genero" @bind-Value="Input.Genero" class="form-select" aria-required="true" TValue="Genero?">
-                    <ValidationMessage For="() => Input.Genero" class="text-danger"/>
-
                     @foreach (Genero genero in Enum.GetValues(typeof(Genero)))
                     {
                         <option value=@genero> @genero </option>
                     }
                 </InputSelect>
+                <ValidationMessage For="() => Input.Genero" class="text-danger"/>
                 <label for="genero" class="text-muted">Género</label>
             </div>
 
@@ -93,41 +92,97 @@
 @code {
     private ApplicationUser _user = default!;
     private string? _email;
-    private string? _nombre; 
-    private string? _apellido;
-    private DateTime? _fechaNacimiento;
-    private int? _dni;
-    private Nacionalidad _nacionalidad;
-    private YateMate.Aplicacion.Entidades.Genero _genero;
-
+    
     [CascadingParameter] private HttpContext HttpContext { get; set; } = default!;
 
     [SupplyParameterFromForm] private InputModel Input { get; set; } = new();
 
     private string? message;
+    
+    private EditContext? editContext;
 
+    public CustomValidator customValidator;
+    
+    
+    private async Task SubmitPelado()
+    {
+        Console.WriteLine($" email de usuario que puso es {Input.EmailAModificar}");
+        var errors = new Dictionary<string, List<string>>();
+        
+        foreach (var property in Input.GetType().GetProperties()) //me cago en microsoft
+        {
+            var value = property.GetValue(Input);
+            // Console.WriteLine(property.Name);
+            if (String.IsNullOrWhiteSpace(value?.ToString()))
+            {
+                errors.Add(property.Name, new List<string>() {"Este campo es obligatorio"});
+            }
+        }
+        
+        if (Input.Dni is not null)
+        {
+            if(Input.Dni.Value.CompareTo(1000000) < 0 || Input.Dni.Value.CompareTo(100000000) > 0) 
+                errors.Add(nameof(Input.Dni), new List<string>(){"El número de dni debe estar entre un millon (1.000.000) y cien millones (100.000.000)"});
+        }
+        
+        if (Input.FechaNacimiento is not null)
+        {
+            if (DateTime.Compare((DateTime)Input.FechaNacimiento, DateTime.Today.AddYears(-18)) > 0)
+            {
+                errors.Add(nameof(Input.FechaNacimiento), new List<string>(){"La edad mínima permitida es 18 años"});
+                Console.WriteLine("a1");
+
+            }
+
+            if (DateTime.Compare((DateTime)Input.FechaNacimiento, DateTime.Today.AddYears(-120)) < 0)
+            {
+                Console.WriteLine("a2");
+                errors.Add(nameof(Input.FechaNacimiento), new List<string>(){"La edad máxima permitida es 120 años"});
+            }
+        }
+
+        if (!String.IsNullOrWhiteSpace(Input.EmailAModificar))
+        {
+            var mail = new MailAddress("hola@hola.com");
+            var valido = MailAddress.TryCreate(Input.EmailAModificar, out mail);
+            if (!valido)
+            {
+                errors.Add(nameof(Input.EmailAModificar), new List<string>() { "La direccion de email no es valida" });
+            }
+        }
+
+        if (errors.Count > 0)
+        {
+            customValidator.DisplayErrors(errors);
+            return;
+        }
+        
+        await OnValidSubmitAsync();
+    }
+    
     protected override async Task OnInitializedAsync()
     {
+        Input ??= new();
+        editContext = new(Input);
+        
         _user = await UserAccessor.GetRequiredUserAsync(HttpContext);
         _email = await UserManager.GetUserNameAsync(_user);
-        _nombre = _user.Nombre;
-        _apellido = _user.Apellido;
-        _fechaNacimiento = _user.FechaNacimiento;
-        _dni = _user.Dni;
-        _genero = _user.Genero;
-        _nacionalidad = _user.Nacionalidad;
+
+        // foreach (var elem in _user.GetType().GetProperties())
+        // {
+        //     Console.WriteLine($"propiedad sacada de la bd {elem.GetValue()}");
+        // }
         
-        Console.WriteLine($"Datos sacados de la base de datos {_email} {_nombre} {_apellido} nacimiento:{_fechaNacimiento} dni:{_dni} genero:{_genero} nacionalidad:{_nacionalidad}");
-        
-        Input.Nombre ??= _nombre;
-        Input.Apellido ??= _apellido;
-        Input.FechaNacimiento ??= _fechaNacimiento;
-        Input.Dni ??= _dni;
-        Input.Genero ??= _genero;
-        Input.Nacionalidad ??= _nacionalidad;
+        Input.Nombre ??= _user.Nombre;
+        Input.Apellido ??= _user.Apellido;
+        Input.FechaNacimiento ??= _user.FechaNacimiento;
+        Input.Dni ??= _user.Dni;
+        Input.Genero ??= _user.Genero;
+        Input.Nacionalidad ??= _user.Nacionalidad;
         Input.EmailAModificar ??= _email;
         
-        Console.WriteLine($"Datos de los inputs {Input.EmailAModificar}" +
+        Console.WriteLine($"Datos de los inputs" +
+                          $" mail:{Input.EmailAModificar}" +
                           $" nom:{Input.Nombre}" +
                           $" ap:{Input.Apellido}" +
                           $" nacimiento:{Input.FechaNacimiento}" +
@@ -136,6 +191,7 @@
                           $" nacionalidad:{Input.Nacionalidad}");
     }
 
+    
     private async Task OnValidSubmitAsync()
     {
         Console.WriteLine($"Datos de los inputs despues del form {Input.EmailAModificar}" +
@@ -150,8 +206,8 @@
         _user.Apellido = Input.Apellido;
         _user.FechaNacimiento = Input.FechaNacimiento;
         _user.Dni = Input.Dni;
-        _user.Genero = (Genero) Input.Genero;
-        _user.Nacionalidad = (Nacionalidad) Input.Nacionalidad;
+        _user.Genero = (Genero) Input.Genero!;
+        _user.Nacionalidad = (Nacionalidad) Input.Nacionalidad!;
         
         ModificarUser.Ejecutar(_user);
         
@@ -163,7 +219,10 @@
             if (otroUserConEseMail is not null)
             {
                 message+= ", excepto el email, que ya esta en uso";
+                //var errors = new Dictionary<string, List<string>>();
+                //errors.Add(nameof(Input.EmailAModificar), new List<string>() { "La direccion de email ya esta en uso" });
                 Input.EmailAModificar = _email;
+                //customValidator.DisplayErrors(errors);
             }
             else
             {
@@ -195,33 +254,35 @@
 
     private sealed class InputModel
     {
-        [Display(Name = "Email")] 
-        [Required]
+        [Required(ErrorMessage = "Ingresa un email")]
+        [EmailAddress(ErrorMessage = "La direccion de correo ingresada no es valida")]
+        [Display(Name = "Email")]
         public string? EmailAModificar { get; set; } = null;
         
+        [Required(ErrorMessage = "Ingresa un nombre")]
         [Display(Name = "Nombre")]
-        [Required]
         public string? Nombre { get; set; } = null!;
         
+        [Required(ErrorMessage = "Ingresa un apellido")]
         [Display(Name = "Apellido")]
-        [Required]
         public string? Apellido { get; set; } = null!;
         
+        [Required(ErrorMessage = "Ingresa un genero")]
         [Display(Name = "Genero")]
-        [Required]
-        public Genero? Genero { get; set; } = null;
+        public Genero? Genero { get; set; }
 
+        [Required(ErrorMessage = "Ingresa una fecha de nacimiento")]
         [Display(Name = "Fecha de Nacimiento")]
-        [Required]
         public DateTime? FechaNacimiento { get; set; } = null;
-        
+
+        [Required(ErrorMessage = "Ingresa un Dni")]
         [Display(Name = "Dni")]
-        [Required]
+        [Range(1000000, 100000000, ErrorMessage = "El número de dni debe estar entre un millon (1.000.000) y cien millones (100.000.000)")]
         public int? Dni { get; set; } = null;
-        
+
+        [Required(ErrorMessage = "Ingresa una nacionalidad")]
         [Display(Name = "Nacionalidad")]
-        [Required]
         public Nacionalidad? Nacionalidad { get; set; } = null;
     }
-
+    
 }

@@ -16,8 +16,8 @@ public class RepositorioEmbarcacion:IRepositorioEmbarcacion
 
     public List<Embarcacion> ObtenerEmbarcacionesDe(string clienteId)
     {
-        using ( var context = ApplicationDbContext.CrearContexto())        {
-            return context.Embarcaciones.Where(embarcacion => embarcacion.ClienteId.Equals(clienteId) ).ToList();
+        using ( var context = ApplicationDbContext.CrearContexto()){
+            return context.Embarcaciones.Where(embarcacion => embarcacion.ClienteId.Equals(clienteId)).ToList();
         }
     }
 
@@ -25,9 +25,13 @@ public class RepositorioEmbarcacion:IRepositorioEmbarcacion
     {
         using ( var context = ApplicationDbContext.CrearContexto())        {
             var embarcacionVieja = context.Embarcaciones.FirstOrDefault(e => e.Id == embarcacion.Id);
-            embarcacionVieja.Nombre = embarcacion.Nombre;
+            embarcacionVieja!.Nombre = embarcacion.Nombre;
             embarcacionVieja.Eslora = embarcacion.Eslora;
             embarcacionVieja.Calado = embarcacion.Calado;
+            embarcacionVieja.Matricula = embarcacion.Matricula;
+            embarcacionVieja.Manga = embarcacion.Manga;
+            embarcacionVieja.Bandera = embarcacion.Bandera;
+            //TODO: descomentar esto
             context.SaveChanges();
         }
     }
@@ -53,18 +57,25 @@ public class RepositorioEmbarcacion:IRepositorioEmbarcacion
         }
     }
 
-    public bool EliminarEmbarcacion(int embarcacionId)
+   
+    public Embarcacion? ObtenerEmbarcacionPorMatricula(string matricula)
     {
-        using ( var context = ApplicationDbContext.CrearContexto())
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Embarcaciones.FirstOrDefault(e => e.Matricula == matricula);
+        }
+    }
+
+    public void EliminarEmbarcacion(int embarcacionId)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
         {
             var embarcacion = context.Embarcaciones.FirstOrDefault((emb => emb.Id == embarcacionId));
             if (embarcacion != null)
             {
                 context.Remove(embarcacion);
-                return true;
+                context.SaveChanges();
             }
         }
-
-        return false;
     }
 }

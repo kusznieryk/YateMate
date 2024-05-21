@@ -3,7 +3,7 @@ using YateMate.Aplicacion.Interfaces;
 
 namespace YateMate.Repositorio;
 
-public class RepositorioPublicacion: IRepositorioPublicacion
+public class RepositorioPublicacion : IRepositorioPublicacion
 {
     public bool AgregarPublicacion(Publicacion publicacion)
     {
@@ -19,7 +19,7 @@ public class RepositorioPublicacion: IRepositorioPublicacion
         }
         catch (Exception e)
         {
-           Console.WriteLine(e); 
+            Console.WriteLine(e);
         }
 
         return false;
@@ -34,7 +34,8 @@ public class RepositorioPublicacion: IRepositorioPublicacion
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
-            var embarcaciones = context.Embarcaciones.Where(embarcacion => embarcacion.ClienteId == idCliente).Select(embarcacion => embarcacion.Id);
+            var embarcaciones = context.Embarcaciones.Where(embarcacion => embarcacion.ClienteId == idCliente)
+                .Select(embarcacion => embarcacion.Id);
             return context.Publicaciones.Where(publicacion => embarcaciones.Contains(publicacion.EmbarcacionId))
                 .ToList();
         }
@@ -48,8 +49,18 @@ public class RepositorioPublicacion: IRepositorioPublicacion
         }
     }
 
-    public bool EliminarPublicacion(int idPublicacion)
+    public bool EliminarPublicacion(int idEmb)
     {
-        throw new NotImplementedException();
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            var pub = context.Publicaciones.FirstOrDefault(b => b.EmbarcacionId == idEmb);
+            if (pub != null)
+            {
+                context.Remove(pub);
+                context.SaveChanges();
+            }
+        }
+
+        return true;
     }
 }

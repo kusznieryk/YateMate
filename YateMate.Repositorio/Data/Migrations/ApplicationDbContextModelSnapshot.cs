@@ -175,7 +175,7 @@ namespace YateMate.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Genero")
-                        .HasMaxLength(20)
+                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.Property<bool>("LockoutEnabled")
@@ -185,6 +185,7 @@ namespace YateMate.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("Nacionalidad")
+                        .IsRequired()
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
 
@@ -244,17 +245,18 @@ namespace YateMate.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<byte[]>("Imagen")
+                    b.Property<string>("Imagen")
                         .IsRequired()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Nombre")
                         .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("UsuarioId")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("UsuarioId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
@@ -272,15 +274,28 @@ namespace YateMate.Migrations
                     b.Property<string>("ApplicationUserId")
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("Bandera")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
                     b.Property<double>("Calado")
                         .HasColumnType("REAL");
 
                     b.Property<string>("ClienteId")
                         .IsRequired()
+                        .HasMaxLength(50)
                         .HasColumnType("TEXT");
 
                     b.Property<double>("Eslora")
                         .HasColumnType("REAL");
+
+                    b.Property<double>("Manga")
+                        .HasColumnType("REAL");
+
+                    b.Property<string>("Matricula")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Nombre")
                         .IsRequired()

@@ -2,16 +2,24 @@
 @using Microsoft.AspNetCore.Identity
 @using YateMate.Aplicacion.UseCases.ApplicationUser
 @using YateMate.Components.Account.Shared
+@using YateMate.Components.Shared
 
 @inject ObtenerEmpleadosUseCase ObtenerEmpleadosUseCase;
-@inject EliminarApplicationUserUseCase EliminarApplicationUserUseCase
+@inject EliminarApplicationUserUseCase EliminarApplicationUserUseCase;
 @* @inject UserManager<ApplicationUser> UserManager le agrego el rol desde aca ya fue*@
+@* @inject NavigationManager Navegador; *@
+@inject IDialogService Dialog
 
 @rendermode InteractiveServer
 
-<DialogoConfirmacion @ref="dialogo" OnConfirmado="EliminarApplicationUser" />
+<PageTitle> Admin </PageTitle>
+<MudDialogProvider  FullWidth="true"
+                    MaxWidth="MaxWidth.Small"
+                    Position="DialogPosition.CenterLeft"/>
 
-<h3>Admin</h3>
+<DialogoConfirmacion @ref="_dialogo" OnConfirmado="EliminarApplicationUser" />
+
+<h1>Admin</h1>
     @if (!_tieneElementos) {
         <p>No hay empleados para mostrar</p>
     } 
@@ -45,9 +53,17 @@
                     <td>
                         <div class="row">
                             <div class="col-md-6">
-                                <EditForm Model="new()" FormName="@($"Eliminar-cliente-{empleado.Id}")" OnValidSubmit="() => ConfirmarEliminacion(empleado)" method="post">
-                                    <button type="submit" class="w-200 btn btn-lg btn-primary">Eliminar</button>
-                                </EditForm>
+                                <button type="submit" @onclick="() => ConfirmarEliminacion(empleado)" class="w-200 btn btn-lg btn-primary">Eliminar</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="submit" @onclick="() => EditarEmpleado(empleado)" class="w-200 btn btn-lg btn-primary">Modificar</button>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <button type="submit" @onclick="() => VerEmpleado(empleado)" class="w-200 btn btn-lg btn-primary">Ver Datos</button>
                             </div>
                         </div>
                     </td>
@@ -57,7 +73,12 @@
         </tbody>
         </table>
     }
-
+<button type="button" class="btn btn-primary" @onclick="@(() => EditarEmpleado(null))">
+    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"></path>
+    </svg>
+    Agregar Empleado
+</button>
 
 
     @code {
@@ -72,31 +93,50 @@
     }
     protected override void OnParametersSet()
     {
-        if(_lista.Count > 0) 
-        {
-            _tieneElementos = true;
-        }
+        _tieneElementos = _lista.Count > 0;
     }
 
-    DialogoConfirmacion dialogo = null!;
+    DialogoConfirmacion _dialogo = null!;
     void ConfirmarEliminacion(ApplicationUser user)
     {
         _userAEliminar = user;
-        dialogo.Mensaje = $"Deseas eliminar al empleado {user.Nombre} ?";
-        dialogo.Mostrar();
+        _dialogo.Mensaje = $"Deseas eliminar al empleado {user.Nombre} ?";
+        _dialogo.Mostrar();
     }
 
     ApplicationUser? _userAEliminar = null;
     private void EliminarApplicationUser()
     {
-        EliminarApplicationUserUseCase.Ejecutar(_userAEliminar.Id);
+        EliminarApplicationUserUseCase.Ejecutar(_userAEliminar!.Id);
+        ActualizarLista();
+    }
+
+    private async void EditarEmpleado(ApplicationUser? empleado)
+    {
+        string mensaje = empleado is null ? "Agregando empleado" : "Modificando empleado";
+        string textoBoton = empleado is null ? "Agregar" : "Modificar";
+        var parameters = new DialogParameters<EditarEmpleado>();
+        parameters.Add(x => x.Empleado, empleado);
+        parameters.Add(x => x.textoBoton, textoBoton);
+        parameters.Add(x => x.agregando, empleado is null);
+        var _ = Dialog.Show<EditarEmpleado>(mensaje, parameters);
+        await _.Result;
+        _lista = ObtenerEmpleadosUseCase.Ejecutar(); //lo mas eficiente seria definir un callback en el que el hijo me pase el valor actualizado y uso ese en vez de consultar la bd
+        StateHasChanged();
+    }
+
+    private void VerEmpleado(ApplicationUser empleado)
+    {
+        var parameters = new DialogParameters<VerDatosEmpleado>();
+        parameters.Add(x => x.Empleado, empleado);
+        Dialog.Show<VerDatosEmpleado>($"Viendo al empleado {empleado.Nombre}", parameters);
+    }
+
+    private void ActualizarLista()
+    {
         _lista = ObtenerEmpleadosUseCase.Ejecutar();
-        
-        if(_lista.Count == 0)
-        {
-            _tieneElementos = false;
-        }
-        
+
+        _tieneElementos = _lista.Count > 0;
     }
     
 }

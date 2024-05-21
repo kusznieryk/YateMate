@@ -30,6 +30,11 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasConversion(
                 v => v.ToString(),
             v => (Nacionalidad)Enum.Parse(typeof(Nacionalidad), v));
+        modelBuilder.Entity<Embarcacion>()
+            .Property(p => p.Bandera)
+            .HasConversion(
+                v => v.ToString(),
+                v => (Nacionalidad)Enum.Parse(typeof(Nacionalidad), v));
     }
 
 #nullable disable

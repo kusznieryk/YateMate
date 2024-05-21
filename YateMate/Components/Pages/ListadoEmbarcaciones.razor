@@ -1,66 +1,67 @@
 @page "/listadoembarcaciones/{Id}"
 @using YateMate.Aplicacion.UseCases.Embarcaciones
+@using YateMate.Components.Shared
 @inject ObtenerEmbarcacionesDeUseCase ObtenerEmbarcacionesDeUseCase
 @inject ModificarEmbarcacionUseCase ModificarEmbarcacionUseCase
 @inject NavigationManager NavigationManager
-@rendermode InteractiveServer
-<h3>Listado de embarcaciones</h3>
+@inject IDialogService Dialog
 
-    @if (!_tieneElementos) 
+@rendermode InteractiveServer
+
+<MudDialogProvider  FullWidth="true"
+                    MaxWidth="MaxWidth.Small"
+                    Position="DialogPosition.CenterLeft"/>
+
+<MudContainer>
+    <h1>Listado de embarcaciones</h1>
+
+    @if (!_tieneElementos)
     {
-        <p>No hay elementos</p>
+        <MudText Typo="Typo.h6">No hay elementos</MudText>
     }
     else
     {
-        <table id="table" class="table">    
-            <thead>
-            <tr>
-                <th>NOMBRE</th>
-                <th>ESLORA</th>
-                <th>CALADO</th>
-                <th>ACCIÓN</th>
-            </tr>
-            </thead>
-            <tbody>
-            @foreach (var embarcacion in _lista)
-            {
-                <tr>
-                    <td>@embarcacion.Nombre</td>
-                    <td>@embarcacion.Eslora</td>
-                    <td>@embarcacion.Calado</td>
-                    <td>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <EditForm Model="new()" FormName="@($"Mostrar-formulario-{embarcacion.Id}")" OnValidSubmit="() => MostrarFormularioEdicion(embarcacion)" method="post">
-                                    <button type="submit" class="btn btn-lg btn-primary btn-block">Modificar</button>
-                                </EditForm>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-            }
-            </tbody>
-        </table>
-        @if (_mostrandoFormularioEdicion)
-        {
-            <div>
-                <h3>Modificar Embarcación</h3>
-                <input type="text" @bind="_embarcacionAModificar.Nombre" />
-                <input type="number" step="0.1" @bind="_embarcacionAModificar.Eslora" />
-                <input type="number" step="0.1" @bind="_embarcacionAModificar.Calado" />
-                <div class="row">
-                    <div class="col-md-6">
-                        <EditForm Model="new()" FormName="@($"Modificar-embarcacion-{_embarcacionAModificar.Id}")" OnValidSubmit="() => ModificarEmbarcacion(_embarcacionAModificar)" method="post">
-                            <button type="submit" class="btn btn-lg btn-primary btn-block">Guardar</button>
-                        </EditForm>
-                    </div>
-                </div>
-            </div>
-        }
+        <MudTable Items="_lista" Class="mt-4" Dense="true" Outlined="true">
+            <HeaderContent>
+                <MudTh>NOMBRE</MudTh>
+                <MudTh>ESLORA</MudTh>
+                <MudTh>CALADO</MudTh>
+                <MudTh>MANGA</MudTh>
+                <MudTh>BANDERA</MudTh>
+                <MudTh>MATRÍCULA</MudTh>
+                <MudTh>ACCIÓN</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    @context.Nombre
+                </MudTd>
+                <MudTd>
+                    @context.Eslora
+                </MudTd>
+                <MudTd>
+                    @context.Calado
+                </MudTd>
+                @* TODO: descomentar esto cuando este hecha la migracion *@
+                <MudTd>
+                    @context.Manga
+                </MudTd>
+                <MudTd>
+                    @context.Bandera
+                </MudTd>
+                <MudTd>
+                    @context.Matricula
+                </MudTd>
+                <MudTd>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ModificarEmbarcacion(@context))">Modificar</MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
     }
+</MudContainer>
+
 @code {
-    [Parameter] public string Id { get; set; }
-    
+    [Parameter] public string Id { get; set; } = null!;
+
     List<Embarcacion> _lista = new List<Embarcacion>();
     bool _tieneElementos = false;
     protected override void OnInitialized()
@@ -80,11 +81,10 @@
     }
     public void ModificarEmbarcacion(Embarcacion embarcacion)
     {
-        ModificarEmbarcacionUseCase.Ejecutar(embarcacion);
-        _mostrandoFormularioEdicion = false;
-        StateHasChanged();
-        NavigationManager.Refresh(true);
+        var parameters = new DialogParameters<EditarEmbarcacion>();
+        parameters.Add(x => x.barco, embarcacion);
+        Dialog.Show<EditarEmbarcacion>("Ver Datos", parameters);
     }
-    
-    
+
+
 }
