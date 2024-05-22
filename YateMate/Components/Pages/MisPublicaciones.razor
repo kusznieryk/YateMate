@@ -4,6 +4,7 @@
 @rendermode InteractiveServer
 @inject IdentityUserAccessor UserAccessor
 @inject IDialogService Dialog
+@inject NavigationManager Navegador;
 @using YateMate.Components.Shared
 
 <h1>Mis publicaciones</h1>
@@ -33,6 +34,7 @@ else
                         </MudCardContent>
                         <MudCardActions Style="justify-content: space-between;">
                             <MudButton Variant="Variant.Text" @onclick="() => HandleClick(new Publicacion(publicacion.Image, publicacion.Titulo, publicacion.Descripcion, publicacion.EmbarcacionId))" Color="Color.Primary">Ver más</MudButton>
+                            <MudButton Variant="Variant.Text" @onclick="()=>HandleClickOferta(publicacion.Id)" Color="Color.Primary">Listar ofertas</MudButton>
                             @* <MudButton Variant="Variant.Text" Color="Color.Primary"> ❤️</MudButton> *@
                             @* <MudButton Variant="Variant.Text" Color="Color.Primary">Enviar mensaje</MudButton> *@
                         </MudCardActions>
@@ -48,7 +50,7 @@ else
     bool _tieneElementos;
     List<Publicacion> _lista = new List<Publicacion>();
     [CascadingParameter]
-    private Task<AuthenticationState>? _AuthenticationState { get; set; }   
+    private Task<AuthenticationState>? AuthenticationState { get; set; }   
     string _userId=null!;
    
     protected override void OnParametersSet()
@@ -61,11 +63,10 @@ else
     
     protected override async Task OnInitializedAsync()
     {
-        if (_AuthenticationState is not null)
+        if (AuthenticationState is not null)
         {
-            var authState = await _AuthenticationState;
+            var authState = await AuthenticationState;
             var user = authState.User;
-            
             _userId = user.Claims.FirstOrDefault()?.Value!;
             _lista = ListarMisPublicaciones.Ejecutar(_userId);
         }
@@ -78,4 +79,8 @@ else
         Dialog.Show<VerDatosEmbarcacion>("Simple Dialog", parameters);
     }
 
+    public void HandleClickOferta(int publicacionId)
+    {
+        Navegador.NavigateTo($"/ListadoOfertas/{publicacionId}");
+    }
 }

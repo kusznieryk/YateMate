@@ -1,4 +1,4 @@
-@page "/ListarMisBienes"
+@page "/ListarMisBienes/{Origen}"
 @rendermode InteractiveServer
 
 @using Microsoft.Extensions.Options
@@ -8,9 +8,11 @@
 @using YateMate.Components.Shared
 
 @using MudBlazor.Components
+@using YateMate.Aplicacion.UseCases.Oferta
 @* @inject IdentityUserAccessor UserAccessor; *@
 @inject ListarBienesDeUseCase ListarBienesDeUseCase
 @inject EliminarBienUseCase EliminarBienUseCase
+@inject HacerOfertaUseCase HacerOfertaUseCase
 @inject NavigationManager Navegador;
 @inject IDialogService Dialog
 
@@ -21,10 +23,13 @@
 <title>Mis bienes</title>
 <h1>Mis bienes</h1>
 
-@if (!_tieneElementos) 
+@if (!_tieneElementos && Origen!.Equals("lista")) 
 {
     <h2>No tiene bienes cargados en el sistema.</h2>
-    
+}
+else if (!_tieneElementos)
+{
+    <h2>No tiene bienes para ofertar actualmente.</h2>
 }
 else
 {
@@ -45,9 +50,15 @@ else
                                     <MudText Typo="Typo.body2" Style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">@bien.Descripcion</MudText>
                                 </MudCardContent>
                                 <MudCardActions Style="justify-content: space-between;">
-                                    <MudButton Variant="Variant.Text" @onclick="@((e) => OpenDialog(bien))" Color="Color.Primary">Ver más</MudButton> @*Aca hay que crear un evento que rediriga/abra una ventana en la que podamos modificar/eliminar el bien y eso*@
-                                    @* <MudButton Variant="Variant.Filled" StartIcon="@Icons.Material.Filled.Edit" Color="Color.Info"  Size="Size.Small">Editar</MudButton> *@
-                                    <MudButton Variant="Variant.Text" OnClick="() => Eliminar(bien)" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error"> Borrar </MudButton>
+                                    @if (Origen!.Equals("lista"))
+                                    {
+                                        <MudButton Variant="Variant.Text" @onclick="@((e) => OpenDialog(bien))" Color="Color.Primary">Ver más</MudButton>
+                                        <MudButton Variant="Variant.Text" OnClick="() => Eliminar(bien)" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error"> Borrar </MudButton>
+                                    }
+                                    else
+                                    {
+                                        <MudButton Variant="Variant.Text" OnClick="() => Ofertar(bien)" Color="Color.Primary"> Ofertar </MudButton>
+                                    }
                                 </MudCardActions>
                             </MudCard>
                         </MudPaper>
@@ -58,30 +69,32 @@ else
     </MudPaper>
     
 }
-
-<br/>
-<button type="button" class="btn btn-primary" @onclick="@(() => Navegador.NavigateTo("bien/"))">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"></path>
-    </svg>
-    Agregar Bien
-</button>
+@if (Origen!.Equals("lista"))
+{
+    <br/>
+    <button type="button" class="btn btn-primary" @onclick="@(() => Navegador.NavigateTo("bien/"))">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
+            <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"></path>
+        </svg>
+        Agregar Bien
+    </button>
+}
 
 @code {
-    
+    [Parameter] public string? Origen { get; set; }
     bool _tieneElementos;
     List<Bien> _lista = new();
-    Bien? _BienParaEliminar;
+    Bien? _bienParaEliminar;
     
     [CascadingParameter]
-    private Task<AuthenticationState>? _AuthenticationState { get; set; }
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
     private string? _userId;    
     
     protected override async Task OnInitializedAsync()
     {
-        if (_AuthenticationState is not null)
+        if (AuthenticationState is not null)
         {
-            var authState = await _AuthenticationState;
+            var authState = await AuthenticationState;
             var user = authState.User;
             
             _userId = user.Claims.FirstOrDefault()?.Value;
@@ -103,25 +116,27 @@ else
         }
     }
     
-    void ModificarBien(Bien bien)
-    {
-        Navegador.NavigateTo($"bien/{bien.Id}");
-    }
-    
     private void Eliminar(Bien bien)
     {
-        _BienParaEliminar = bien;
-        EliminarBienUseCase.Ejecutar(_BienParaEliminar.Id);
+        _bienParaEliminar = bien;
+        EliminarBienUseCase.Ejecutar(_bienParaEliminar.Id);
         _lista = ListarBienesDeUseCase.Ejecutar(_userId!);
         if (_lista.Count == 0)
             _tieneElementos = false;
     }
+
+    private void Ofertar(Bien bien)
+    {
+        var oferta = new Oferta(bien.Id,int.Parse(Origen!));
+        HacerOfertaUseCase.Ejecutar(oferta);
+        Navegador.NavigateTo($"/ListadoPublicacionesDisponibles");
+    }
     
-    private void OpenDialog(Bien Bien)
+    private void OpenDialog(Bien bien)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
         var parameters = new DialogParameters<VerDatosBien>();
-        parameters.Add(x => x.Bien, Bien);
+        parameters.Add(x => x.Bien, bien);
         Dialog.Show<VerDatosBien>("Ver Datos", parameters);
     }
 }

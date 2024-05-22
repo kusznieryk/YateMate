@@ -17,7 +17,7 @@
 <div style="overflow-x:@(!_tieneElementos ? "hidden" : "inherit")">
     
         @if (!_tieneElementos) {
-            <h4>No hay trueques disponibles en este momento.</h4>
+            <h2>No hay trueques disponibles en este momento.</h2>
         }
         else {
             <MudGrid>
@@ -62,6 +62,7 @@
                                 </MudCardContent>
                                 <MudCardActions Style="justify-content: space-between;">
                                     <MudButton Variant="Variant.Text" @onclick="()=>HandleClick(new Publicacion(publicacion.Image, publicacion.Titulo, publicacion.Descripcion,publicacion.EmbarcacionId))" Color="Color.Primary">Ver más</MudButton>
+                                    <MudButton Variant="Variant.Text" @onclick="()=>HandleClickOferta(publicacion.Id.ToString())" Color="Color.Primary">Hacer Oferta</MudButton>
                                     @* <MudButton Variant="Variant.Text" Color="Color.Primary"> ❤️</MudButton> *@
                                     @* <MudButton Variant="Variant.Text" Color="Color.Primary">Enviar mensaje</MudButton> *@
                                 </MudCardActions>
@@ -124,5 +125,10 @@
         var parameters = new DialogParameters<VerDatosEmbarcacion>();
         parameters.Add( x=>x.Publicacion, publicacion);
         Dialog.Show<VerDatosEmbarcacion>("Simple Dialog", parameters);
+    }
+    
+    public void HandleClickOferta(string id)
+    {
+        Navegador.NavigateTo($"/ListarMisBienes/{id}");
     }
 }
