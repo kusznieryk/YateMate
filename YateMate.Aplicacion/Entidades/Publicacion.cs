@@ -15,4 +15,6 @@ public class Publicacion(string image, string titulo, string descripcion, int em
     public string Titulo { get; set; } = titulo;
 
     public string Descripcion { get; set; } = descripcion;
+    
+    public List<Oferta> Ofertas { get; set; }
 }

@@ -14,10 +14,10 @@ public class ApplicationUser : IdentityUser
     
     public Genero Genero { get; set; }
     
-    public int? Dni { get; set; } //ver si cambiar a string
+    public int? Dni { get; set; }
     
     [MaxLength(100)]
-    public Nacionalidad Nacionalidad { get; set; }  //no se esto que tipo hacerlo
+    public Nacionalidad Nacionalidad { get; set; }
     
     public List<Embarcacion>? Embarcaciones { get; set; }
     public List<Bien>? Bienes { get; set; }
