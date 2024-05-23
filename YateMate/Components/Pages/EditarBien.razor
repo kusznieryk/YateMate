@@ -123,10 +123,8 @@ else
             bien.Descripcion = Input.Descripcion;
             if(_userId is null)
                 Console.WriteLine("user id es null, no se q decirte");
-            // Console.WriteLine(Input.Nombre);
             if (_esNuevoBien)
             {
-                // Console.WriteLine("Entro al if");
                 
                 AgregarBienUseCase.Ejecutar(bien);
             }
@@ -142,6 +140,7 @@ else
     {
         [Required(ErrorMessage = "Cargar una imagen es obligatorio")]
         public string Imagen { get; set; } = null!;
+        
         [Required(ErrorMessage = "El nombre es obligatorio")]
         [ MaxLength(50) ]
         public string Nombre { get; set; } = null!;
