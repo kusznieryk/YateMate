@@ -13,6 +13,8 @@ using YateMate.Aplicacion.UseCases.ApplicationUser;
 using YateMate.Aplicacion.UseCases.Embarcaciones;
 using YateMate.Aplicacion.UseCases.Oferta;
 using YateMate.Components.Pages;
+using YateMate.Hubs;
+using YateMate.Manager;
 
 
 namespace YateMate;
@@ -109,7 +111,9 @@ public class Program
         // Console.WriteLine();
         
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, EmailSender>();
-        
+
+        builder.Services.AddSignalR(); //cositas del chat
+        builder.Services.AddTransient<IChatManager, ChatManager>(); 
         
         var app = builder.Build();
 
@@ -224,7 +228,16 @@ public class Program
         // Add additional endpoints required by the Identity /Account Razor components. 
         // esto solo hace falta porque tiene el logout, pero tiene mucho de 2fa y eso
         app.MapAdditionalIdentityEndpoints();
-
+        
+#pragma warning disable ASP0014
+        app.UseEndpoints(endpoints =>
+        {
+            endpoints.MapRazorPages();
+            endpoints.MapControllers();
+            endpoints.MapFallbackToFile("index.html");
+            endpoints.MapHub<SignalRHub>("/signalRHub");
+        });
+#pragma warning restore ASP0014
         app.Run();
     }
 }
