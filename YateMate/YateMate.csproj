@@ -22,4 +22,8 @@
       <ProjectReference Include="..\YateMate.Repositorio\YateMate.Repositorio.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="wwwroot\Pictures\logo_yatemate.png" />
+    </ItemGroup>
+
 </Project>

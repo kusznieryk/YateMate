@@ -2,30 +2,40 @@
 @using Microsoft.AspNetCore.Components.Authorization
 <PageTitle>Inicio</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-16 position-relative">
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-16 position-relative" class="">
 
-    <MudGrid Justify="Justify.Center" Class="mb-16">
+   
+            <MudPaper Elevation="25" Class="pa-8 mb-16">
+    <MudGrid Justify="Justify.Center">
+        <MudItem>
+            <MudImage Src="Pictures/logo_yatemate.png" Width="250" Height="250" Alt="Logo de YateMate" Elevation="25" Class="rounded-lg ma-4"/>
+        </MudItem>
         <MudItem xs="12" sm="8" md="6">
-            <MudPaper Elevation="25" Class="pa-8">
                 <MudText Typo="Typo.h4" GutterBottom="true" Align="Align.Center">YateMate</MudText>
                 <MudText Align="Align.Center" Class="mb-4">Tu brújula en el mar de los trueques</MudText>
-            </MudPaper>
         </MudItem>
     </MudGrid>
+            </MudPaper>
     <AuthorizeView>
         <NotAuthorized>
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="Account/Register">
+            <MudContainer  Class="d-flex justify-center flex-grow-1 gap-4 mb-16">
+              
+                <MudButton Href="Account/Register"
+                           Rel="nofollow"
+                           Variant="Variant.Filled"
+                           Color="Color.Primary"
+                           Size="Size.Large">
                     <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Registrarse
-                </NavLink>
-                @* <MudNavLink  Href="Account/Register" Match="NavLinkMatch.Prefix" Icon="@Icons.Material.Filled.List">Register</MudNavLink> *@
-            </div>
 
-            <div class="nav-item px-3">
-                <NavLink class="nav-link" href="Account/Login">
+                </MudButton>
+                <MudButton Href="Account/Login"
+                           Rel="nofollow noopener"
+                           Variant="Variant.Outlined"
+                           Color="Color.Secondary"
+                           Size="Size.Large">
                     <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Iniciar sesión
-                </NavLink>
-            </div>
+                </MudButton>
+            </MudContainer>
         </NotAuthorized>
     </AuthorizeView>
     <MudGrid Justify="Justify.Center" Class="mb-16 align-center" >
@@ -80,3 +90,21 @@
 
     <MudText Align="Align.Center">&copy; 2024 YateMate. Todos los derechos reservados.</MudText>
 </MudPaper>
+
+<style>
+    .video-background {
+        background: #000;
+        position: fixed;
+        top: 0; right: 0; bottom: 0; left: 0;
+        z-index: -99;
+    }
+    .video-foreground,
+    .video-background iframe {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        pointer-events: none;
+    }
+</style>
