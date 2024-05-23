@@ -6,5 +6,6 @@ public interface IRepositorioOferta
     List<Publicacion> ListarTruequesDisponibles();
     void HacerOferta(Oferta oferta);
     void EliminarOferta(int id);
-    
+    List<Oferta> ListarOfertasDe(int publicacionId);
+
 }

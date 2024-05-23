@@ -1,10 +1,13 @@
 using System.Security.AccessControl;
 using YateMate.Aplicacion.Entidades;
 using YateMate.Aplicacion.Interfaces;
+using YateMate.Aplicacion.UseCases;
+
 namespace YateMate.Repositorio;
 
 public class RepositorioOferta : IRepositorioOferta
 {
+    
     public List<Publicacion> ListarTruequesDisponibles()
     {
         using (var context = ApplicationDbContext.CrearContexto())
@@ -20,7 +23,7 @@ public class RepositorioOferta : IRepositorioOferta
             var publicacion = context.Publicaciones.FirstOrDefault(p => p.Id == oferta.PublicacionId);
             if (publicacion != null)
             {
-                publicacion.Ofertas.Add(oferta);
+                publicacion!.Ofertas?.Add(oferta);
                 context.Add(oferta);
                 context.SaveChanges();
             }
@@ -43,4 +46,13 @@ public class RepositorioOferta : IRepositorioOferta
             }
         }
     }
+
+    public List<Oferta> ListarOfertasDe(int publicacionId)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Ofertas.Where(o => o.PublicacionId == publicacionId).ToList();
+        }
+    }
+    
 }

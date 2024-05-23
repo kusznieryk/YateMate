@@ -309,6 +309,27 @@ namespace YateMate.Migrations
                     b.ToTable("Embarcaciones");
                 });
 
+            modelBuilder.Entity("YateMate.Aplicacion.Entidades.Oferta", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("BienId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PublicacionId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BienId");
+
+                    b.HasIndex("PublicacionId");
+
+                    b.ToTable("Ofertas");
+                });
+
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.Publicacion", b =>
                 {
                     b.Property<int>("Id")
@@ -401,11 +422,31 @@ namespace YateMate.Migrations
                         .HasForeignKey("ApplicationUserId");
                 });
 
+            modelBuilder.Entity("YateMate.Aplicacion.Entidades.Oferta", b =>
+                {
+                    b.HasOne("YateMate.Aplicacion.Entidades.Bien", "Bien")
+                        .WithMany()
+                        .HasForeignKey("BienId");
+
+                    b.HasOne("YateMate.Aplicacion.Entidades.Publicacion", null)
+                        .WithMany("Ofertas")
+                        .HasForeignKey("PublicacionId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Bien");
+                });
+
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.ApplicationUser", b =>
                 {
                     b.Navigation("Bienes");
 
                     b.Navigation("Embarcaciones");
+                });
+
+            modelBuilder.Entity("YateMate.Aplicacion.Entidades.Publicacion", b =>
+                {
+                    b.Navigation("Ofertas");
                 });
 #pragma warning restore 612, 618
         }
