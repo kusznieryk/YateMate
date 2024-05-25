@@ -1,43 +1,56 @@
 ﻿@page "/"
 @using Microsoft.AspNetCore.Components.Authorization
+<!--suppress CssUnresolvedCustomProperty -->
 <PageTitle>Inicio</PageTitle>
 
-<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-16 position-relative" class="">
-
+<MudContainer MaxWidth="MaxWidth.ExtraLarge" Class="py-16 position-relative" >
    
-            <MudPaper Elevation="25" Class="pa-8 mb-16">
-    <MudGrid Justify="Justify.Center">
-        <MudItem>
-            <MudImage Src="Pictures/logo_yatemate.png" Width="250" Height="250" Alt="Logo de YateMate" Elevation="25" Class="rounded-lg ma-4"/>
+    <MudPaper Elevation="25" Class="mb-16 ml-auto mr-auto pa-4" MaxWidth="70%" >
+    <MudGrid Justify="Justify.Center" Class="align-center">
+        <MudItem xs="12" sm="8" md="6">
+        <video playsinline autoplay muted loop poster="my-static-image.jpg">
+            <source src="Video/YateMate%20Experience%20.mp4" type="video/mp4">
+            Your browser does not support the video tag.
+        </video>
+            @* <MudImage Src="Pictures/logo_yatemate.png" Width="250" Height="250" Alt="Logo de YateMate" Elevation="25" Class="rounded-lg ma-4"/> *@
         </MudItem>
         <MudItem xs="12" sm="8" md="6">
                 <MudText Typo="Typo.h4" GutterBottom="true" Align="Align.Center">YateMate</MudText>
                 <MudText Align="Align.Center" Class="mb-4">Tu brújula en el mar de los trueques</MudText>
-        </MudItem>
+                <AuthorizeView>
+                    <Authorized>
+                        <MudContainer Class="d-flex justify-center align-center flex-grow-1 gap-4 mb-16">
+                            <MudText> Consigue una embarcacion ahora</MudText>
+                            <MudButton Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       Size="Size.Large">
+                            <MudLink href="/ListadoPublicacionesDisponibles" Color="Color.Tertiary" > 🚢Ver Publicaciones</MudLink>
+                            </MudButton>
+                        </MudContainer>
+                    </Authorized>
+                    <NotAuthorized>
+                        <MudContainer Class="d-flex justify-center flex-grow-1 gap-4 mb-16">
+                            <MudButton Href="Account/Register"
+                                       Rel="nofollow"
+                                       Variant="Variant.Filled"
+                                       Color="Color.Primary"
+                                       Size="Size.Large">
+                                <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Registrarse
+                            </MudButton>
+                            <MudButton Href="Account/Login"
+                                       Rel="nofollow noopener"
+                                       Variant="Variant.Outlined"
+                                       Color="Color.Secondary"
+                                       Size="Size.Large">
+                                <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Iniciar sesión
+                            </MudButton>
+                        </MudContainer>
+                    </NotAuthorized>
+                </AuthorizeView>
+                </MudItem>
     </MudGrid>
             </MudPaper>
-    <AuthorizeView>
-        <NotAuthorized>
-            <MudContainer  Class="d-flex justify-center flex-grow-1 gap-4 mb-16">
-              
-                <MudButton Href="Account/Register"
-                           Rel="nofollow"
-                           Variant="Variant.Filled"
-                           Color="Color.Primary"
-                           Size="Size.Large">
-                    <span class="bi bi-person-nav-menu" aria-hidden="true"></span> Registrarse
-
-                </MudButton>
-                <MudButton Href="Account/Login"
-                           Rel="nofollow noopener"
-                           Variant="Variant.Outlined"
-                           Color="Color.Secondary"
-                           Size="Size.Large">
-                    <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Iniciar sesión
-                </MudButton>
-            </MudContainer>
-        </NotAuthorized>
-    </AuthorizeView>
+ 
     <MudGrid Justify="Justify.Center" Class="mb-16 align-center" >
         <MudItem xs="12">
             <MudText Typo="Typo.h5" GutterBottom="true" Align="Align.Center">¿Cómo funciona?</MudText>
@@ -68,7 +81,7 @@
         
 </MudContainer>
 
-<MudPaper Elevation="25" Class="pa-4" Style="background-color: #eee">
+<MudPaper Elevation="25" Class="pa-4" Style="background-color:var(--mud-palette-secondary);color: var(--mud-palette-tertiary) ">
     <MudGrid Justify="Justify.Center">
         <MudItem xs="12">
             <MudText Typo="Typo.h5" GutterBottom="true" Align="Align.Center">¿Por qué elegir YateMate?</MudText>
@@ -92,19 +105,7 @@
 </MudPaper>
 
 <style>
-    .video-background {
-        background: #000;
-        position: fixed;
-        top: 0; right: 0; bottom: 0; left: 0;
-        z-index: -99;
-    }
-    .video-foreground,
-    .video-background iframe {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        pointer-events: none;
-    }
+   video{
+    width: 100%;
+   }
 </style>
