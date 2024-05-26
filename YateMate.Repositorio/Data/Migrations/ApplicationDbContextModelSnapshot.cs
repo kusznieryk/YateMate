@@ -309,21 +309,49 @@ namespace YateMate.Migrations
                     b.ToTable("Embarcaciones");
                 });
 
+            modelBuilder.Entity("YateMate.Aplicacion.Entidades.MensajeChat", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("FromUserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Message")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("ToUserId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FromUserId");
+
+                    b.HasIndex("ToUserId");
+
+                    b.ToTable("MensajesChats");
+                });
+
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.Oferta", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<int?>("BienId")
+                    b.Property<int>("BienId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("PublicacionId")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("BienId");
 
                     b.HasIndex("PublicacionId");
 
@@ -422,24 +450,39 @@ namespace YateMate.Migrations
                         .HasForeignKey("ApplicationUserId");
                 });
 
+            modelBuilder.Entity("YateMate.Aplicacion.Entidades.MensajeChat", b =>
+                {
+                    b.HasOne("YateMate.Aplicacion.Entidades.ApplicationUser", "FromUser")
+                        .WithMany("ChatMessagesFromUsers")
+                        .HasForeignKey("FromUserId")
+                        .IsRequired();
+
+                    b.HasOne("YateMate.Aplicacion.Entidades.ApplicationUser", "ToUser")
+                        .WithMany("ChatMessagesToUsers")
+                        .HasForeignKey("ToUserId")
+                        .IsRequired();
+
+                    b.Navigation("FromUser");
+
+                    b.Navigation("ToUser");
+                });
+
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.Oferta", b =>
                 {
-                    b.HasOne("YateMate.Aplicacion.Entidades.Bien", "Bien")
-                        .WithMany()
-                        .HasForeignKey("BienId");
-
                     b.HasOne("YateMate.Aplicacion.Entidades.Publicacion", null)
                         .WithMany("Ofertas")
                         .HasForeignKey("PublicacionId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.Navigation("Bien");
                 });
 
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.ApplicationUser", b =>
                 {
                     b.Navigation("Bienes");
+
+                    b.Navigation("ChatMessagesFromUsers");
+
+                    b.Navigation("ChatMessagesToUsers");
 
                     b.Navigation("Embarcaciones");
                 });
