@@ -1,5 +1,4 @@
 using YateMate.Aplicacion.Interfaces;
-using YateMate.Aplicacion.Entidades;
 namespace YateMate.Aplicacion.UseCases.ApplicationUser;
 
 public class ObtenerClientesUseCase

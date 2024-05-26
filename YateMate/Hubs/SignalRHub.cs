@@ -9,8 +9,9 @@ public class SignalRHub : Hub
     {
         await Clients.All.SendAsync("ReceiveMessage", message, userName);
     }
-    public async Task ChatNotificationAsync(string message, string receiverUserId, string senderUserId)
+    
+    public void SendMessageTo(MensajeChat message, string userNameFrom, string userIdTo)
     {
-        await Clients.All.SendAsync("ReceiveChatNotification", message, receiverUserId, senderUserId);
+        Clients.User(userIdTo).SendAsync("ReceiveMessage", message, userNameFrom);
     }
 }

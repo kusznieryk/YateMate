@@ -12,9 +12,9 @@ using YateMate.Aplicacion.UseCases.Bien;
 using YateMate.Aplicacion.UseCases.ApplicationUser;
 using YateMate.Aplicacion.UseCases.Embarcaciones;
 using YateMate.Aplicacion.UseCases.Oferta;
+using YateMate.Aplicacion.UseCases.Mensaje;
 using YateMate.Components.Pages;
 using YateMate.Hubs;
-using YateMate.Manager;
 
 
 namespace YateMate;
@@ -44,6 +44,9 @@ public class Program
         builder.Services.AddTransient<ModificarApplicationUserUseCase>();
         builder.Services.AddTransient<ObtenerEmpleadosUseCase>();
         builder.Services.AddTransient<ObtenerClientesUseCase>();
+        builder.Services.AddTransient<ObtenerClientesExceptoUseCase>();
+        builder.Services.AddTransient<ObtenerApplicationUserUseCase>();
+        builder.Services.AddTransient<ObtenerContactosDeUseCase>();
         builder.Services.AddScoped<IRepositorioApplicationUser, RepositorioApplicationUser>();
         
         builder.Services.AddTransient<AgregarBienUseCase>();
@@ -65,6 +68,10 @@ public class Program
         builder.Services.AddTransient<FiltrarPublicacionesPorCaladoUseCase>();
         builder.Services.AddTransient<FiltrarPublicacionesPorEsloraUseCase>();
         builder.Services.AddScoped<IRepositorioPublicacion, RepositorioPublicacion>();
+
+        builder.Services.AddTransient<AgregarMensajeUseCase>();
+        builder.Services.AddTransient<ObtenerMensajesEntreUseCase>();
+        builder.Services.AddScoped<IRepositorioMensaje, RepositorioMensaje>();
 
             
         builder.Services.AddCascadingAuthenticationState();
@@ -113,10 +120,15 @@ public class Program
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, EmailSender>();
 
         builder.Services.AddSignalR(); //cositas del chat
-        builder.Services.AddTransient<IChatManager, ChatManager>(); 
         
         var app = builder.Build();
+        
+        app.UseAntiforgery();
+        
+        app.MapHub<SignalRHub>("/signalRHub");
+        app.MapFallbackToFile("index.html");
 
+        
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
@@ -128,100 +140,11 @@ public class Program
             // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
             app.UseHsts();
         }
-        // asi se agregan roles, un admin y un empleado a la base de datos si no estan agregados,
-        // si descomentas esto main tiene que ser async Task
-        // using (var scope = app.Services.CreateScope())
-        // {
-        //     var email = "admin@admin.com";
-        //     var password = "Test123,";
-        //     string[] roles = ["Admin", "Empleado", "Cliente"];
-        // var userManager = scope.ServiceProvider.GetRequiredService<UserManager<ApplicationUser>>();
-        //     var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-            // foreach (var role in roles)
-            // {
-            //     if (!await roleManager.RoleExistsAsync(role))
-            //     {
-            //         IdentityRole roleRole = new IdentityRole(role);
-            //         await roleManager.CreateAsync(roleRole);
-            //     }
-            // }
-        //     if (await userManager.FindByNameAsync(email) == null)
-        //     {
-        //         var user = new ApplicationUser();
-        //         user.UserName = email;
-        //         user.Email = email;
-        //         user.EmailConfirmed = true;
-        //         var result = await userManager.CreateAsync(user, password);
-        //         await userManager.AddToRoleAsync(user, "Admin");
-        //     }
-        //     
-        //     email = "empleado1@empleado.com";
-        //     password = "Empleado123,";
-        //     
-        //     if (await userManager.FindByNameAsync(email) == null)
-        //     {
-        //         var user = new ApplicationUser();
-        //         user.UserName = email;
-        //         user.Email = email;
-        //         user.EmailConfirmed = true;
-        //
-        //         user.Genero = Genero.Masculino;
-        //
-        //         var result = await userManager.CreateAsync(user, password);
-        //         await userManager.AddToRoleAsync(user, "Empleado");
-        //     }
-        //
-        //     
-        //     email = "empleado1@empleado.com";
-        //     password = "Empleado123,";
-        //     
-        //     if (await userManager.FindByNameAsync(email) == null)
-        //     {
-        //         var user = new ApplicationUser();
-        //         user.UserName = email;
-        //         user.Email = email;
-        //         user.EmailConfirmed = true;
-        //
-        //         user.Nombre = "Jose";
-        //         user.Apellido = "tapa";
-        //         user.Genero = Genero.Femenino;
-        //         user.Nacionalidad = Nacionalidad.Argentina;
-        //         user.Dni = 1234567;
-        //         user.FechaNacimiento = DateTime.Now;
-        //
-        //         var result = await userManager.CreateAsync(user, password);
-        //         await userManager.AddToRoleAsync(user, "Empleado");
-        //         
-        //         
-        //     }
-        //         
-        //     email = "empleado2@empleado.com";
-        //     password = "Empleado123,";
-        //     
-        //     if (await userManager.FindByNameAsync(email) == null)
-        //     {
-        //         var user = new ApplicationUser();
-        //         user.UserName = email;
-        //         user.Email = email;
-        //         user.EmailConfirmed = true;
-        //         user.Nombre = "Josefina";
-        //         user.Apellido = "tapita";
-        //         user.Genero = Genero.Femenino;
-        //         user.Nacionalidad = Nacionalidad.Argentina;
-        //         user.Dni = 1234567;
-        //         user.FechaNacimiento = DateTime.Now;
-        //
-        //         var result = await userManager.CreateAsync(user, password);
-        //         await userManager.AddToRoleAsync(user, "Empleado");
-        //         
-        //         
-        //     }
-        // }
+        
         app.UseHttpsRedirection();
 
         app.UseStaticFiles();
-        app.UseAntiforgery();
-
+        
         app.MapRazorComponents<App>()
             .AddInteractiveServerRenderMode();
 
@@ -229,15 +152,7 @@ public class Program
         // esto solo hace falta porque tiene el logout, pero tiene mucho de 2fa y eso
         app.MapAdditionalIdentityEndpoints();
         
-#pragma warning disable ASP0014
-        app.UseEndpoints(endpoints =>
-        {
-            endpoints.MapRazorPages();
-            endpoints.MapControllers();
-            endpoints.MapFallbackToFile("index.html");
-            endpoints.MapHub<SignalRHub>("/signalRHub");
-        });
-#pragma warning restore ASP0014
+
         app.Run();
     }
 }

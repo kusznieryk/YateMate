@@ -1,4 +1,5 @@
 ﻿@using YateMate.Components.Account.Shared
+<CascadingAuthenticationState> @*En teoria esto no era necesario, con el authorizeRouteView alcanzaba pero si no AuthState era null en el chat*@
 <Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
         <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
@@ -9,3 +10,4 @@
         <FocusOnNavigate RouteData="routeData" Selector="h1"/>
     </Found>
 </Router>
+</CascadingAuthenticationState>
