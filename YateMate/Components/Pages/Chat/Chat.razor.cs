@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.SignalR.Client;
+using Microsoft.JSInterop;
 using YateMate.Aplicacion.Entidades;
 using YateMate.Aplicacion.UseCases.Mensaje;
 using YateMate.Aplicacion.UseCases.ApplicationUser;
@@ -24,6 +25,8 @@ public partial class Chat
     [Inject] private ObtenerMensajesEntreUseCase ObtenerMensajesEntreUseCase { get; set; }
     
     [Inject] private NavigationManager NavigationManager { get; set; }
+
+    [Inject] private IJSRuntime _jsRuntime { get; set; }
     
     public List<ApplicationUser> ChatUsers = new List<ApplicationUser>();
     [Parameter] public string ContactEmail { get; set; }
@@ -65,11 +68,10 @@ public partial class Chat
         {
             if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId) || (ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
             {
-
+        
                 if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId))
                 {
                     messages.Add(new MensajeChat { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new ApplicationUser() { Email = CurrentUserEmail } } );
-                    // await hubConnection.SendAsync("ChatNotificationAsync", $"New Message From {userName}", ContactId, CurrentUserId);
                 }
                 else if ((ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
                 {
@@ -112,6 +114,11 @@ public partial class Chat
     {
         ChatUsers = ObtenerContactosDeUseCase.Ejecutar(CurrentUserId);
         // Console.WriteLine(ChatUsers.Count);
+    }
+    
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        await _jsRuntime.InvokeAsync<string>("ScrollToBottom", "chatContainer");
     }
 }
 

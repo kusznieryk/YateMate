@@ -1,6 +1,4 @@
 ﻿@inherits LayoutComponentBase
-@using Microsoft.AspNetCore.SignalR.Client;
-@inject NavigationManager NavigationManager
 <MudThemeProvider/>
 <MudSnackbarProvider/>
 
@@ -8,9 +6,7 @@
 
             <NavMenu></NavMenu>
     <MudMainContent Style="min-height: 100vh">
-        <CascadingValue Value="hubConnection">
             @Body
-        </CascadingValue>
     </MudMainContent>
 </MudLayout>
 
@@ -51,13 +47,7 @@
         // }
     };
     
-    private HubConnection hubConnection;
-
-    protected override async Task OnInitializedAsync()
-    {
-        hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/signalRHub")).Build();
-        await hubConnection.StartAsync();
-    }
+    
 
 }
 
