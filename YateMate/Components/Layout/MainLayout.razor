@@ -5,9 +5,8 @@
 <MudSnackbarProvider/>
 
 <MudLayout>
-    
-            <NavMenu></NavMenu>
 
+            <NavMenu></NavMenu>
     <MudMainContent Style="min-height: 100vh">
         <CascadingValue Value="hubConnection">
             @Body
@@ -33,9 +32,17 @@
         {
             Primary = "#23466C",
             Secondary = "#765D3A",
+            Tertiary = "#FEFEFE",
             Background = "#FEFEFE",
             TextPrimary = "#071A34"
-        }
+        },
+        Typography = new Typography()
+        {
+            Default = new Default()
+                {
+                    FontFamily = new[] { "Helvetica", "Arial", "sans-serif" }
+                }
+    }
         //
         // LayoutProperties = new LayoutProperties()
         // {

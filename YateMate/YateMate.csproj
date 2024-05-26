@@ -27,4 +27,8 @@
       <None Include="wwwroot\Pictures\logo_yatemate.png" />
     </ItemGroup>
 
+    <ItemGroup>
+      <Folder Include="wwwroot\Video\" />
+    </ItemGroup>
+
 </Project>
