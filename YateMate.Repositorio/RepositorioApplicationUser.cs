@@ -96,4 +96,34 @@ public class RepositorioApplicationUser : IRepositorioApplicationUser
 
         }
     }
+
+    public ApplicationUser? ObtenerApplicationUser(string id)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.ApplicationUsers.Find(id);
+        }
+    }
+
+    public List<ApplicationUser> ObtenerClientesExcepto(string id)
+    {
+        return ObtenerClientes().Where(c => c.Id != id).ToList();
+    }
+
+    public List<ApplicationUser> ObtenerContactosDe(string id)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.MensajesChats
+                .Where(m => m.FromUserId == id || m.ToUserId == id)
+                .Select(m => new { UserId = m.FromUserId == id ? m.ToUserId : m.FromUserId })
+                .Distinct()
+                .Select(m => context.Users.FirstOrDefault(u => u.Id == m.UserId))
+                .Where(u => u != null)
+                .ToList()!;
+        }
+        
+        
+
+    }
 }

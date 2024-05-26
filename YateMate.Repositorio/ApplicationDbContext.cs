@@ -35,16 +35,30 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
             .HasConversion(
                 v => v.ToString(),
                 v => (Nacionalidad)Enum.Parse(typeof(Nacionalidad), v));
+        
+        modelBuilder.Entity<MensajeChat>(entity =>
+        {
+            entity.HasOne(d => d.FromUser)
+                .WithMany(p => p.ChatMessagesFromUsers)
+                .HasForeignKey(d => d.FromUserId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+            entity.HasOne(d => d.ToUser)
+                .WithMany(p => p.ChatMessagesToUsers)
+                .HasForeignKey(d => d.ToUserId)
+                .OnDelete(DeleteBehavior.ClientSetNull);
+        });
+        //no se si les parece hacer que al borrar pongamos el id en null, no se como hacer lo de borrar y ponerlo en otra tabla
     }
 
 #nullable disable
     //public DbSet<Amarra> Amarras { get; set; }
     public DbSet<Bien> Bienes { get; set; }
     public DbSet<Embarcacion> Embarcaciones { get; set; }
-    //public DbSet<Mensaje> Mensajes { get; set; }
+    public DbSet<MensajeChat> MensajesChats { get; set; }
     public DbSet<Oferta> Ofertas { get; set; }
     public DbSet<Publicacion> Publicaciones { get; set; }
     //public DbSet<Subalquiler> Subalquileres { get; set; }
+    
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     #nullable enable
     
