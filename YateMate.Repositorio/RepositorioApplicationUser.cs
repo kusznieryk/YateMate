@@ -114,12 +114,16 @@ public class RepositorioApplicationUser : IRepositorioApplicationUser
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
-            return  context.MensajesChats
+            return context.MensajesChats
                 .Where(m => m.FromUserId == id || m.ToUserId == id)
-                .Select(m => m.FromUserId == id ? m.ToUser : m.FromUser)
+                .Select(m => new { UserId = m.FromUserId == id ? m.ToUserId : m.FromUserId })
                 .Distinct()
-                .ToList();
+                .Select(m => context.Users.FirstOrDefault(u => u.Id == m.UserId))
+                .Where(u => u != null)
+                .ToList()!;
         }
+        
+        
 
     }
 }
