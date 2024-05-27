@@ -75,7 +75,8 @@ else
     public void HandleClick(Publicacion publicacion)
     {
         var parameters = new DialogParameters<VerDatosEmbarcacion>();
-        parameters.Add( x=>x.Publicacion, publicacion);
+        parameters.Add( x=>x.Publicacion, publicacion);        
+        parameters.Add( x=>x.Duenio, true);
         Dialog.Show<VerDatosEmbarcacion>("Simple Dialog", parameters);
     }
 
