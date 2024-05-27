@@ -10,27 +10,34 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudCard>
+        <MudCard Style="box-shadow: none">
             <MudCardHeader>
                 <CardHeaderContent>
                     <MudText Typo="Typo.h4">@Publicacion.Titulo</MudText>
                 </CardHeaderContent>
             </MudCardHeader>
-            <MudCardContent>
-                <MudText Typo="Typo.h5"  GutterBottom="true">Descripción</MudText>
-                <MudText>@Publicacion.Descripcion</MudText>
+            <MudCardContent Style="font-size: large">
+                <MudText >@Publicacion.Descripcion</MudText>
 
-                <MudText Typo="Typo.h5" GutterBottom="true">Calado (m)</MudText>
-                <MudText>@(Original.Calado)</MudText>
-
-                <MudText Typo="Typo.h5" GutterBottom="true">Eslora (m)</MudText>
-                <MudText>@(Original.Eslora)</MudText>
-
-                <MudText Typo="Typo.h5" GutterBottom="true">Manga (m)</MudText>
-                <MudText>@(Original.Manga)</MudText>
-
-                <MudText Typo="Typo.h5" GutterBottom="true">Bandera</MudText> 
-                <MudText>@Original.Bandera</MudText>
+                <MudSimpleTable>
+                    <thead>
+                    <tr>
+                        
+                    <th>Calado(m)</th>
+                    <th>Eslora(m)</th>
+                    <th>Manga(m)</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        
+                    <th>@(Original.Calado)</th>
+                    <th>@(Original.Eslora)</th>
+                    <th>@(Original.Manga)</th>
+                    </tr>
+                    </tbody>
+                </MudSimpleTable>
+                <MudText>Bandera: @Original.Bandera</MudText>
 
                 <MudImage Fluid="true" Src="@Publicacion.Image" Alt="Imagen de la publicación" Style="max-height: 300px;"/>
             </MudCardContent>
@@ -39,12 +46,30 @@
     <DialogActions>
         <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
         <div style="flex-grow: 1;"></div>
-        @*<MudButton Variant="Variant.Filled" Href=""StartIcon="@Icons.Material.Filled.Edit" OnClick="@((e) => Editar(Bien!.Id))" Color="Color.Info" Size="Size.Small">Editar</MudButton>*@
+        @if (Duenio)
+        {
+            <MudButton Variant="Variant.Filled"
+                       Href=""
+                       StartIcon="@Icons.Material.Filled.Delete"
+                       OnClick="@((e) => Console.WriteLine("No implementado"))"
+                       Color="Color.Error"
+                       Size="Size.Small">Eliminar
+            </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       Href=""
+                       StartIcon="@Icons.Material.Filled.Edit"
+                       OnClick="@((e) => Console.WriteLine("No implementado"))"
+                       Color="Color.Primary"
+                       Size="Size.Small">Editar
+            </MudButton>
+        }
     </DialogActions>
 </MudDialog>
 
 @code {
     [Parameter] public Publicacion Publicacion { get; set; } = null!;
+    [Parameter] public bool Duenio { get; set; }=false;
+
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
     Embarcacion Original { get; set; } = null!;
     protected override void OnInitialized()
