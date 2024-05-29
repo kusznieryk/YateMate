@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using YateMate.Aplicacion.Entidades;
@@ -16,7 +17,7 @@ public partial class Chat
     [Parameter] public string CurrentUserEmail { get; set; }
     private List<MensajeChat> messages = new List<MensajeChat>();
     
-    [Inject] //no se puede hacer @inject aca
+    [Inject]
     AuthenticationStateProvider AuthenticationStateProvider { get; set; }
     
     [Inject] private AgregarMensajeUseCase AgregarMensajeUseCase { get; set; }
@@ -31,14 +32,15 @@ public partial class Chat
     public List<ApplicationUser> ChatUsers = new List<ApplicationUser>();
     [Parameter] public string ContactEmail { get; set; }
     [Parameter] public string ContactId { get; set; }
+    [Parameter] public string ContactName { get; set; }
+
+    private string img = "";
     
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationState { get; set; } 
     
     private async Task SubmitAsync()
     {
-        Console.WriteLine($"{CurrentUserEmail} Enviando mensaje a {ContactId}");
-        
         if (!string.IsNullOrEmpty(CurrentMessage) && !string.IsNullOrEmpty(ContactId))
         {
             var chatHistory = new MensajeChat()
@@ -46,12 +48,16 @@ public partial class Chat
                 Message = CurrentMessage,
                 ToUserId = ContactId,
                 CreatedDate = DateTime.Now,
-                FromUserId = CurrentUserId
+                FromUserId = CurrentUserId,
+                IsImage = !string.IsNullOrEmpty(img)
             };
             AgregarMensajeUseCase.Ejecutar(chatHistory);
             
             await hubConnection.SendAsync("SendMessageAsync", chatHistory, CurrentUserEmail);
+            Console.WriteLine($"{CurrentUserEmail} Enviando mensaje a {ContactId}");
+
             CurrentMessage = string.Empty;
+            img = string.Empty;
         }
     }
     protected override async Task OnInitializedAsync()
@@ -71,17 +77,18 @@ public partial class Chat
         
                 if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId))
                 {
-                    messages.Add(new MensajeChat { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new ApplicationUser() { Email = CurrentUserEmail } } );
+                    messages.Add(new MensajeChat { Message = message.Message, CreatedDate = message.CreatedDate, IsImage = message.IsImage, FromUser = new ApplicationUser() { Email = CurrentUserEmail } } );
                 }
                 else if ((ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
                 {
-                    messages.Add(new MensajeChat { Message = message.Message, CreatedDate = message.CreatedDate, FromUser = new ApplicationUser() { Email = ContactEmail } });
+                    messages.Add(new MensajeChat { Message = message.Message, CreatedDate = message.CreatedDate, IsImage = message.IsImage, FromUser = new ApplicationUser() { Email = ContactEmail } });
                 }
+                Console.WriteLine($"se recibio un mensaje, mail actual es {CurrentUserEmail}");
                 await InvokeAsync(StateHasChanged);
             }
         }); 
         
-        // Console.WriteLine("consegiu contactos"); //se ejecuta
+        // Console.WriteLine("consegui contactos"); //se ejecuta
         
         if (AuthenticationState is not null)
         {
@@ -105,6 +112,7 @@ public partial class Chat
         var contact = ObtenerApplicationUserUseCase.Ejecutar(userId);
         ContactId = contact.Id;
         ContactEmail = contact.Email;
+        ContactName = contact.Nombre;
         // NavigationManager.NavigateTo($"chat/{ContactId}");
         messages = new List<MensajeChat>();
         messages = ObtenerMensajesEntreUseCase.Ejecutar(userId, CurrentUserId);
@@ -119,6 +127,18 @@ public partial class Chat
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await _jsRuntime.InvokeAsync<string>("ScrollToBottom", "chatContainer");
+    }
+
+    private async Task saveImage(IBrowserFile file)
+    {
+        var buffer = new byte[file.Size];
+        var reader = file.OpenReadStream(long.MaxValue);
+        await reader.ReadExactlyAsync(buffer);
+        var imagesrc = Convert.ToBase64String(buffer);
+        reader.Close();
+        img = $"data:{file.ContentType};base64,{imagesrc}";
+        CurrentMessage = img;
+        //await InvokeAsync(StateHasChanged); //ver si es necesario
     }
 }
 
