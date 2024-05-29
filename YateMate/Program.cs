@@ -13,6 +13,7 @@ using YateMate.Aplicacion.UseCases.ApplicationUser;
 using YateMate.Aplicacion.UseCases.Embarcaciones;
 using YateMate.Aplicacion.UseCases.Oferta;
 using YateMate.Aplicacion.UseCases.Mensaje;
+using YateMate.Aplicacion.UseCases.Publicaciones;
 using YateMate.Components.Pages;
 using YateMate.Hubs;
 
@@ -56,10 +57,12 @@ public class Program
         builder.Services.AddTransient<ObtenerBienUseCase>();
         builder.Services.AddScoped<IRepositorioBien,RepositorioBien>();
         
-        builder.Services.AddTransient<ListarTruequesDisponiblesUseCase>();
-        builder.Services.AddTransient<HacerOfertaUseCase>();
         builder.Services.AddTransient<EliminarOfertaUseCase>();
+        builder.Services.AddTransient<HacerOfertaUseCase>();
         builder.Services.AddTransient<ListarOfertasDeUseCase>();
+        builder.Services.AddTransient<ListarOfertasHechasUseCase>();
+        builder.Services.AddTransient<ListarTruequesDisponiblesUseCase>();
+        builder.Services.AddTransient<ObtenerPublicacionDeUseCase>();
         builder.Services.AddScoped<IRepositorioOferta,RepositorioOferta>();
               
         builder.Services.AddTransient<ObtenerPublicacionUseCase>();
