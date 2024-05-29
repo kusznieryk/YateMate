@@ -54,5 +54,21 @@ public class RepositorioOferta : IRepositorioOferta
             return context.Ofertas.Where(o => o.PublicacionId == publicacionId).ToList();
         }
     }
+
+    public List<Oferta> ListarOfertasHechas(string userId)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Ofertas.Where(o => o.UsuarioId == userId).ToList();
+        }
+    }
+
+    public Publicacion ObtenerPublicacionDe(int id)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Publicaciones.FirstOrDefault(p => p.Id == id) ?? throw new InvalidOperationException();
+        }
+    }
     
 }

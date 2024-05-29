@@ -19,79 +19,85 @@
                     </svg> Inicio
                 </MudNavLink>
 
-            <AuthorizeView Roles="Cliente">
-                <Authorized Context="cliente">
-                        <MudNavLink class="nav-link" Href="/Account/Manage">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-vcard-fill" viewBox="0 0 16 16">
-                                <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm9 1.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1h-4a.5.5 0 0 0-.5.5M9 8a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1h-4A.5.5 0 0 0 9 8m1 2.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 0-1h-3a.5.5 0 0 0-.5.5m-1 2C9 10.567 7.21 9 5 9c-2.086 0-3.8 1.398-3.984 3.181A1 1 0 0 0 2 13h6.96q.04-.245.04-.5M7 6a2 2 0 1 0-4 0 2 2 0 0 0 4 0"/>
-                            </svg>
-                            Mi perfil
-                        </MudNavLink>
-                        <MudNavLink class="nav-link" Href="/ListarMisBienes/lista">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-briefcase" viewBox="0 0 16 16">
-                                <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
-                            </svg>
-                            Ver mis bienes
-                        </MudNavLink>
-                        <MudNavLink class="nav-link" Href="/mis_publicaciones">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
-                                <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-                            </svg> Ver mis publicaciones
-                        </MudNavLink>
-                        @*<MudNavLink class="nav-link" Href="/ListadoPublicacionesDisponibles">
+                    <AuthorizeView Roles="Cliente">
+                        <Authorized Context="cliente">
+                            <MudNavLink class="nav-link" Href="/Account/Manage">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-vcard-fill" viewBox="0 0 16 16">
+                                    <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2zm9 1.5a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1h-4a.5.5 0 0 0-.5.5M9 8a.5.5 0 0 0 .5.5h4a.5.5 0 0 0 0-1h-4A.5.5 0 0 0 9 8m1 2.5a.5.5 0 0 0 .5.5h3a.5.5 0 0 0 0-1h-3a.5.5 0 0 0-.5.5m-1 2C9 10.567 7.21 9 5 9c-2.086 0-3.8 1.398-3.984 3.181A1 1 0 0 0 2 13h6.96q.04-.245.04-.5M7 6a2 2 0 1 0-4 0 2 2 0 0 0 4 0"/>
+                                </svg>
+                                Mi perfil
+                            </MudNavLink>
+                            <MudNavLink class="nav-link" Href="/ListarMisBienes/lista">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-briefcase" viewBox="0 0 16 16">
+                                    <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
+                                </svg>
+                                Ver mis bienes
+                            </MudNavLink>
+                            <MudNavLink class="nav-link" Href="/ListadoOfertasHechas">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-briefcase" viewBox="0 0 16 16">
+                                    <path d="M6.5 1A1.5 1.5 0 0 0 5 2.5V3H1.5A1.5 1.5 0 0 0 0 4.5v8A1.5 1.5 0 0 0 1.5 14h13a1.5 1.5 0 0 0 1.5-1.5v-8A1.5 1.5 0 0 0 14.5 3H11v-.5A1.5 1.5 0 0 0 9.5 1zm0 1h3a.5.5 0 0 1 .5.5V3H6v-.5a.5.5 0 0 1 .5-.5m1.886 6.914L15 7.151V12.5a.5.5 0 0 1-.5.5h-13a.5.5 0 0 1-.5-.5V7.15l6.614 1.764a1.5 1.5 0 0 0 .772 0M1.5 4h13a.5.5 0 0 1 .5.5v1.616L8.129 7.948a.5.5 0 0 1-.258 0L1 6.116V4.5a.5.5 0 0 1 .5-.5"/>
+                                </svg>
+                                Mis ofertas hechas
+                            </MudNavLink>
+                            <MudNavLink class="nav-link" Href="/mis_publicaciones">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-person-fill" viewBox="0 0 16 16">
+                                    <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                                </svg> Ver mis publicaciones
+                            </MudNavLink>
+                            @*<MudNavLink class="nav-link" Href="/ListadoPublicacionesDisponibles">
                             🚢
                             Publicaciones
                         </MudNavLink>*@
-                        <MudNavLink class="nav-link" Href="/embarcaciones">
-                            ⛵
-                            Ver mis embarcaciones
-                        </MudNavLink>
-                        <MudNavLink class="nav-link" Href="/chat">
-                            <MudIcon Icon="@Icons.Material.Outlined.ChatBubble"></MudIcon>
-                            Chat
-                        </MudNavLink>
+                            <MudNavLink class="nav-link" Href="/embarcaciones">
+                                ⛵
+                                Ver mis embarcaciones
+                            </MudNavLink>
+                            <MudNavLink class="nav-link" Href="/chat">
+                                <MudIcon Icon="@Icons.Material.Outlined.ChatBubble"></MudIcon>
+                                Chat
+                            </MudNavLink>
 
-                </Authorized>
-            </AuthorizeView>
+                        </Authorized>
+                    </AuthorizeView>
 
-            <AuthorizeView Roles="Empleado">
-                <Authorized Context="Empleado">
-                    <div class="nav-item px-3">
-                        <MudNavLink class="nav-link" Href="/agregarApplicationUser">
-                            <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Agregar cliente
-                        </MudNavLink>
-                    </div>
-                    <div class="nav-item px-3">
-                        <MudNavLink class="nav-link" Href="/ListarApplicationUsers">
-                            <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Listar clientes
-                        </MudNavLink>
-                    </div>
-                </Authorized>
-            </AuthorizeView>
+                    <AuthorizeView Roles="Empleado">
+                        <Authorized Context="Empleado">
+                            <div class="nav-item px-3">
+                                <MudNavLink class="nav-link" Href="/agregarApplicationUser">
+                                    <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Agregar cliente
+                                </MudNavLink>
+                            </div>
+                            <div class="nav-item px-3">
+                                <MudNavLink class="nav-link" Href="/ListarApplicationUsers">
+                                    <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Listar clientes
+                                </MudNavLink>
+                            </div>
+                        </Authorized>
+                    </AuthorizeView>
 
-            <AuthorizeView Roles="Admin">
-                <Authorized Context="Admin">
-                    <div class="nav-item px-3">
-                        <MudNavLink class="nav-link" Href="/admin">
-                            <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Administrar empleados
-                        </MudNavLink>
-                    </div>
-                </Authorized>
-            </AuthorizeView>
+                    <AuthorizeView Roles="Admin">
+                        <Authorized Context="Admin">
+                            <div class="nav-item px-3">
+                                <MudNavLink class="nav-link" Href="/admin">
+                                    <span class="bi bi-person-fill-nav-menu" aria-hidden="true"></span> Administrar empleados
+                                </MudNavLink>
+                            </div>
+                        </Authorized>
+                    </AuthorizeView>
 
-            <form action="Account/Logout" method="post" style="display: flex; justify-content: space-evenly" >
-                <AntiforgeryToken/>
-                <MudButton Style="font-size: large;" ButtonType="ButtonType.Submit" Variant="Variant.Outlined" Color="Color.Secondary" >
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">
-                        <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0z"/>
-                        <path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708z"/>
-                    </svg> Cerrar sesión
-                </MudButton>
-            </form>
-        </MudNavMenu>
-        </MudDrawer>
+                    <form action="Account/Logout" method="post" style="display: flex; justify-content: space-evenly" >
+                        <AntiforgeryToken/>
+                        <MudButton Style="font-size: large;" ButtonType="ButtonType.Submit" Variant="Variant.Outlined" Color="Color.Secondary" >
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-box-arrow-left" viewBox="0 0 16 16">
+                                <path fill-rule="evenodd" d="M6 12.5a.5.5 0 0 0 .5.5h8a.5.5 0 0 0 .5-.5v-9a.5.5 0 0 0-.5-.5h-8a.5.5 0 0 0-.5.5v2a.5.5 0 0 1-1 0v-2A1.5 1.5 0 0 1 6.5 2h8A1.5 1.5 0 0 1 16 3.5v9a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 12.5v-2a.5.5 0 0 1 1 0z"/>
+                                <path fill-rule="evenodd" d="M.146 8.354a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L1.707 7.5H10.5a.5.5 0 0 1 0 1H1.707l2.147 2.146a.5.5 0 0 1-.708.708z"/>
+                            </svg> Cerrar sesión
+                        </MudButton>
+                    </form>
+                </MudNavMenu>
+            </MudDrawer>
 
-</MudContainer>
+        </MudContainer>
     </Authorized>
 </AuthorizeView>
 
