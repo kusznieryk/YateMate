@@ -41,7 +41,7 @@
                     <option value=""></option>
                     @foreach (Nacionalidad nacionalidad in Enum.GetValues(typeof(Nacionalidad)))
                     {
-                    <option value=@nacionalidad> @nacionalidad </option>
+                        <option value=@nacionalidad> @nacionalidad </option>
                     }   
                 </InputSelect>
                 <label for="bandera">Bandera</label>
@@ -89,8 +89,8 @@
         Model.Calado ??= barco.Calado;
         Model.Eslora ??= barco.Eslora;
         Model.Manga ??= barco.Manga;
-    Model.Nombre ??= barco.Nombre;
-    Model.Bandera ??= barco.Bandera;
+        Model.Nombre ??= barco.Nombre;
+        Model.Bandera ??= barco.Bandera;
         Model.Matricula ??= barco.Matricula;
         Model.ClienteId = barco.ClienteId;
         editContext = new(Model);
