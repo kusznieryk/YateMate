@@ -1,6 +1,7 @@
 @page "/ListarMisBienes/{Origen}"
 @rendermode InteractiveServer
 
+@using Microsoft.AspNetCore.Identity
 @using Microsoft.Extensions.Options
 @using YateMate.Aplicacion.UseCases.Bien
 @using YateMate.Components.Account
@@ -13,6 +14,8 @@
 @inject ListarBienesDeUseCase ListarBienesDeUseCase
 @inject EliminarBienUseCase EliminarBienUseCase
 @inject HacerOfertaUseCase HacerOfertaUseCase
+@inject ListarOfertasDeUseCase ListarOfertasDeUseCase
+@inject IEmailSender<ApplicationUser> EmailSender
 @inject NavigationManager Navegador;
 @inject IDialogService Dialog
 
@@ -55,7 +58,7 @@ else
                                         <MudButton Variant="Variant.Text" @onclick="@((e) => OpenDialog(bien))" Color="Color.Primary">Ver más</MudButton>
                                         <MudButton Variant="Variant.Text" OnClick="() => Eliminar(bien)" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error"> Borrar </MudButton>
                                     }
-                                    else
+                                    else if (!ListarOfertasDeUseCase.Ejecutar(int.Parse(Origen!)).Exists(o => o.BienId == bien.Id))
                                     {
                                         <MudButton Variant="Variant.Text" OnClick="() => Ofertar(bien)" Color="Color.Primary"> Ofertar </MudButton>
                                     }
@@ -107,7 +110,6 @@ else
         _lista = ListarBienesDeUseCase.Ejecutar(_userId!);
     }
     
-    
     protected override void OnParametersSet()
     {
         if(_lista.Count > 0) 
@@ -127,8 +129,9 @@ else
 
     private void Ofertar(Bien bien)
     {
-        var oferta = new Oferta(bien.Id,int.Parse(Origen!));
+        var oferta = new Oferta(bien.Id,int.Parse(Origen!), _userId);
         HacerOfertaUseCase.Ejecutar(oferta);
+        // tengo que mandar el mail todavia
         Navegador.NavigateTo($"/ListadoPublicacionesDisponibles");
     }
     
@@ -137,6 +140,7 @@ else
         var options = new DialogOptions { CloseOnEscapeKey = true };
         var parameters = new DialogParameters<VerDatosBien>();
         parameters.Add(x => x.Bien, bien);
+        parameters.Add(x => x.Duenio, false);
         Dialog.Show<VerDatosBien>("Ver Datos", parameters);
     }
 }

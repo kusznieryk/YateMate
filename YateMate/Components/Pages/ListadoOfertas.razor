@@ -1,5 +1,4 @@
 @page "/ListadoOfertas/{Id:int?}"
-
 @rendermode InteractiveServer
 @using YateMate.Aplicacion.UseCases.Bien
 @using YateMate.Components.Shared
@@ -71,27 +70,12 @@ else
         }
     }
 
-    // private void Eliminar(Bien oferta)
-    // {
-    //     _ofertaParaEliminar = oferta;
-    //     EliminarBienUseCase.Ejecutar(_ofertaParaEliminar.Id);
-    //     _lista = ListarBienesDeUseCase.Ejecutar(_userId!);
-    //     if (_lista.Count == 0)
-    //         _tieneElementos = false;
-    // }
-    //
-    // private void Ofertar(Bien oferta)
-    // {
-    //     var oferta = new Oferta(oferta.Id,int.Parse(Origen!));
-    //     HacerOfertaUseCase.Ejecutar(oferta);
-    //     Navegador.NavigateTo($"/ListadoPublicacionesDisponibles");
-    // }
-
     private void OpenDialog(Bien oferta)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
         var parameters = new DialogParameters<VerDatosBien>();
         parameters.Add(x => x.Bien, oferta);
+        parameters.Add(x => x.Duenio, true);
         Dialog.Show<VerDatosBien>("Ver Datos", parameters);
     }
 }
