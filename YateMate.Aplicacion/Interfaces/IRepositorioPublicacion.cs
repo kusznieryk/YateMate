@@ -9,4 +9,5 @@ public interface IRepositorioPublicacion
     List<Publicacion> ObtenerPublicacionesDe(string idCliente);
     Publicacion? ObtenerPublicacion(int idPublicacion);
     bool EliminarPublicacion(int idPublicacion);
+    void ModificarPublicacion(Publicacion publicacion);
 }

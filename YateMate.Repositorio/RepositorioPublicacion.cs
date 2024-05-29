@@ -63,4 +63,18 @@ public class RepositorioPublicacion : IRepositorioPublicacion
 
         return true;
     }
+
+    public void ModificarPublicacion(Publicacion publicacion)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            var pub = context.Publicaciones.FirstOrDefault(b => b.Id == publicacion.Id);
+            if (pub != null)
+            {
+                context.Remove(pub);
+                context.Add(publicacion);
+                context.SaveChanges();
+            }
+        }
+    }
 }

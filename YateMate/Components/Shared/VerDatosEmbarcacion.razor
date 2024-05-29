@@ -1,6 +1,7 @@
 @using YateMate.Aplicacion.UseCases.Embarcaciones
-@using YateMate.Components.Pages
-
+@using YateMate.Aplicacion.UseCases.Publicaciones
+@inject NavigationManager Navegador;
+@inject EliminarPublicacionUseCase EliminarPublicacion
 @inject NavigationManager NavigationManager
 @inject ObtenerEmbarcacionUseCase ObtenerEmbarcacion
 <MudDialog>
@@ -51,7 +52,7 @@
             <MudButton Variant="Variant.Filled"
                        Href=""
                        StartIcon="@Icons.Material.Filled.Delete"
-                       OnClick="@((e) => Console.WriteLine("No implementado"))"
+                       OnClick="EliminarHandler"
                        Color="Color.Error"
                        Size="Size.Small">Eliminar
             </MudButton>
@@ -83,6 +84,13 @@
     {
         Submit();
         NavigationManager.NavigateTo($"publicacion/{id}");
+
+    }
+
+    public void EliminarHandler(object e)
+    {
+        EliminarPublicacion.Ejecutar(Publicacion);
+        Navegador.NavigateTo("/mis_publicaciones", true);
 
     }
 

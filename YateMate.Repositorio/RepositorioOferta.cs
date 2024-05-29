@@ -70,5 +70,18 @@ public class RepositorioOferta : IRepositorioOferta
             return context.Publicaciones.FirstOrDefault(p => p.Id == id) ?? throw new InvalidOperationException();
         }
     }
-    
+
+    public void EliminarOfertasDe(int idPublicacion)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            var ofertas = context.Ofertas.Where(o => o.PublicacionId == idPublicacion);
+            if (!ofertas.Any()) return;
+            foreach (var oferta in ofertas)
+            {
+                context.Remove(oferta);
+            }
+            context.SaveChanges();
+        }
+    }
 }
