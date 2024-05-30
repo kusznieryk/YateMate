@@ -4,6 +4,7 @@
 @inject EliminarPublicacionUseCase EliminarPublicacion
 @inject NavigationManager NavigationManager
 @inject ObtenerEmbarcacionUseCase ObtenerEmbarcacion
+
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
@@ -59,7 +60,7 @@
             <MudButton Variant="Variant.Filled"
                        Href=""
                        StartIcon="@Icons.Material.Filled.Edit"
-                       OnClick="@((e) => Console.WriteLine("No implementado"))"
+                       OnClick="@((e) => NavigationManager.NavigateTo("/publicar/"+Publicacion.EmbarcacionId))"
                        Color="Color.Primary"
                        Size="Size.Small">Editar
             </MudButton>
@@ -95,3 +96,4 @@
     }
 
 }
+

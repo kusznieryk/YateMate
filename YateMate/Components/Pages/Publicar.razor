@@ -1,6 +1,8 @@
 @page "/publicar/{Id:int}"
 @using System.ComponentModel.DataAnnotations
-@using Microsoft.CodeAnalysis
+@using YateMate.Aplicacion.UseCases.Publicaciones
+@inject ObtenerPublicacionUseCase ObtenerPublicacion
+@inject ModificarPublicacionUseCase ModificarPublicacion
 @rendermode InteractiveServer
 @inject PublicarEmbarcacionUseCase PublicarEmbarcacion
 @inject NavigationManager Navegador;
@@ -54,6 +56,19 @@
     [SupplyParameterFromForm]
     public PublicacionForm Model { get; set; }= new ();
     public Publicacion ModelSubir { get; set; }= new ("", "","", 0);
+    Publicacion? _publicacion = null;
+
+    protected override void OnInitialized()
+    {
+        _publicacion = ObtenerPublicacion.Ejecutar(Id);
+        if (_publicacion != null)
+        {
+            Model.Titulo = _publicacion.Titulo;
+            Model.Descripcion = _publicacion.Descripcion;
+            Model.Image = _publicacion.Image;
+            Model.FileVaciaWarning = new BrowserDouble();
+        }
+    }
 
     private async Task UploadFiles(IBrowserFile file)
     {
@@ -72,8 +87,17 @@
         ModelSubir.Titulo = Model.Titulo;
         ModelSubir.Descripcion = Model.Descripcion;
         ModelSubir.Image = Model.Image;
-        PublicarEmbarcacion.Ejecutar(ModelSubir);
-        Navegador.NavigateTo("embarcaciones");
+        if (_publicacion == null)
+        {
+            PublicarEmbarcacion.Ejecutar(ModelSubir);       
+            Navegador.NavigateTo("embarcaciones");
+        }
+        else
+        {
+            ModelSubir.Id = _publicacion.Id;
+            Navegador.NavigateTo("mis_publicaciones", true);
+            ModificarPublicacion.Ejecutar(ModelSubir);
+        }
     }
 
     public class PublicacionForm
@@ -90,5 +114,18 @@
         //agrego este solo para poder hacer el warning
         [Required(ErrorMessage = "Cargar una imagen es obligatorio")]
         public IBrowserFile FileVaciaWarning { get; set; } = null!; 
+    }
+
+    public class BrowserDouble : IBrowserFile
+    {
+        public Stream OpenReadStream(long maxAllowedSize = 512000, CancellationToken cancellationToken = new CancellationToken())
+        {
+            throw new NotImplementedException();
+        }
+
+        public string Name { get; }
+        public DateTimeOffset LastModified { get; }
+        public long Size { get; }
+        public string ContentType { get; }
     }
 }
