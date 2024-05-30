@@ -1,4 +1,6 @@
+@using YateMate.Aplicacion.UseCases.ApplicationUser
 @inject NavigationManager NavigationManager
+@inject ObtenerContactosDeUseCase ObtenerContactosDeUseCase
 
 <MudDialog>
     <TitleContent>
@@ -32,12 +34,38 @@
                        Size="Size.Small">Editar
             </MudButton>
         }
+        @if(!_contactos.Select(u=> u.Id).Contains(Bien.UsuarioId))
+        {
+        <MudButton Variant="Variant.Filled"
+                   @onclick="@(() => NavigationManager.NavigateTo($"/chat/{Bien.UsuarioId}"))"
+                   Color="Color.Primary" StartIcon="@Icons.Material.Filled.ChatBubble"
+                   Size="Size.Small"> Iniciar Conversación
+        </MudButton>
+        }
     </DialogActions>
 </MudDialog>
 
 @code {
     [Parameter] public Bien? Bien { get; set; }
     [Parameter] public bool Duenio { get; set; }
+    
+    [CascadingParameter] 
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+    private string? _userId;
+    List<ApplicationUser> _contactos = new List<ApplicationUser>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationState is not null)
+        {
+            var authState = await AuthenticationState;
+            var user = authState.User;
+            _userId = user.Claims.FirstOrDefault()?.Value;
+            _contactos = ObtenerContactosDeUseCase.Ejecutar(_userId);
+        }
+    }
+    
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
 
     void Submit() => MudDialog!.Close(DialogResult.Ok(true));

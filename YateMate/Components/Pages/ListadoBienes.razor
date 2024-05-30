@@ -56,7 +56,7 @@ else
                                     @if (Origen!.Equals("lista"))
                                     {
                                         <MudButton Variant="Variant.Text" @onclick="@((e) => OpenDialog(bien))" Color="Color.Primary">Ver más</MudButton>
-                                        <MudButton Variant="Variant.Text" OnClick="() => Eliminar(bien)" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error"> Borrar </MudButton>
+                                        <MudButton Variant="Variant.Text" OnClick="() => Eliminar(bien)" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error"> Eliminar </MudButton>
                                     }
                                     else if (!ListarOfertasDeUseCase.Ejecutar(int.Parse(Origen!)).Exists(o => o.BienId == bien.Id))
                                     {
