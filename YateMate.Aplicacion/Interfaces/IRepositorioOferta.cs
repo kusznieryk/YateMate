@@ -10,5 +10,7 @@ public interface IRepositorioOferta
     List<Oferta> ListarOfertasHechas(string userId);
     Publicacion ObtenerPublicacionDe(int id);
     void EliminarOfertasDe(int idPublicacion);
+    void EliminarOfertasDelBien(int idBien);
+
 
 }

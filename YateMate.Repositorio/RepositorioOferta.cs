@@ -84,4 +84,17 @@ public class RepositorioOferta : IRepositorioOferta
             context.SaveChanges();
         }
     }
+    public void EliminarOfertasDelBien(int idBien)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            var ofertas = context.Ofertas.Where(o => o.BienId == idBien);
+            if (!ofertas.Any()) return;
+            foreach (var oferta in ofertas)
+            {
+                context.Remove(oferta);
+            }
+            context.SaveChanges();
+        }
+    }
 }
