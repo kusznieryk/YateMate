@@ -38,6 +38,7 @@ public class Program
         builder.Services.AddTransient<ObtenerEmbarcacionUseCase>();
         builder.Services.AddTransient<ObtenerEmbarcacionesDeUseCase>();
         builder.Services.AddTransient<ObtenerEmbarcacionPorMatriculaUseCase>();
+        builder.Services.AddTransient<EliminarEmbarcacionUseCase>();
         builder.Services.AddScoped<IRepositorioEmbarcacion, RepositorioEmbarcacion>();
         
         builder.Services.AddTransient<EliminarApplicationUserUseCase>();

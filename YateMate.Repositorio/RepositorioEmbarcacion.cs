@@ -70,10 +70,11 @@ public class RepositorioEmbarcacion:IRepositorioEmbarcacion
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
-            var embarcacion = context.Embarcaciones.FirstOrDefault((emb => emb.Id == embarcacionId));
-            if (embarcacion != null)
+            var embarcacionAEliminar = context.Embarcaciones.FirstOrDefault((emb => emb.Id == embarcacionId));
+            if (embarcacionAEliminar != null)
             {
-                context.Remove(embarcacion);
+                embarcacionAEliminar.EstaEliminado = true;
+                //context.Remove(embarcacionAEliminar); Para hard delete
                 context.SaveChanges();
             }
         }
