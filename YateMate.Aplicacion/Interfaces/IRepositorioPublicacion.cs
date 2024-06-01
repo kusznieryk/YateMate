@@ -7,7 +7,7 @@ public interface IRepositorioPublicacion
     bool AgregarPublicacion(Publicacion publicacion);
     List<Publicacion> ObtenerPublicaciones();
     List<Publicacion> ObtenerPublicacionesDe(string idCliente);
-    Publicacion? ObtenerPublicacion(int idPublicacion);
+    Publicacion? ObtenerPublicacion(int idEmbarcacion);
     bool EliminarPublicacion(int idPublicacion);
     void ModificarPublicacion(Publicacion publicacion);
 }
