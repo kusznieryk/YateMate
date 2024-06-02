@@ -126,14 +126,19 @@ public class Program
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, EmailSender>();
         builder.Services.AddTransient<EmailSender>();
 
-        builder.Services.AddSignalR(); //cositas del chat
+        //cosas del chat
+        builder.Services.AddSignalR(hubOptions =>
+        {
+            hubOptions.MaximumReceiveMessageSize = Constants.SignalRConstants.MaximumMessageSize;
+        });
+        
         
         var app = builder.Build();
         
         app.UseAntiforgery();
         
-        app.MapHub<SignalRHub>("/signalRHub");
-        app.MapFallbackToFile("index.html");
+        app.MapHub<SignalRHub>(Constants.SignalRConstants.HubPath);
+        app.MapFallbackToFile(Constants.SignalRConstants.FallbackFile);
 
         
         // Configure the HTTP request pipeline.

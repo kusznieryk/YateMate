@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
+using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using YateMate.Aplicacion.Entidades;
@@ -13,8 +14,11 @@ public partial class Chat
 {
     [CascadingParameter] public HubConnection hubConnection { get; set; }
     [Parameter] public string CurrentMessage { get; set; }
+
+    [Parameter]
+    public ApplicationUser CurrentUser { get; set; }
     [Parameter] public string CurrentUserId { get; set; }
-    [Parameter] public string CurrentUserEmail { get; set; }
+    
     private List<MensajeChat> messages = new List<MensajeChat>();
     
     [Inject]
@@ -30,17 +34,30 @@ public partial class Chat
     [Inject] private IJSRuntime _jsRuntime { get; set; }
     
     public List<ApplicationUser> ChatUsers = new List<ApplicationUser>();
-    [Parameter] public string ContactEmail { get; set; }
     [Parameter] public string ContactId { get; set; }
-    [Parameter] public string ContactName { get; set; }
+    
+    [Parameter] public ApplicationUser Contacto { get; set; }
 
     private string img = "";
+
+    private bool _isImgTooBig;
     
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationState { get; set; } 
     
+    public async Task Enter(KeyboardEventArgs e)
+    {
+        if (e.Code == "Enter" || e.Code == "NumpadEnter")
+        {
+            await SubmitAsync();
+        }
+        
+    }
     private async Task SubmitAsync()
     {
+        if (!string.IsNullOrEmpty(img)) 
+            CurrentMessage = img;
+        
         if (!string.IsNullOrEmpty(CurrentMessage) && !string.IsNullOrEmpty(ContactId))
         {
             var chatHistory = new MensajeChat()
@@ -53,8 +70,8 @@ public partial class Chat
             };
             AgregarMensajeUseCase.Ejecutar(chatHistory);
             
-            await hubConnection.SendAsync("SendMessageAsync", chatHistory, CurrentUserEmail);
-            Console.WriteLine($"{CurrentUserEmail} Enviando mensaje a {ContactId}");
+            await hubConnection.SendAsync(Constants.SignalRConstants.SendMessage, chatHistory, CurrentUser.Email);
+            Console.WriteLine($"{CurrentUser.Email} Enviando mensaje a {ContactId}");
 
             CurrentMessage = string.Empty;
             img = string.Empty;
@@ -64,26 +81,26 @@ public partial class Chat
     {
         if (hubConnection == null)
         {
-            hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri("/signalRHub")).Build();
+            hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri(Constants.SignalRConstants.HubPath)).Build();
         }
         if (hubConnection.State == HubConnectionState.Disconnected)
         {
             await hubConnection.StartAsync();
         }
-        hubConnection.On<MensajeChat, string>("ReceiveMessage", async (message, userName) =>
+        hubConnection.On<MensajeChat, string>(Constants.SignalRConstants.ReceiveMessage, async (message, userName) =>
         {
             if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId) || (ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
             {
         
-                if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId))
+                if ((ContactId == message.ToUserId && CurrentUserId == message.FromUserId)) //si lo envie yo
                 {
-                    messages.Add(new MensajeChat { Message = message.Message, CreatedDate = message.CreatedDate, IsImage = message.IsImage, FromUser = new ApplicationUser() { Email = CurrentUserEmail } } );
+                    messages.Add(new MensajeChat { Message = message.Message, CreatedDate = message.CreatedDate, IsImage = message.IsImage, FromUser = CurrentUser } );
                 }
                 else if ((ContactId == message.FromUserId && CurrentUserId == message.ToUserId))
                 {
-                    messages.Add(new MensajeChat { Message = message.Message, CreatedDate = message.CreatedDate, IsImage = message.IsImage, FromUser = new ApplicationUser() { Email = ContactEmail } });
+                    messages.Add(new MensajeChat { Message = message.Message, CreatedDate = message.CreatedDate, IsImage = message.IsImage, FromUser = Contacto });
                 }
-                Console.WriteLine($"se recibio un mensaje, mail actual es {CurrentUserEmail}");
+                Console.WriteLine($"se recibio un mensaje, mail actual es {CurrentUser.Email}");
                 await InvokeAsync(StateHasChanged);
             }
         }); 
@@ -95,9 +112,10 @@ public partial class Chat
             var authState = await AuthenticationState;
             var user = authState.User;
             CurrentUserId = user.Claims.FirstOrDefault()?.Value!;
-            CurrentUserEmail = user.Identity?.Name!;
+            CurrentUser = ObtenerApplicationUserUseCase.Ejecutar(CurrentUserId)!;
+            
         }
-        Console.WriteLine($"mail usuario actual {CurrentUserEmail} Id usuario actual {CurrentUserId}'");
+        Console.WriteLine($"mail usuario actual {CurrentUser.Email} Id usuario actual {CurrentUserId}'");
         
         GetContactos();
         
@@ -109,14 +127,12 @@ public partial class Chat
     
     void LoadUserChat(string userId)
     {
-        var contact = ObtenerApplicationUserUseCase.Ejecutar(userId);
-        ContactId = contact.Id;
-        ContactEmail = contact.Email;
-        ContactName = contact.Nombre;
+        Contacto = ObtenerApplicationUserUseCase.Ejecutar(userId)!;
+        ContactId = Contacto.Id;
         // NavigationManager.NavigateTo($"chat/{ContactId}");
         messages = new List<MensajeChat>();
         messages = ObtenerMensajesEntreUseCase.Ejecutar(userId, CurrentUserId);
-        Console.WriteLine($"Loaded user chat {contact.Email}");
+        Console.WriteLine($"Loaded user chat {Contacto.Email}");
     }
     private void GetContactos()
     {
@@ -131,15 +147,23 @@ public partial class Chat
 
     private async Task saveImage(IBrowserFile file)
     {
+        
+        if (file.Size > Constants.SignalRConstants.MaximumMessageSize)
+        {
+            Console.WriteLine($"Usuario mando mensaje mayor al maximo. Bytes: {file.Size}");
+            img = "";
+            CurrentMessage = "";
+            _isImgTooBig = true;
+            return;
+
+        }
         var buffer = new byte[file.Size];
         var reader = file.OpenReadStream(long.MaxValue);
         await reader.ReadExactlyAsync(buffer);
         var imagesrc = Convert.ToBase64String(buffer);
         reader.Close();
         img = $"data:{file.ContentType};base64,{imagesrc}";
-        CurrentMessage = img;
-        //await InvokeAsync(StateHasChanged); //ver si es necesario
+        _isImgTooBig = false;
+        CurrentMessage = "Imagen seleccionada";
     }
 }
-
-//
