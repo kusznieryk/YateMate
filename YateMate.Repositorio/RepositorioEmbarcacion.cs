@@ -73,10 +73,20 @@ public class RepositorioEmbarcacion:IRepositorioEmbarcacion
             var embarcacionAEliminar = context.Embarcaciones.FirstOrDefault((emb => emb.Id == embarcacionId));
             if (embarcacionAEliminar != null)
             {
-                embarcacionAEliminar.EstaEliminado = true;
-                //context.Remove(embarcacionAEliminar); Para hard delete
-                context.SaveChanges();
+                var publicaciones = context.Publicaciones.Where((pub => pub.EmbarcacionId == embarcacionId)).ToList();
+                var tieneTruequeConfirmado = publicaciones.Any(pub =>
+                    context.TruequesConfirmados.Any(trueque => trueque.PublicacionId == pub.Id));
+                    context.Embarcaciones.Remove(embarcacionAEliminar);
+                    if (tieneTruequeConfirmado)
+                    {
+                        embarcacionAEliminar.EstaEliminado = true;
+                    }
+                    else
+                    {
+                        context.Remove(embarcacionAEliminar);
+                    }
             }
+            context.SaveChanges();
         }
     }
 }
