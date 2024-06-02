@@ -22,7 +22,11 @@ public class EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
          string resetLink) => SendEmailAsync(email, "Cambia tu contraseña:", 
          $"Haz click aqui para cambiar tu contraseña {resetLink}");
 
-          public Task SendPasswordResetCodeAsync(ApplicationUser user, string email, 
+        public Task SendMessageOferta(string Email, Bien bien,
+            Publicacion publicacion) => SendEmailAsync(Email, "Recibiste una nueva oferta",
+            $"Te han ofertado el bien: '{bien.Nombre}', con descripción: '{bien.Descripcion}' para tu publicación: '{publicacion.Titulo}'");
+     
+        public Task SendPasswordResetCodeAsync(ApplicationUser user, string email, 
          string resetCode) => SendEmailAsync(email, "Cambia tu contraseña", 
          $"Cambia tu contraseña usando el siguiente codigo: {resetCode}");
      //nota: tampoco se deberia ejecutar
@@ -47,14 +51,15 @@ public class EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
         {
             message = message.Replace("&amp;", "&");
         }
-         var client = new SmtpClient("sandbox.smtp.mailtrap.io", 2525)
-         {
-             Credentials = new NetworkCredential("b7680a9e8a9a3a", apiKey),
-             EnableSsl = true
-         };
-         client.EnableSsl = true;
-         client.Send("YateMate@YateMate.com", toEmail, subject, message);
+        var client = new SmtpClient("sandbox.smtp.mailtrap.io", 2525)
+        {
+            Credentials = new NetworkCredential("b7680a9e8a9a3a", apiKey),
+            EnableSsl = true
+        };
+        client.EnableSsl = true;
+        client.Send("YateMate@YateMate.com", toEmail, subject, message);
          
-         _logger.LogInformation($"Email to {toEmail} sent!, with subject {subject} and message {message}");
+        _logger.LogInformation($"Email to {toEmail} sent!, with subject {subject} and message {message}");
      }
+
 }

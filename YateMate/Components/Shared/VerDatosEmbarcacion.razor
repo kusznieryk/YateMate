@@ -1,5 +1,6 @@
 @using YateMate.Aplicacion.UseCases.ApplicationUser
 @using YateMate.Aplicacion.UseCases.Embarcaciones
+@using YateMate.Aplicacion.UseCases.Oferta
 @using YateMate.Aplicacion.UseCases.Publicaciones
 @inject NavigationManager Navegador;
 @inject EliminarPublicacionUseCase EliminarPublicacion
@@ -80,7 +81,7 @@
         <MudButton Variant="Variant.Filled"
                    Href=""
                    StartIcon="@Icons.Material.Filled.SyncAlt"
-                   @onclick="@(()=> NavigationManager.NavigateTo($"/ListarMisBienes/{Publicacion.Id.ToString()}"))"
+                   @onclick="@(()=> NavigationManager.NavigateTo($"/ListarMisBienes/{Publicacion.Id.ToString()}/{ObtenerDuenio.Ejecutar(Publicacion)}"))"
                    Color="Color.Primary"
                    Size="Size.Small">Hacer Oferta
         </MudButton>

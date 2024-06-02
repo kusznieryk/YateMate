@@ -74,7 +74,6 @@ public class Program
         builder.Services.AddTransient<ModificarPublicacionUseCase>();
         builder.Services.AddTransient<EliminarPublicacionUseCase>();
         builder.Services.AddTransient<ObtenerDuenioUseCase>();
-        
         builder.Services.AddScoped<IRepositorioPublicacion, RepositorioPublicacion>();
 
         builder.Services.AddTransient<AgregarMensajeUseCase>();
@@ -126,6 +125,7 @@ public class Program
         // Console.WriteLine();
         
         builder.Services.AddSingleton<IEmailSender<ApplicationUser>, EmailSender>();
+        builder.Services.AddTransient<EmailSender>();
 
         builder.Services.AddSignalR(); //cositas del chat
         
