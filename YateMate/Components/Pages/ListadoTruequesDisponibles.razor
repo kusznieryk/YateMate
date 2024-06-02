@@ -1,10 +1,14 @@
 @page "/ListadoPublicacionesDisponibles"
+@using YateMate.Aplicacion.UseCases.ApplicationUser
+@using YateMate.Aplicacion.UseCases.Embarcaciones
 @using YateMate.Aplicacion.UseCases.Oferta
+@using YateMate.Aplicacion.UseCases.Publicaciones
 @inject ListarTruequesDisponiblesUseCase ListarTruequesDisponiblesUseCase
 @inject NavigationManager Navegador;
 @inject FiltrarPublicacionesPorEsloraUseCase FiltrarPorEslora
 @inject FiltrarPublicacionesPorCaladoUseCase FiltrarPorCalado
 @inject IDialogService Dialog
+
 @using YateMate.Components.Shared
 @rendermode InteractiveServer
 
@@ -24,19 +28,19 @@
                 <MudItem sm="12" md="6">
                     <h5>Filtrar por eslora</h5>
                     <MudRadioGroup @bind-Value="@OpcionEslora">
-                        <MudRadio Value="@("0 - 5")"> &lt;5m </MudRadio>
-                        <MudRadio Value="@("5 -10 ")"> &gt;5m - &lt;10m</MudRadio>
-                        <MudRadio Value="@("10 - 15")"> &gt;10m - &lt;15m</MudRadio>
-                        <MudRadio Value="@("15 -" + int.MaxValue)"> &gt;15m</MudRadio>
+                        <MudRadio Value="@("0 - 5")"> &lt;5' </MudRadio>
+                        <MudRadio Value="@("5 -10 ")"> &gt;5' - &lt;10'</MudRadio>
+                        <MudRadio Value="@("10 - 15")"> &gt;10' - &lt;15'</MudRadio>
+                        <MudRadio Value="@("15 -" + int.MaxValue)"> &gt;15'</MudRadio>
                     </MudRadioGroup>
                 </MudItem>
                 <MudItem sm="12" md="6">
                     <h5>Filtrar por calado</h5>
                     <MudRadioGroup @bind-Value="@OpcionCalado">
-                        <MudRadio Value="@("0 - 5")"> &lt;5m </MudRadio>
-                        <MudRadio Value="@("5 -10 ")"> &gt;5m - &lt;10m</MudRadio>
-                        <MudRadio Value="@("10 - 15")"> &gt;10m - &lt;15m</MudRadio>
-                        <MudRadio Value="@("15 -" +int.MaxValue)"> &gt;15m</MudRadio>
+                        <MudRadio Value="@("0 - 5")"> &lt;5' </MudRadio>
+                        <MudRadio Value="@("5 -10 ")"> &gt;5' - &lt;10'</MudRadio>
+                        <MudRadio Value="@("10 - 15")"> &gt;10' - &lt;15'</MudRadio>
+                        <MudRadio Value="@("15 -" +int.MaxValue)"> &gt;15'</MudRadio>
                     </MudRadioGroup>
                 </MudItem>
                 <MudItem sm="12" md="6">
@@ -61,10 +65,7 @@
                                     <MudText Typo="Typo.body2" Style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">@publicacion.Descripcion</MudText>
                                 </MudCardContent>
                                 <MudCardActions Style="justify-content: space-between;">
-                                    <MudButton Variant="Variant.Text" @onclick="()=>HandleClick(new Publicacion(publicacion.Image, publicacion.Titulo, publicacion.Descripcion,publicacion.EmbarcacionId))" Color="Color.Primary">Ver más</MudButton>
-                                    <MudButton Variant="Variant.Text" @onclick="()=>HandleClickOferta(publicacion.Id.ToString())" Color="Color.Primary">Hacer Oferta</MudButton>
-                                    @* <MudButton Variant="Variant.Text" Color="Color.Primary"> ❤️</MudButton> *@
-                                    @* <MudButton Variant="Variant.Text" Color="Color.Primary">Enviar mensaje</MudButton> *@
+                                    <MudButton Variant="Variant.Text" @onclick="()=>HandleClick(publicacion)" Color="Color.Primary">Ver más</MudButton>
                                 </MudCardActions>
                             </MudCard>
                         </MudPaper>
@@ -81,7 +82,7 @@
     public string OpcionCalado { get; set; } = "";
     List<Publicacion> _lista = new List<Publicacion>();
     List<Publicacion> _mostrar = new List<Publicacion>();
-
+    
     bool _tieneElementos;
     
     protected override void OnInitialized()
@@ -125,10 +126,5 @@
         var parameters = new DialogParameters<VerDatosEmbarcacion>();
         parameters.Add( x=>x.Publicacion, publicacion);
         Dialog.Show<VerDatosEmbarcacion>("Simple Dialog", parameters);
-    }
-    
-    public void HandleClickOferta(string id)
-    {
-        Navegador.NavigateTo($"/ListarMisBienes/{id}");
     }
 }

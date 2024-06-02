@@ -2,17 +2,12 @@ using YateMate.Aplicacion.Entidades;
 using YateMate.Aplicacion.Interfaces;
 namespace YateMate.Aplicacion.UseCases.Bien;
 
-public class EliminarBienUseCase
+public class EliminarBienUseCase(IRepositorioBien repo, IRepositorioOferta repoOf)
 {
-    private readonly IRepositorioBien _repo;
-
-    public EliminarBienUseCase(IRepositorioBien repo)
-    {
-        this._repo = repo;
-    }
 
     public void Ejecutar(int id)
     {
-        _repo.EliminarBien(id);
+        repo.EliminarBien(id);
+        repoOf.EliminarOfertasDelBien(id);
     }
 }

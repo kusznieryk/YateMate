@@ -1,9 +1,14 @@
+@using YateMate.Aplicacion.UseCases.ApplicationUser
 @using YateMate.Aplicacion.UseCases.Embarcaciones
+@using YateMate.Aplicacion.UseCases.Oferta
 @using YateMate.Aplicacion.UseCases.Publicaciones
 @inject NavigationManager Navegador;
 @inject EliminarPublicacionUseCase EliminarPublicacion
 @inject NavigationManager NavigationManager
 @inject ObtenerEmbarcacionUseCase ObtenerEmbarcacion
+@inject ObtenerDuenioUseCase ObtenerDuenio
+@inject ObtenerContactosDeUseCase ObtenerContactosDeUseCase
+
 
 <MudDialog>
     <TitleContent>
@@ -65,13 +70,45 @@
                        Size="Size.Small">Editar
             </MudButton>
         }
+        @if(!_contactos.Select(u=> u.Id).Contains(ObtenerDuenio.Ejecutar(Publicacion)))
+        {
+            <MudButton Variant="Variant.Filled"
+            @onclick="@(() => Navegador.NavigateTo($"/chat/{ObtenerDuenio.Ejecutar(Publicacion)}"))"
+            Color="Color.Primary" StartIcon="@Icons.Material.Filled.ChatBubble"
+            Size="Size.Small"> Iniciar Conversación
+            </MudButton>
+        }
+        <MudButton Variant="Variant.Filled"
+                   Href=""
+                   StartIcon="@Icons.Material.Filled.SyncAlt"
+                   @onclick="@(()=> NavigationManager.NavigateTo($"/ListarMisBienes/{Publicacion.Id.ToString()}/{ObtenerDuenio.Ejecutar(Publicacion)}"))"
+                   Color="Color.Primary"
+                   Size="Size.Small">Hacer Oferta
+        </MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
     [Parameter] public Publicacion Publicacion { get; set; } = null!;
     [Parameter] public bool Duenio { get; set; }=false;
+    
+    [CascadingParameter] 
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+    private string? _userId;
+    List<ApplicationUser> _contactos = new List<ApplicationUser>();
 
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationState is not null)
+        {
+            var authState = await AuthenticationState;
+            var user = authState.User;
+            _userId = user.Claims.FirstOrDefault()?.Value;
+            _contactos = ObtenerContactosDeUseCase.Ejecutar(_userId);
+        }
+    }
+    
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
     Embarcacion Original { get; set; } = null!;
     protected override void OnInitialized()
@@ -92,7 +129,11 @@
     {
         EliminarPublicacion.Ejecutar(Publicacion);
         Navegador.NavigateTo("/mis_publicaciones", true);
-
+    }
+    
+    public void HandleClickOferta(string id)
+    {
+        Navegador.NavigateTo($"/ListarMisBienes/{id}");
     }
 
 }
