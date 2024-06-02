@@ -70,12 +70,23 @@ public class RepositorioEmbarcacion:IRepositorioEmbarcacion
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
-            var embarcacion = context.Embarcaciones.FirstOrDefault((emb => emb.Id == embarcacionId));
-            if (embarcacion != null)
+            var embarcacionAEliminar = context.Embarcaciones.FirstOrDefault((emb => emb.Id == embarcacionId));
+            if (embarcacionAEliminar != null)
             {
-                context.Remove(embarcacion);
-                context.SaveChanges();
+                var publicaciones = context.Publicaciones.Where((pub => pub.EmbarcacionId == embarcacionId)).ToList();
+                var tieneTruequeConfirmado = publicaciones.Any(pub =>
+                    context.TruequesConfirmados.Any(trueque => trueque.PublicacionId == pub.Id));
+                    context.Embarcaciones.Remove(embarcacionAEliminar);
+                    if (tieneTruequeConfirmado)
+                    {
+                        embarcacionAEliminar.EstaEliminado = true;
+                    }
+                    else
+                    {
+                        context.Remove(embarcacionAEliminar);
+                    }
             }
+            context.SaveChanges();
         }
     }
 }

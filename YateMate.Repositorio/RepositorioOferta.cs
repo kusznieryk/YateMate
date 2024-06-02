@@ -97,4 +97,17 @@ public class RepositorioOferta : IRepositorioOferta
             context.SaveChanges();
         }
     }
+
+    public List<Oferta> ObtenerTruequesAcordados()
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Ofertas.Where(oferta => oferta.Acordado).ToList();
+        }
+    }
+
+    public void RetrotraerTrueque()
+    {
+        
+    }
 }

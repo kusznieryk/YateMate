@@ -11,6 +11,7 @@ public interface IRepositorioOferta
     Publicacion ObtenerPublicacionDe(int id);
     void EliminarOfertasDe(int idPublicacion);
     void EliminarOfertasDelBien(int idBien);
+    List<Oferta> ObtenerTruequesAcordados();
 
 
 }

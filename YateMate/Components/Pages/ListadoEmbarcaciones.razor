@@ -1,8 +1,9 @@
 @page "/listadoembarcaciones/{Id}"
 @using YateMate.Aplicacion.UseCases.Embarcaciones
 @using YateMate.Components.Shared
+@using YateMate.Components.Account.Shared
 @inject ObtenerEmbarcacionesDeUseCase ObtenerEmbarcacionesDeUseCase
-@inject ModificarEmbarcacionUseCase ModificarEmbarcacionUseCase
+@inject  EliminarEmbarcacionUseCase EliminarEmbarcacionUseCase
 @inject NavigationManager NavigationManager
 @inject IDialogService Dialog
 
@@ -12,6 +13,7 @@
                     MaxWidth="MaxWidth.Small"
                     Position="DialogPosition.CenterLeft"/>
 
+<DialogoConfirmacion @ref="_dialogo" OnConfirmado="EliminarEmbarcacion" />
 <MudContainer>
     <h1>Listado de embarcaciones</h1>
 
@@ -53,6 +55,8 @@
                 </MudTd>
                 <MudTd>
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ModificarEmbarcacion(@context))">Editar</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ModificarEmbarcacion(@context))">Modificar</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => ConfirmarEliminacion(@context))">Eliminar</MudButton>
                 </MudTd>
             </RowTemplate>
         </MudTable>
@@ -85,6 +89,26 @@
         parameters.Add(x => x.barco, embarcacion);
         Dialog.Show<EditarEmbarcacion>("Ver Datos", parameters);
     }
+    
+    DialogoConfirmacion _dialogo = null!;
+    Embarcacion _embarcacionAEliminar = null;
+    public void ConfirmarEliminacion(Embarcacion embarcacion)
+    {
+        _embarcacionAEliminar = embarcacion;
+        _dialogo.Mensaje = $"Deseas eliminar a la embarcacion con matricula {_embarcacionAEliminar.Matricula}?";
+        _dialogo.Mostrar();
+    }
 
+    public void EliminarEmbarcacion()
+    {
+        EliminarEmbarcacionUseCase.Ejecutar(_embarcacionAEliminar.Id);
+        ActualizarLista();
+    }
+    
+    private void ActualizarLista()
+    {
+        _lista = ObtenerEmbarcacionesDeUseCase.Ejecutar(Id);
+        _tieneElementos = _lista.Count > 0;
+    }
 
 }

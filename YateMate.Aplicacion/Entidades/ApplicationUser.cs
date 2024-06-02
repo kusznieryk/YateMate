@@ -21,7 +21,8 @@ public class ApplicationUser : IdentityUser
     
     public List<Embarcacion>? Embarcaciones { get; set; }
     public List<Bien>? Bienes { get; set; }
-    
+
+    public bool EstaEliminado { get; set; }
     public virtual ICollection<MensajeChat> ChatMessagesFromUsers { get; set; } = new HashSet<MensajeChat>(); //
 
     public virtual ICollection<MensajeChat> ChatMessagesToUsers { get; set; } = new HashSet<MensajeChat>();
