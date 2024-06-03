@@ -19,69 +19,55 @@
 
 <DialogoConfirmacion @ref="_dialogo" OnConfirmado="EliminarApplicationUser" />
 
-<h1>Admin</h1>
-    @if (!_tieneElementos) {
-        <p>No hay empleados para mostrar</p>
-    } 
-    else 
+<MudContainer>
+    @if (!_tieneElementos)
     {
-        <table id="table" class="table">
-        <thead>
-        <tr>
-            <th>EMAIL</th>
-            <th>NOMBRE</th>
-            <th>APELLIDO</th>
-            <th>NACIONALIDAD</th>
-            <th>GENERO</th>
-            <th>DNI</th>
-            <th>FECHA DE NACIMIENTO</th>
-            <th>ACCIÓN</th>
-        </tr>
-        </thead>
-        <tbody>
-        @foreach (var empleado in _lista)
-            {
-                
-                <tr>
-                    <td>@empleado.Email</td>
-                    <td>@empleado.Nombre</td>
-                    <td>@empleado.Apellido</td>
-                    <td>@empleado.Nacionalidad</td>
-                    <td>@empleado.Genero</td>
-                    <td>@empleado.Dni</td>
-                    <td>@empleado.FechaNacimiento</td>
-                    <td>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <button type="submit" @onclick="() => ConfirmarEliminacion(empleado)" class="w-200 btn btn-lg btn-primary">Eliminar</button>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <button type="submit" @onclick="() => EditarEmpleado(empleado)" class="w-200 btn btn-lg btn-primary">Modificar</button>
-                            </div>
-                        </div>
-                        <div class="row">
-                            <div class="col-md-6">
-                                <button type="submit" @onclick="() => VerEmpleado(empleado)" class="w-200 btn btn-lg btn-primary">Ver Datos</button>
-                            </div>
-                        </div>
-                    </td>
-                </tr>
-                    
-            }
-        </tbody>
-        </table>
+    <MudText Typo="Typo.h6">No hay elementos</MudText>
     }
-<button type="button" class="btn btn-primary" @onclick="@(() => EditarEmpleado(null))">
-    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus" viewBox="0 0 16 16">
-        <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4"></path>
-    </svg>
-    Agregar Empleado
-</button>
+    else
+    {
+    <MudTable Items="@_lista" Class="mt-4" Dense="true" Outlined="true">
+        <HeaderContent>
+            <MudTh>Email</MudTh>
+            <MudTh>Nombre</MudTh>
+            <MudTh>Apellido</MudTh>
+            <MudTh>Nacionalidad</MudTh>
+            <MudTh>Genero</MudTh>
+            <MudTh>DNI</MudTh>
+            <MudTh>Fecha de nacimiento</MudTh>
+            <MudTh>Acciones</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Email</MudTd>
+            <MudTd>@context.Nombre</MudTd>
+            <MudTd>@context.Apellido</MudTd>
+            <MudTd>@context.Nacionalidad</MudTd>
+            <MudTd>@context.Genero</MudTd>
+            <MudTd>@context.Dni</MudTd>
+            <MudTd>@context.FechaNacimiento!.Value.ToString("dd-MM-yyyy")</MudTd>
+            <MudTd>
+                
+                <div class="button-container">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => VerEmpleado(context))">Ver datos</MudButton>
+                </div>
+                <div class="button-container">
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => EditarEmpleado(context))">Modificar</MudButton>
+                </div>
+                <div class="button-container">
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => ConfirmarEliminacion(context))">Eliminar</MudButton>
+                </div>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+    }
+    <br/>
+    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => EditarEmpleado(null))" StartIcon="@Icons.Material.Filled.Add" > Agregar Empleado</MudButton>
+</MudContainer>
 
 
-    @code {
+
+
+@code {
         
         
     List<ApplicationUser> _lista = new();
@@ -139,5 +125,10 @@
         _tieneElementos = _lista.Count > 0;
     }
     
-    }
 }
+
+<style>
+    .button-container {
+        margin-bottom: 8px;
+    }
+</style>

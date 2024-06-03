@@ -38,7 +38,7 @@
             <MudTd>@context.Nacionalidad</MudTd>
             <MudTd>@context.Genero</MudTd>
             <MudTd>@context.Dni</MudTd>
-            <MudTd>@context.FechaNacimiento</MudTd>
+            <MudTd>@context.FechaNacimiento!.Value.ToString("dd-MM-yyyy")</MudTd>
             <MudTd>
                 <div class="button-container">
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ListarEmbarcaciones(context.Id))">Listar embarcaciones</MudButton>
