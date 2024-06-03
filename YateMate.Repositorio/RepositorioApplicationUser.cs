@@ -13,7 +13,8 @@ public class RepositorioApplicationUser : IRepositorioApplicationUser
             var applicationUserAEliminar = context.ApplicationUsers.FirstOrDefault(au => au.Id.Equals(id));
             if (applicationUserAEliminar != null)
             {
-                context.Remove(applicationUserAEliminar);
+                applicationUserAEliminar.EstaEliminado = true;
+                //context.Remove(applicationUserAEliminar); Para hard delete
                 context.SaveChanges();
             }
         }
@@ -89,7 +90,7 @@ public class RepositorioApplicationUser : IRepositorioApplicationUser
                     role => role.Id,
                     (userUserRole, role) => new { userUserRole.User, Role = role }
                 )
-                .Where(x => x.Role.Name == "Cliente")
+                .Where(x => x.Role.Name == "Cliente" && !x.User.EstaEliminado)
                 .Select(x => x.User)
                 .ToList();
             return clientes;
@@ -119,7 +120,7 @@ public class RepositorioApplicationUser : IRepositorioApplicationUser
                 .Select(m => new { UserId = m.FromUserId == id ? m.ToUserId : m.FromUserId })
                 .Distinct()
                 .Select(m => context.Users.FirstOrDefault(u => u.Id == m.UserId))
-                .Where(u => u != null)
+                .Where(u => u != null && !u.EstaEliminado)
                 .ToList()!;
         }
         

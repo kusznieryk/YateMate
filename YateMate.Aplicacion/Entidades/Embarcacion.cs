@@ -17,4 +17,6 @@ public class Embarcacion(string nombre, double eslora, double calado, string cli
     
     public Nacionalidad Bandera { get; set; }
     public double Manga { get; set; } = manga;
+    
+    public bool EstaEliminado { get; set; }
 }
