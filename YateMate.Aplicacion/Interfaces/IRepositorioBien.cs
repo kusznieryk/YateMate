@@ -8,4 +8,5 @@ public interface IRepositorioBien
     void ModificarBien(Bien bien);
     List<Bien> ListarBienesDe(String id);
     Bien? ObtenerBien(int id);
+    bool TieneOfertaAceptada(int bienId);
 }

@@ -148,7 +148,7 @@ else
         var options = new DialogOptions { CloseOnEscapeKey = true };
         var parameters = new DialogParameters<VerDatosBien>();
         parameters.Add(x => x.Bien, bien);
-        parameters.Add(x => x.Duenio, false);
+        parameters.Add(x => x.Duenio, true);
         Dialog.Show<VerDatosBien>("Ver Datos", parameters);
     }
 }

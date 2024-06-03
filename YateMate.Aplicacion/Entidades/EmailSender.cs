@@ -25,7 +25,10 @@ public class EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
         public Task SendMessageOferta(string Email, Bien bien,
             Publicacion publicacion) => SendEmailAsync(Email, "Recibiste una nueva oferta",
             $"Te han ofertado el bien: '{bien.Nombre}', con descripción: '{bien.Descripcion}' para tu publicación: '{publicacion.Titulo}'");
-     
+
+        public Task SendMessageAceptacion(string Email, Bien bien, Publicacion publicacion) => SendEmailAsync(Email,
+            "Una oferta ha sido aceptada"
+            , $"Te aceptaron la oferta del bien {bien.Nombre}, en la publicacion {publicacion.Titulo}");
         public Task SendPasswordResetCodeAsync(ApplicationUser user, string email, 
          string resetCode) => SendEmailAsync(email, "Cambia tu contraseña", 
          $"Cambia tu contraseña usando el siguiente codigo: {resetCode}");

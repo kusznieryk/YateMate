@@ -7,11 +7,14 @@ public class Oferta
     public int PublicacionId { get; set; }
     public string UsuarioId { get; set; }
     public bool Acordado { get; set; }
-    public Oferta(int bienId, int publicacionId, string usuarioId)
+    public bool Aceptada { get; set; }
+
+public Oferta(int bienId, int publicacionId, string usuarioId)
     {
         this.BienId = bienId;
         this.PublicacionId = publicacionId;
         this.UsuarioId = usuarioId;
+        this.Aceptada = false;
     }
 
     public Oferta()

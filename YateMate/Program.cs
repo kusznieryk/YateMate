@@ -60,6 +60,7 @@ public class Program
         
         builder.Services.AddTransient<EliminarOfertaUseCase>();
         builder.Services.AddTransient<HacerOfertaUseCase>();
+        builder.Services.AddTransient<AceptarOfertaUseCase>();
         builder.Services.AddTransient<ListarOfertasDeUseCase>();
         builder.Services.AddTransient<ListarOfertasHechasUseCase>();
         builder.Services.AddTransient<ListarTruequesDisponiblesUseCase>();

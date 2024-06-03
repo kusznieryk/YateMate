@@ -38,7 +38,7 @@ else
                                     <MudText Typo="Typo.body2" Style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">@bien.Descripcion</MudText>
                                 </MudCardContent>
                                 <MudCardActions Style="justify-content: space-between;">
-                                    <MudButton Variant="Variant.Text" @onclick="@((e) => OpenDialog(bien))" Color="Color.Primary">Ver más</MudButton>
+                                    <MudButton Variant="Variant.Text" @onclick="@((e) => OpenDialog(bien, oferta))" Color="Color.Primary">Ver más</MudButton>
                                     @* <MudButton Variant="Variant.Text" OnClick="() => Eliminar(bien)" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error"> Borrar </MudButton> *@
                                 </MudCardActions>
                             </MudCard>
@@ -69,12 +69,13 @@ else
         }
     }
 
-    private void OpenDialog(Bien oferta)
+    private void OpenDialog(Bien bien, Oferta oferta)
     {
         var options = new DialogOptions { CloseOnEscapeKey = true };
         var parameters = new DialogParameters<VerDatosBien>();
-        parameters.Add(x => x.Bien, oferta);
-        parameters.Add(x => x.Duenio, true);
+        parameters.Add(x => x.Bien, bien);
+        parameters.Add(x => x.Duenio, false);
+        parameters.Add(x => x.oferta, oferta);
         Dialog.Show<VerDatosBien>("Ver Datos", parameters);
     }
 }

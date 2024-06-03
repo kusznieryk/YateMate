@@ -110,4 +110,23 @@ public class RepositorioOferta : IRepositorioOferta
     {
         
     }
+
+    public void ModificarOferta(Oferta oferta)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            var viejaO = context.Ofertas.FirstOrDefault(o => o.Id == oferta.Id);
+            if (viejaO == null) return;
+            viejaO.Aceptada = oferta.Aceptada;
+            context.SaveChanges();
+        }
+    }
+
+    public bool TieneOfertaAceptada(int publicacionId)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Ofertas.Any(oferta => oferta.PublicacionId==publicacionId && oferta.Aceptada);
+        }
+    }
 }

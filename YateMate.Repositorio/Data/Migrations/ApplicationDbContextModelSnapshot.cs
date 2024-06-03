@@ -354,6 +354,9 @@ namespace YateMate.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("Aceptada")
+                        .HasColumnType("INTEGER");
+
                     b.Property<bool>("Acordado")
                         .HasColumnType("INTEGER");
 

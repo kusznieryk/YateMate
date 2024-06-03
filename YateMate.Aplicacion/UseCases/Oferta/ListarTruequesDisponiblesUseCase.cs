@@ -3,17 +3,11 @@ using YateMate.Aplicacion.Interfaces;
 
 namespace YateMate.Aplicacion.UseCases.Oferta;
 
-public class ListarTruequesDisponiblesUseCase
+public class ListarTruequesDisponiblesUseCase(IRepositorioOferta repo, IRepositorioOferta repoOf)
 {
-    private readonly IRepositorioOferta _repo;
-
-    public ListarTruequesDisponiblesUseCase(IRepositorioOferta repo)
-    {
-        this._repo = repo;
-    }
 
     public List<Publicacion> Ejecutar()
     {
-        return _repo.ListarTruequesDisponibles();
+        return repo.ListarTruequesDisponibles().Where(pub =>!repoOf.TieneOfertaAceptada(pub.Id)).ToList();
     }
 }

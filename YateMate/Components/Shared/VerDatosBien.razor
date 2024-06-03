@@ -1,6 +1,13 @@
 @using YateMate.Aplicacion.UseCases.ApplicationUser
+@using YateMate.Aplicacion.UseCases.Oferta
+@using YateMate.Aplicacion.UseCases.Publicaciones
 @inject NavigationManager NavigationManager
 @inject ObtenerContactosDeUseCase ObtenerContactosDeUseCase
+@inject AceptarOfertaUseCase AceptarOferta
+@inject EliminarOfertaUseCase EliminarOferta
+@inject EmailSender EmailSender
+@inject ObtenerApplicationUserUseCase ObtenerApplicationUserUseCase
+@inject ObtenerPublicacionDeUseCase ObtenerPublicacion
 
 <MudDialog>
     <TitleContent>
@@ -24,7 +31,7 @@
     <DialogActions>
         <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
         <div style="flex-grow: 1;"></div>
-        @if (!Duenio)
+        @if (Duenio)
         {
             <MudButton Variant="Variant.Filled"
                        Href=""
@@ -33,6 +40,23 @@
                        Color="Color.Primary"
                        Size="Size.Small">Editar
             </MudButton>
+        }
+        else if(oferta!=null)
+        {
+            <MudButton Variant="Variant.Filled"
+                       Href=""
+                       StartIcon="@Icons.Material.Filled.Clear"
+                       OnClick="HandlerRechazar"
+                       Color="Color.Warning"
+                       Size="Size.Small">Rechazar oferta
+            </MudButton> 
+            <MudButton Variant="Variant.Filled"
+                       Href=""
+                       StartIcon="@Icons.Material.Filled.Check"
+                       OnClick="HandlerAceptar"
+                       Color="Color.Primary"
+                       Size="Size.Small">Aceptar oferta
+            </MudButton> 
         }
         @if(!_contactos.Select(u=> u.Id).Contains(Bien.UsuarioId))
         {
@@ -46,9 +70,9 @@
 </MudDialog>
 
 @code {
-    [Parameter] public Bien? Bien { get; set; }
+    [Parameter] public Bien Bien { get; set; } = null!;
     [Parameter] public bool Duenio { get; set; }
-    
+    [Parameter] public Oferta? oferta { get; set; }
     [CascadingParameter] 
     private Task<AuthenticationState>? AuthenticationState { get; set; }
     private string? _userId;
@@ -75,6 +99,20 @@
         Submit();
         NavigationManager.NavigateTo($"bien/{id}");
 
+    }
+
+    void HandlerRechazar()
+    {
+        EliminarOferta.Ejecutar(oferta.Id);
+        NavigationManager.NavigateTo($"listadoOfertas/{oferta.PublicacionId}", true);
+    }
+    async Task HandlerAceptar()
+    {
+        AceptarOferta.Ejecutar(oferta);
+        var duenio = ObtenerApplicationUserUseCase.Ejecutar(oferta.UsuarioId);
+        var pub = ObtenerPublicacion.Ejecutar(oferta.PublicacionId);
+        await EmailSender.SendMessageAceptacion(duenio.Email, Bien,pub );
+        NavigationManager.NavigateTo($"mis_publicaciones");
     }
 
 }

@@ -31,6 +31,14 @@ public class RepositorioBien : IRepositorioBien
         }
     }
 
+    public bool TieneOfertaAceptada(int bienId)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Ofertas.Any(o => o.BienId == bienId && o.Aceptada);
+        }
+    }
+
     public void ModificarBien(Bien bien)
     {
         using (var context =ApplicationDbContext.CrearContexto())
