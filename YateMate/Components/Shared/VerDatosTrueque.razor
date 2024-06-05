@@ -1,32 +1,53 @@
+@using YateMate.Aplicacion.UseCases.Bien
+@using YateMate.Aplicacion.UseCases.Oferta
+@inject RetrotraerTruequeUseCase RetrotraerTruequeUseCase
+@inject ObtenerBienUseCase ObtenerBienUseCase
+@inject ObtenerPublicacionDeUseCase ObtenerPublicacion
+@inject NavigationManager NavigationManager
+
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
-            Viendo datos
+            Viendo datos del trueque
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudCard>
-            <MudCardHeader>
-                <CardHeaderContent>
-                    <MudText Typo="Typo.h6">@Bien!.Nombre</MudText>
-                </CardHeaderContent>
-            </MudCardHeader>
-            <MudCardContent>
-                <MudImage Fluid="true" Src="@Bien!.Imagen" Alt="Image"/>
-                <MudText>@Bien.Descripcion</MudText>
-            </MudCardContent>
-        </MudCard>
+        <div class="card-container">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Bien a intercambiar: @Bien!.Nombre</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudImage Fluid="true" Src="@Bien!.Imagen" Alt="Image"/>
+                    <MudText Typo="Typo.h6">Descripcion: @Bien.Descripcion</MudText>
+                </MudCardContent>
+            </MudCard>
+        </div>
+        <div class="card-container">
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Publicacion: @Publicacion!.Titulo</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudImage Fluid="true" Src="@Publicacion!.Image" Alt="Image"/>
+                    <MudText Typo="Typo.h6">Descripcion: @Publicacion!.Descripcion</MudText>
+                </MudCardContent>
+            </MudCard>
+        </div>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
         <div style="flex-grow: 1;"></div>
         <MudButton Variant="Variant.Filled"
-                   @*onclick*@
                    Color="Color.Primary" StartIcon="@Icons.Material.Filled.Check"
                    Size="Size.Small"> Confirmar Trueque
         </MudButton>
         <MudButton Variant="Variant.Filled"
-                   @*onclick*@
+                   OnClick="RetrotraerTrueque"
                    Color="Color.Primary" StartIcon="@Icons.Material.Filled.Redo"
                    Size="Size.Small"> Retrotraer Trueque
         </MudButton>
@@ -34,9 +55,25 @@
 </MudDialog>
 
 @code {
-    [Parameter] public Bien? Bien { get; set; }
-    [Parameter] public Publicacion? Publicacion { get; set; }
+    [Parameter] public Oferta Oferta{ get; set; }
     
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
     void Cancel() => MudDialog!.Cancel();
+
+    Bien Bien { get; set; } = null!;
+    Publicacion Publicacion { get; set; } = null!;
+    protected override void OnInitialized()
+    {
+        Bien = ObtenerBienUseCase.Ejecutar(Oferta.BienId);
+        Publicacion = ObtenerPublicacion.Ejecutar(Oferta.PublicacionId);
+    }
+    public void RetrotraerTrueque()
+    {
+        RetrotraerTruequeUseCase.Ejecutar(Oferta.Id);
+        NavigationManager.NavigateTo("/ListadoTruequesAcordados", forceLoad:true);
+    }
 }
+<style>.card-container {
+        margin-bottom: 16px;
+    }
+</style>

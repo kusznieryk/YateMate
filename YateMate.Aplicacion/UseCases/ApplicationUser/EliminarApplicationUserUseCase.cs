@@ -1,36 +1,36 @@
 using YateMate.Aplicacion.Interfaces;
 using YateMate.Aplicacion.Entidades;
+using YateMate.Aplicacion.UseCases.Bien;
+using YateMate.Aplicacion.UseCases.Embarcaciones;
 
 namespace YateMate.Aplicacion.UseCases.ApplicationUser;
 
 public class EliminarApplicationUserUseCase
 {
+    private readonly EliminarEmbarcacionUseCase _eliminarEmbarcacionUseCase;
+    private readonly ObtenerEmbarcacionesDeUseCase _obtenerEmbarcacionesDeUseCase;
+    private readonly ListarBienesDeUseCase _listarBienesDeUseCase;
+    private readonly EliminarBienUseCase _eliminarBienUseCase;
     private readonly IRepositorioApplicationUser _repo;
-    private readonly IRepositorioEmbarcacion _repoEmbarcacion;
-    private readonly IRepositorioBien _repoBien;
-    private readonly IRepositorioPublicacion _repositorioPublicacion;
-
-    public EliminarApplicationUserUseCase(IRepositorioApplicationUser repo, IRepositorioEmbarcacion repoEmbarcacion, IRepositorioBien repoBien, IRepositorioPublicacion repoPublicacion)
+    public EliminarApplicationUserUseCase(EliminarEmbarcacionUseCase eliminarEmbarcacionUseCase, ObtenerEmbarcacionesDeUseCase obtenerEmbarcacionesDeUseCase, ListarBienesDeUseCase listarBienesDeUseCase, EliminarBienUseCase eliminarBienUseCase, IRepositorioApplicationUser repo)
     {
+        _eliminarEmbarcacionUseCase = eliminarEmbarcacionUseCase;
+        _obtenerEmbarcacionesDeUseCase = obtenerEmbarcacionesDeUseCase;
+        _listarBienesDeUseCase = listarBienesDeUseCase;
+        _eliminarBienUseCase = eliminarBienUseCase;
         _repo = repo;
-        _repoEmbarcacion = repoEmbarcacion;
-        _repoBien = repoBien;
-        _repositorioPublicacion = repoPublicacion;
     }
 
     public void Ejecutar(string id)
     {
-        foreach (var embarcacion in _repoEmbarcacion.ObtenerEmbarcacionesDe(id))
+        foreach (var embarcacion in _obtenerEmbarcacionesDeUseCase.Ejecutar(id))
         {
-            _repositorioPublicacion.EliminarPublicacion(embarcacion.Id);
-            _repoEmbarcacion.EliminarEmbarcacion(embarcacion.Id);
+            _eliminarEmbarcacionUseCase.Ejecutar(embarcacion.Id);
         }
-
-        foreach (var bien in _repoBien.ListarBienesDe(id))
+        foreach (var bien in _listarBienesDeUseCase.Ejecutar(id))
         {
-            _repoBien.EliminarBien(bien.Id);
+            _eliminarBienUseCase.Ejecutar(bien.Id);
         }
-
         _repo.EliminarApplicationUser(id);
     }
 }

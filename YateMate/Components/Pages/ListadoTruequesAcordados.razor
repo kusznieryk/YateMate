@@ -1,4 +1,5 @@
 @page "/ListadoTruequesAcordados"
+<MudDialogProvider />
 @using YateMate.Aplicacion.UseCases.Bien
 @using YateMate.Aplicacion.UseCases.Oferta
 @using YateMate.Components.Shared
@@ -33,7 +34,7 @@ else
                                     <MudText Typo="Typo.body2" Style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">@bien.Descripcion</MudText>
                                 </MudCardContent>
                                 <MudCardActions Style="justify-content: space-between;">
-                                    <MudButton Variant="Variant.Text" @onclick="@((e) => OpenDialog(bien,publicacion))" Color="Color.Primary">Ver más</MudButton>
+                                    <MudButton Variant="Variant.Text" @onclick="()=>OpenDialog(oferta)" Color="Color.Primary">Ver más</MudButton>
                                 </MudCardActions>
                             </MudCard>
                         </MudPaper>
@@ -52,12 +53,17 @@ else
     {
         _lista = ObtenerTruequesAcordadosUseCase.Ejecutar();
     }
-    private void OpenDialog(Bien bien, Publicacion publicacion)
+    protected override void OnParametersSet()
     {
-        var options = new DialogOptions { CloseOnEscapeKey = true };
+        if (_lista.Count > 0)
+        {
+            _tieneElementos = true;
+        }
+    }
+    private void OpenDialog(Oferta oferta)
+    {
         var parameters = new DialogParameters<VerDatosTrueque>();
-        parameters.Add(x => x.Bien, bien);
-        parameters.Add(x => x.Publicacion, publicacion);
-        Dialog.Show<VerDatosTrueque>("Ver mas", parameters);
+        parameters.Add(x => x.Oferta, oferta);
+        Dialog.Show<VerDatosTrueque>("Simple Dialog", parameters);
     }
 }

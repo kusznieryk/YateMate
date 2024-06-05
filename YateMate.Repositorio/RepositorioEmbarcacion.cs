@@ -17,7 +17,7 @@ public class RepositorioEmbarcacion:IRepositorioEmbarcacion
     public List<Embarcacion> ObtenerEmbarcacionesDe(string clienteId)
     {
         using ( var context = ApplicationDbContext.CrearContexto()){
-            return context.Embarcaciones.Where(embarcacion => embarcacion.ClienteId.Equals(clienteId)).ToList();
+            return context.Embarcaciones.Where(embarcacion => embarcacion.ClienteId.Equals(clienteId) && !embarcacion.EstaEliminado).ToList();
         }
     }
 
@@ -66,27 +66,29 @@ public class RepositorioEmbarcacion:IRepositorioEmbarcacion
         }
     }
 
-    public void EliminarEmbarcacion(int embarcacionId)
+    public void EliminarEmbarcacion(int embarcacionId, bool tienePublicacion)
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
             var embarcacionAEliminar = context.Embarcaciones.FirstOrDefault((emb => emb.Id == embarcacionId));
             if (embarcacionAEliminar != null)
             {
-                var publicaciones = context.Publicaciones.Where((pub => pub.EmbarcacionId == embarcacionId)).ToList();
-                var tieneTruequeConfirmado = publicaciones.Any(pub =>
-                    context.TruequesConfirmados.Any(trueque => trueque.PublicacionId == pub.Id));
-                    context.Embarcaciones.Remove(embarcacionAEliminar);
-                    if (tieneTruequeConfirmado)
-                    {
-                        embarcacionAEliminar.EstaEliminado = true;
-                    }
-                    else
-                    {
-                        context.Remove(embarcacionAEliminar);
-                    }
+                if (tienePublicacion)
+                {
+                    embarcacionAEliminar.EstaEliminado = true;
+                }
+                else
+                    context.Remove(embarcacionAEliminar);
             }
             context.SaveChanges();
+        }
+    }
+
+    public bool tienePublicacion(int id)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Publicaciones.Any(pub => pub.EmbarcacionId == id);
         }
     }
 }

@@ -10,6 +10,7 @@ public class Bien
     public string Descripcion { get; set; }
     public string UsuarioId { get; set; }
     public string Imagen { get; set; }
+    public bool EstaEliminado { get; set; }
 
     public Bien(string nombre, string descripcion, string imagen, string usuarioId)
     {

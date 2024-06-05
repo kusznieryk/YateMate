@@ -61,7 +61,15 @@ public class RepositorioBien : IRepositorioBien
             var bien = context.Bienes.FirstOrDefault(b => b.Id == id);
             if (bien != null)
             {
-                context.Remove(bien);
+                var tieneTruequeConfirmado = context.TruequesConfirmados.Any(trueque => trueque.BienId == bien.Id);
+                if (tieneTruequeConfirmado)
+                {
+                    bien.EstaEliminado = true;
+                }
+                else
+                {
+                    context.Remove(bien);   
+                }
                 context.SaveChanges();
             }
         }

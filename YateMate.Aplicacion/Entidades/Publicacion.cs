@@ -16,5 +16,7 @@ public class Publicacion(string image, string titulo, string descripcion, int em
 
     public string Descripcion { get; set; } = descripcion;
     
+    public bool EstaEliminado { get; set; }
+    
     public List<Oferta> Ofertas { get; set; }
 }

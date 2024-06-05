@@ -7,9 +7,7 @@ public class EliminarPublicacionUseCase(IRepositorioPublicacion repo, IRepositor
 {
     public void Ejecutar(Publicacion pub)
     {
-
-        repo.EliminarPublicacion(pub.EmbarcacionId);
         repoOferta.EliminarOfertasDe(pub.Id);
-
+        repo.EliminarPublicacion(pub.EmbarcacionId);
     }
 }
