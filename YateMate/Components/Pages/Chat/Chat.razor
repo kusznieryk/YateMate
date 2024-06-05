@@ -18,7 +18,7 @@
                 else
                 {
                     <MudIcon Icon="@Icons.Material.Outlined.ChatBubble" Style="margin-right:10px"></MudIcon>
-                    <MudText Typo="Typo.h6">Estás hablando con @Contacto.Nombre</MudText>
+                    <MudText Typo="Typo.h6">Estás hablando con @Contacto.Nombre @Contacto.Apellido</MudText>
                 }
             </MudToolBar>
             <div class="d-flex flex-column px-4" style="max-height:65vh;min-height:65vh; overflow:auto;" id="chatContainer">
@@ -29,7 +29,7 @@
                             <MudAvatar Color="Color.Secondary" Style="height:50px; width:50px;">@message.FromUser.Email!.ToUpper().FirstOrDefault()</MudAvatar>
                         </div>
                         <div>
-                            <MudText Typo="Typo.body1">@message.FromUser.Nombre</MudText>
+                            <MudText Typo="Typo.body1">@message.FromUser.Nombre @message.FromUser.Apellido</MudText>
                             <MudText Typo="Typo.caption" Style="">@message.CreatedDate.ToString("dd MMM, yyyy hh:mm tt")</MudText>
                             @if (message.IsImage)
                             {

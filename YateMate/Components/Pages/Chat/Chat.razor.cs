@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Forms;
 using Microsoft.AspNetCore.Components.Web;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR.Client;
 using Microsoft.JSInterop;
 using YateMate.Aplicacion.Entidades;
@@ -12,38 +13,30 @@ namespace YateMate.Components.Pages.Chat;
 
 public partial class Chat
 {
-    [CascadingParameter] public HubConnection hubConnection { get; set; }
     [Parameter] public string CurrentMessage { get; set; }
-
-    [Parameter]
-    public ApplicationUser CurrentUser { get; set; }
+    [Parameter] public ApplicationUser CurrentUser { get; set; }
     [Parameter] public string CurrentUserId { get; set; }
+    [Parameter] public string? ContactId { get; set; }
+    [Parameter] public ApplicationUser Contacto { get; set; }
     
-    private List<MensajeChat> messages = new();
-    
-    [Inject]
-    AuthenticationStateProvider AuthenticationStateProvider { get; set; }
-    
+    [Inject] AuthenticationStateProvider AuthenticationStateProvider { get; set; }
     [Inject] private AgregarMensajeUseCase AgregarMensajeUseCase { get; set; }
     [Inject] private ObtenerContactosDeUseCase ObtenerContactosDeUseCase { get; set; }
     [Inject] private ObtenerApplicationUserUseCase ObtenerApplicationUserUseCase { get; set; }
     [Inject] private ObtenerMensajesEntreUseCase ObtenerMensajesEntreUseCase { get; set; }
-    
     [Inject] private NavigationManager NavigationManager { get; set; }
-
     [Inject] private IJSRuntime _jsRuntime { get; set; }
+    [Inject] private EmailSender EmailSender { get; set; }
     
     public List<ApplicationUser> ChatUsers = new List<ApplicationUser>();
-    [Parameter] public string ContactId { get; set; }
-    
-    [Parameter] public ApplicationUser Contacto { get; set; }
-
     private string img = "";
-
     private bool _isImgTooBig;
-    
-    [CascadingParameter]
-    private Task<AuthenticationState>? AuthenticationState { get; set; } 
+    private bool _isNewConversation;
+    private List<MensajeChat> messages = new();
+
+    [CascadingParameter] private Task<AuthenticationState>? AuthenticationState { get; set; } 
+    [CascadingParameter] public HubConnection hubConnection { get; set; }
+
     
     public async Task Enter(KeyboardEventArgs e)
     {
@@ -73,14 +66,23 @@ public partial class Chat
             await hubConnection.SendAsync(Constants.SignalRConstants.SendMessage, chatHistory, CurrentUser.Email);
             Console.WriteLine($"{CurrentUser.Email} Enviando mensaje a {ContactId}");
 
+            if (!ChatUsers.Select(user => user.Id).Contains(ContactId)) //primer mensaje
+            {
+                Console.WriteLine("Primer mensaje entre los usuarios");
+                await EmailSender.SendMessageChat(Contacto.Email, CurrentUser);
+                ChatUsers.Add(Contacto);
+            }
+            
             CurrentMessage = string.Empty;
             img = string.Empty;
+            _isImgTooBig = false;
         }
     }
     protected override async Task OnInitializedAsync()
     {
-        //lo pongo aca porq adentro de loadUserChat se carga despues del rendereo de la pagina y me explota todo
+        //lo pongo aca porq adentro de loadUserChat se carga despues del rendereo de la pagina y las referencias estan en null
         if (!string.IsNullOrEmpty(ContactId)) Contacto = ObtenerApplicationUserUseCase.Ejecutar(ContactId); 
+        
         if (hubConnection == null) 
         {
             hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri(Constants.SignalRConstants.HubPath)).Build();
@@ -129,9 +131,10 @@ public partial class Chat
     
     void LoadUserChat(string userId)
     {
-        ContactId = Contacto.Id;
+        ContactId ??= userId;
+        Contacto = ObtenerApplicationUserUseCase.Ejecutar(userId);
         messages = ObtenerMensajesEntreUseCase.Ejecutar(userId, CurrentUserId);
-        Console.WriteLine($"Loaded user chat {Contacto.Email}");
+        Console.WriteLine($"Loaded user chat with id {userId}");
     }
     private void GetContactos()
     {

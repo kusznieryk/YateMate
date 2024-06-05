@@ -205,7 +205,7 @@
             if (!result.Succeeded)
             {
                 var identityErrors = result.Errors.Where(error => error.Code != "DuplicateUserName");
-                message = identityErrors is null? null : $"Error: {identityErrors.Select(error => error.Description)} "; 
+                message = identityErrors is null ? null : $"Error: {string.Join(", ", identityErrors.Select(error => error.Description))}";
                 return;
             }
             await UserManager.AddToRoleAsync(Empleado, "Empleado");
@@ -215,6 +215,8 @@
             callbackUrl = NavigationManager.GetUriWithQueryParameters(
                 NavigationManager.ToAbsoluteUri("Account/ResetPassword").AbsoluteUri,
                 new Dictionary<string, object?> { ["code"] = code, ["email"] = Input.Email });
+            
+            message = "Hemos enviado un link de confirmación para crear la cuenta";
         }
         else
         {
@@ -248,6 +250,7 @@
             callbackUrl = NavigationManager.GetUriWithQueryParameters(
                 NavigationManager.ToAbsoluteUri("Account/ConfirmEmailChange").AbsoluteUri,
                 new Dictionary<string, object?> { ["userId"] = userId, ["email"] = Empleado.Email, ["code"] = code });
+            message = "Hemos enviado un link de confirmación para el cambio de correo";
         }
         
         
@@ -256,7 +259,7 @@
 
         //await EmailSender.SendConfirmationLinkAsync(Empleado, Empleado.Email, HtmlEncoder.Default.Encode(callbackUrl));
 
-        message = "Hemos enviado un link de confirmación para el cambio de correo";
+        
         
         
     }
