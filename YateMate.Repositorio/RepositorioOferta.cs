@@ -105,6 +105,16 @@ public class RepositorioOferta : IRepositorioOferta
             return context.Ofertas.Where(oferta => oferta.Acordado).ToList();
         }
     }
+    
+    public List<Oferta> ObtenerOfertasAceptadas()
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Ofertas.Where(oferta => oferta.Aceptada).ToList();
+        }
+    }
+    
+    
 
     public void RetrotraerTrueque()
     {

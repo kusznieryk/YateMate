@@ -1,10 +1,13 @@
 @using YateMate.Aplicacion.UseCases.ApplicationUser
+@using YateMate.Aplicacion.UseCases.Bien
 @using YateMate.Aplicacion.UseCases.Oferta
 @using YateMate.Aplicacion.UseCases.Publicaciones
 @inject NavigationManager NavigationManager
 @inject ObtenerContactosDeUseCase ObtenerContactosDeUseCase
 @inject AceptarOfertaUseCase AceptarOferta
 @inject EliminarOfertaUseCase EliminarOferta
+@inject EliminarBienUseCase EliminarBienUseCase
+@inject ObtenerOfertasAceptadasUseCase ObtenerOfertasAceptadas
 @inject EmailSender EmailSender
 @inject ObtenerApplicationUserUseCase ObtenerApplicationUserUseCase
 @inject ObtenerPublicacionDeUseCase ObtenerPublicacion
@@ -40,25 +43,42 @@
                        Color="Color.Primary"
                        Size="Size.Small">Editar
             </MudButton>
+            @if (!ObtenerOfertasAceptadas.Ejecutar().Exists(o => o.BienId == Bien.Id))
+            {
+                <MudButton Variant="Variant.Filled"
+                           Href=""
+                           StartIcon="@Icons.Material.Filled.Delete"
+                           OnClick="EliminarHandler"
+                           Color="Color.Error"
+                           Size="Size.Small"> Eliminar
+                </MudButton>
+            }
+
         }
         else if(oferta!=null)
         {
-            <MudButton Variant="Variant.Filled"
-                       Href=""
-                       StartIcon="@Icons.Material.Filled.Clear"
-                       OnClick="HandlerRechazar"
-                       Color="Color.Warning"
-                       Size="Size.Small">Rechazar oferta
-            </MudButton> 
-            <MudButton Variant="Variant.Filled"
-                       Href=""
-                       StartIcon="@Icons.Material.Filled.Check"
-                       OnClick="HandlerAceptar"
-                       Color="Color.Primary"
-                       Size="Size.Small">Aceptar oferta
-            </MudButton> 
+            if (!oferta.Aceptada)
+            {
+                <MudButton Variant="Variant.Filled"
+                           Href=""
+                           StartIcon="@Icons.Material.Filled.Clear"
+                           OnClick="HandlerRechazar"
+                           Color="Color.Warning"
+                           Size="Size.Small">Rechazar oferta
+                </MudButton>
+            }
+            if (!ObtenerOfertasAceptadas.Ejecutar().Any())
+            {
+                <MudButton Variant="Variant.Filled"
+                           Href=""
+                           StartIcon="@Icons.Material.Filled.Check"
+                           OnClick="HandlerAceptar"
+                           Color="Color.Primary"
+                           Size="Size.Small">Aceptar oferta
+                </MudButton>
+            }
         }
-        @if(!_contactos.Select(u=> u.Id).Contains(Bien.UsuarioId))
+        @if(!_contactos.Select(u=> u.Id).Contains(Bien.UsuarioId) && !Duenio)
         {
         <MudButton Variant="Variant.Filled"
                    @onclick="@(() => NavigationManager.NavigateTo($"/chat/{Bien.UsuarioId}"))"
@@ -76,6 +96,7 @@
     [CascadingParameter] 
     private Task<AuthenticationState>? AuthenticationState { get; set; }
     private string? _userId;
+
     List<ApplicationUser> _contactos = new List<ApplicationUser>();
 
 
@@ -94,6 +115,13 @@
 
     void Submit() => MudDialog!.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog!.Cancel();
+    
+    public void EliminarHandler(object e)
+    {
+        EliminarBienUseCase.Ejecutar(Bien.Id);
+        NavigationManager.NavigateTo($"ListarMisBienes/lista", true);
+    }
+    
     void Editar(int id)
     {
         Submit();

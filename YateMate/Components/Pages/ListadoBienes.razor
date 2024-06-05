@@ -60,9 +60,8 @@ else
                                     @if (Origen!.Equals("lista"))
                                     {
                                         <MudButton Variant="Variant.Text" @onclick="@((e) => OpenDialog(bien))" Color="Color.Primary">Ver más</MudButton>
-                                        <MudButton Variant="Variant.Text" OnClick="() => Eliminar(bien)" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error"> Eliminar </MudButton>
                                     }
-                                    else if (!ListarOfertasDeUseCase.Ejecutar(int.Parse(Origen!)).Exists(o => o.BienId == bien.Id))
+                                    else if (!ListarOfertasDeUseCase.Ejecutar(int.Parse(Origen!),false).Exists(o => o.BienId == bien.Id))
                                     {
                                         <MudButton Variant="Variant.Text" OnClick="() => Ofertar(bien)" Color="Color.Primary"> Ofertar </MudButton>
                                     }
@@ -93,7 +92,6 @@ else
     
     bool _tieneElementos;
     List<Bien> _lista = new();
-    Bien? _bienParaEliminar;
     
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationState { get; set; }
@@ -124,14 +122,6 @@ else
         }
     }
     
-    private void Eliminar(Bien bien)
-    {
-        _bienParaEliminar = bien;
-        EliminarBienUseCase.Ejecutar(_bienParaEliminar.Id);
-        _lista = ListarBienesDeUseCase.Ejecutar(_userId!);
-        if (_lista.Count == 0)
-            _tieneElementos = false;
-    }
 
     private async Task Ofertar(Bien bien)
     {
