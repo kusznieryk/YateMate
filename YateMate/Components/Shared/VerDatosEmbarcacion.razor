@@ -70,21 +70,25 @@
                        Size="Size.Small">Editar
             </MudButton>
         }
-        @if(!_contactos.Select(u=> u.Id).Contains(ObtenerDuenio.Ejecutar(Publicacion)))
+        else
         {
+            @if (!_contactos.Select(u => u.Id).Contains(ObtenerDuenio.Ejecutar(Publicacion)))
+            {
+                <MudButton Variant="Variant.Filled"
+                           @onclick="@(() => Navegador.NavigateTo($"/chat/{ObtenerDuenio.Ejecutar(Publicacion)}"))"
+                           Color="Color.Primary" StartIcon="@Icons.Material.Filled.ChatBubble"
+                           Size="Size.Small"> Iniciar Conversación
+                </MudButton>
+            }
+
             <MudButton Variant="Variant.Filled"
-            @onclick="@(() => Navegador.NavigateTo($"/chat/{ObtenerDuenio.Ejecutar(Publicacion)}"))"
-            Color="Color.Primary" StartIcon="@Icons.Material.Filled.ChatBubble"
-            Size="Size.Small"> Iniciar Conversación
+                       Href=""
+                       StartIcon="@Icons.Material.Filled.SyncAlt"
+                       @onclick="@(() => NavigationManager.NavigateTo($"/ListarMisBienes/{Publicacion.Id.ToString()}/{ObtenerDuenio.Ejecutar(Publicacion)}"))"
+                       Color="Color.Primary"
+                       Size="Size.Small">Hacer Oferta
             </MudButton>
         }
-        <MudButton Variant="Variant.Filled"
-                   Href=""
-                   StartIcon="@Icons.Material.Filled.SyncAlt"
-                   @onclick="@(()=> NavigationManager.NavigateTo($"/ListarMisBienes/{Publicacion.Id.ToString()}/{ObtenerDuenio.Ejecutar(Publicacion)}"))"
-                   Color="Color.Primary"
-                   Size="Size.Small">Hacer Oferta
-        </MudButton>
     </DialogActions>
 </MudDialog>
 

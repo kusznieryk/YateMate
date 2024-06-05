@@ -39,7 +39,14 @@ else
                                 </MudCardContent>
                                 <MudCardActions Style="justify-content: space-between;">
                                     <MudButton Variant="Variant.Text" @onclick="@((e) => OpenDialog(bien, oferta))" Color="Color.Primary">Ver más</MudButton>
-                                    @* <MudButton Variant="Variant.Text" OnClick="() => Eliminar(bien)" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error"> Borrar </MudButton> *@
+                                    @if (oferta.Aceptada)
+                                    {
+                                        <MudStack Direction="Row" Spacing="1">
+                                            <MudText Color="Color.Success" Typo="Typo.h6">Aceptada
+                                                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success"/>
+                                            </MudText>
+                                        </MudStack>
+                                    }
                                 </MudCardActions>
                             </MudCard>
                         </MudPaper>
@@ -58,7 +65,7 @@ else
     
     protected override void OnInitialized()
     {
-        _lista = ListarOfertasDeUseCase.Ejecutar(Id.Value);
+        _lista = ListarOfertasDeUseCase.Ejecutar(Id.Value,true);
     }
     
     protected override void OnParametersSet()

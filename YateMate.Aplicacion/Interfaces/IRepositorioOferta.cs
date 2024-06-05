@@ -12,6 +12,7 @@ public interface IRepositorioOferta
     void EliminarOfertasDe(int idPublicacion);
     void EliminarOfertasDelBien(int idBien);
     List<Oferta> ObtenerTruequesAcordados();
+    List<Oferta> ObtenerOfertasAceptadas();
     void ModificarOferta(Oferta oferta);
     bool TieneOfertaAceptada(int publicacionId);
 

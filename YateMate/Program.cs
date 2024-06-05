@@ -66,6 +66,8 @@ public class Program
         builder.Services.AddTransient<ListarTruequesDisponiblesUseCase>();
         builder.Services.AddTransient<ObtenerPublicacionDeUseCase>();
         builder.Services.AddTransient<ObtenerTruequesAcordadosUseCase>();
+        builder.Services.AddTransient<ObtenerOfertasAceptadasUseCase>();
+        builder.Services.AddTransient<TieneOfertaAceptadaUseCase>();
         builder.Services.AddScoped<IRepositorioOferta,RepositorioOferta>();
               
         builder.Services.AddTransient<ObtenerPublicacionUseCase>();
