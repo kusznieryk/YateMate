@@ -1,0 +1,60 @@
+@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<ApplicationUser> UserManager
+
+@rendermode InteractiveServer
+
+
+<MudDialog>
+    <DialogContent>
+        @foreach (var role in RolesDisponibles)
+        {
+            <MudCheckBox @bind-Checked="@RolesElegidos[role]" Label="@role"></MudCheckBox>
+
+        }
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
+        <MudButton OnClick="GuardarCambios" Style="margin-left: auto">Confirmar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public ApplicationUser Usuario { get; set; }
+    [Parameter] public IList<String> RolesDeUsuario { get; set;  }
+    [Parameter] public List<String> RolesDisponibles { get; set; }
+    private Dictionary<string, bool> RolesElegidos = new(); //aca tengo rol y booleano
+    
+
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    
+    void Cancel() => MudDialog!.Cancel();
+    
+    protected override void OnInitialized()
+    {
+        
+        foreach (var role in RolesDisponibles)
+        {
+            bool elegido = RolesDeUsuario.Contains(role);
+            RolesElegidos.Add(role, elegido);
+            
+        }
+    }
+
+    protected async void GuardarCambios()
+    {
+        foreach (var rolYeleccion in RolesElegidos)
+        {
+            if (!rolYeleccion.Value  && RolesDeUsuario.Contains(rolYeleccion.Key)) //si eliminaste uno que tenias
+            {
+                await UserManager.RemoveFromRoleAsync(Usuario,rolYeleccion.Key);
+            }
+            else if (rolYeleccion.Value && !RolesDeUsuario.Contains(rolYeleccion.Key))  //si agregaste uno que no tenias
+            {
+                await UserManager.AddToRoleAsync(Usuario, rolYeleccion.Key);
+            }
+        }
+        MudDialog!.Close(DialogResult.Ok(true));
+    }
+
+}

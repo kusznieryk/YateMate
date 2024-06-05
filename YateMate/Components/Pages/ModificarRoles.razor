@@ -1,0 +1,99 @@
+@page "/roles"
+@using Microsoft.AspNetCore.Identity
+@using YateMate.Aplicacion.UseCases.ApplicationUser
+@using YateMate.Components.Shared
+
+@inject UserManager<ApplicationUser> UserManager
+@inject ObtenerApplicationUsersUseCase ObtenerApplicationUsersUseCase 
+@inject RoleManager<IdentityRole> RoleManager
+@inject IDialogService Dialog 
+
+@rendermode InteractiveServer
+
+<MudDialogProvider  FullWidth="true"
+                    MaxWidth="MaxWidth.Small"
+                    Position="DialogPosition.CenterLeft"/>
+
+<MudContainer>
+    @if (!_tieneElementos)
+    {
+    <MudText Typo="Typo.h6">No hay elementos</MudText>
+    }
+    else
+    {
+    <MudTable Items="@_lista" Class="mt-4" Dense="true" Outlined="true">
+        <HeaderContent>
+            <MudTh>Email</MudTh>
+            <MudTh>Nombre</MudTh>
+            <MudTh>Apellido</MudTh>
+            <MudTh>Nacionalidad</MudTh>
+            <MudTh>Genero</MudTh>
+            <MudTh>DNI</MudTh>
+            <MudTh>Fecha de nacimiento</MudTh>
+            <MudTh>Roles</MudTh>
+            <MudTh>Acciones</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Email</MudTd>
+            <MudTd>@context.Nombre</MudTd>
+            <MudTd>@context.Apellido</MudTd>
+            <MudTd>@context.Nacionalidad</MudTd>
+            <MudTd>@context.Genero</MudTd>
+            <MudTd>@context.Dni</MudTd>
+            <MudTd>@context.FechaNacimiento?.ToString("dd-MM-yyyy")</MudTd>
+            @* <MudTd>@RolesDe(@context) </MudTd> *@
+            @* <MudTd>@UserRoles[context.Email!]</MudTd> *@
+            <MudTd>
+                @foreach (var role in UserRoles[context.Email!])
+                {
+                <div>@role</div>
+                }
+            </MudTd>
+            <MudTd>
+                
+                <div class="button-container">
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => EditarRoles(context))">Modificar Roles</MudButton>
+                </div>
+                
+                
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+    }
+    
+</MudContainer>
+
+
+
+@code {
+    List<ApplicationUser> _lista = new();
+    bool _tieneElementos = false;
+    List<String> RolesDisponibles = Constants.RolesConstants.Roles;
+    private Dictionary<string, IList<string>> UserRoles { get; set; } = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        // _lista = ObtenerApplicationUsersUseCase.Ejecutar(); //NO poner esta linea porque al mezclar db context EF tiene problemas para trackear
+        _lista = UserManager.Users.ToList();
+        foreach (var user in _lista)
+        {
+            var roles = await UserManager.GetRolesAsync(user);
+            UserRoles.Add(user.Email!, roles);
+        }
+    }
+    protected override void OnParametersSet()
+    {
+        _tieneElementos = _lista.Count > 0;
+    }
+
+    private async void EditarRoles(ApplicationUser usuario)
+    {   
+        var parameters = new DialogParameters<EditarRolesUsuario>();
+        parameters.Add(x => x.Usuario, usuario);
+        parameters.Add(x => x.RolesDeUsuario, UserRoles[usuario.Email!]);
+        parameters.Add(x => x.RolesDisponibles, RolesDisponibles);
+        Dialog.Show<EditarRolesUsuario>($"Modificando roles del usuario {usuario.Nombre} {usuario.Apellido}", parameters);
+        
+    }
+    
+}
