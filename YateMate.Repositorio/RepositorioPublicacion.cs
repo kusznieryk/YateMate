@@ -53,10 +53,19 @@ public class RepositorioPublicacion : IRepositorioPublicacion
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
-            var pub = context.Publicaciones.FirstOrDefault(b => b.EmbarcacionId == idEmb);
-            if (pub != null)
+            var publicacionAEliminar = context.Publicaciones.FirstOrDefault(b => b.EmbarcacionId == idEmb);
+            if (publicacionAEliminar != null)
             {
-                context.Remove(pub);
+                var tieneTruequeAcordado =
+                    context.Ofertas.Any(oferta => oferta.PublicacionId == publicacionAEliminar.Id && oferta.Aceptada);
+                if (tieneTruequeAcordado)
+                {
+                    publicacionAEliminar.EstaEliminado = true;
+                }
+                else
+                {
+                    context.Remove(publicacionAEliminar);
+                }
                 context.SaveChanges();
             }
         }

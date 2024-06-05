@@ -1,23 +1,30 @@
 using System.Security.Permissions;
 using YateMate.Aplicacion.Entidades;
 using YateMate.Aplicacion.Interfaces;
+using YateMate.Aplicacion.UseCases.Publicaciones;
 
 namespace YateMate.Aplicacion.UseCases.Embarcaciones;
 
 public class EliminarEmbarcacionUseCase
 {
     private readonly IRepositorioEmbarcacion _repo;
-    private readonly IRepositorioPublicacion _repositorioPublicacion;
+    private readonly ObtenerPublicacionUseCase _obtenerPublicacionUseCase;
+    private readonly EliminarPublicacionUseCase _eliminarPublicacionUseCase;
+    private readonly TienePublicacionUseCase _tienePublicacionUseCase;
 
-    public EliminarEmbarcacionUseCase(IRepositorioEmbarcacion repo, IRepositorioPublicacion repoPublicacion)
+    public EliminarEmbarcacionUseCase(IRepositorioEmbarcacion repo, ObtenerPublicacionUseCase obtenerPublicacionUseCase, EliminarPublicacionUseCase eliminarPublicacionUseCase, TienePublicacionUseCase tienePublicacionUseCase)
     {
         _repo = repo;
-        _repositorioPublicacion = repoPublicacion;
+        _obtenerPublicacionUseCase = obtenerPublicacionUseCase;
+        _eliminarPublicacionUseCase = eliminarPublicacionUseCase;
+        _tienePublicacionUseCase = tienePublicacionUseCase;
     }
 
     public void Ejecutar(int embarcacionId)
     {
-        _repositorioPublicacion.EliminarPublicacion(embarcacionId);
-        _repo.EliminarEmbarcacion(embarcacionId);
+        bool tienePublicacion = _tienePublicacionUseCase.Ejecutar(embarcacionId);
+        if(tienePublicacion)
+            _eliminarPublicacionUseCase.Ejecutar(_obtenerPublicacionUseCase.Ejecutar(embarcacionId)!);
+        _repo.EliminarEmbarcacion(embarcacionId, tienePublicacion);
     }
 }

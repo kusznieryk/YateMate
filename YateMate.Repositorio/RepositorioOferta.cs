@@ -33,9 +33,11 @@ public class RepositorioOferta : IRepositorioOferta
             }
         }
     }
-
-    public void EliminarOferta(int id)
-    {
+    
+    //Aca creo que no hace falta lo de borrado logico porque
+    //si se confirmo el trueque se borra la oferta y se crea un Trueque Confirmado
+    public void EliminarOferta(int id) 
+    {                                   
         using (var context = ApplicationDbContext.CrearContexto())
         {
             var oferta = context.Ofertas.FirstOrDefault(o => o.Id == id);
@@ -102,7 +104,7 @@ public class RepositorioOferta : IRepositorioOferta
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
-            return context.Ofertas.Where(oferta => oferta.Acordado).ToList();
+            return context.Ofertas.Where(oferta => oferta.Aceptada).ToList();
         }
     }
     
@@ -115,11 +117,7 @@ public class RepositorioOferta : IRepositorioOferta
     }
     
     
-
-    public void RetrotraerTrueque()
-    {
-        
-    }
+    
 
     public void ModificarOferta(Oferta oferta)
     {
