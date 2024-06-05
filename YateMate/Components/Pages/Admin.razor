@@ -1,12 +1,12 @@
 @page "/admin"
-@using Microsoft.AspNetCore.Identity
+
 @using YateMate.Aplicacion.UseCases.ApplicationUser
 @using YateMate.Components.Account.Shared
 @using YateMate.Components.Shared
 
 @inject ObtenerEmpleadosUseCase ObtenerEmpleadosUseCase;
 @inject EliminarApplicationUserUseCase EliminarApplicationUserUseCase;
-@* @inject UserManager<ApplicationUser> UserManager le agrego el rol desde aca ya fue*@
+
 @* @inject NavigationManager Navegador; *@
 @inject IDialogService Dialog
 

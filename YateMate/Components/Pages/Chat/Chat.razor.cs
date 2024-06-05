@@ -19,7 +19,7 @@ public partial class Chat
     public ApplicationUser CurrentUser { get; set; }
     [Parameter] public string CurrentUserId { get; set; }
     
-    private List<MensajeChat> messages = new List<MensajeChat>();
+    private List<MensajeChat> messages = new();
     
     [Inject]
     AuthenticationStateProvider AuthenticationStateProvider { get; set; }
@@ -79,7 +79,9 @@ public partial class Chat
     }
     protected override async Task OnInitializedAsync()
     {
-        if (hubConnection == null)
+        //lo pongo aca porq adentro de loadUserChat se carga despues del rendereo de la pagina y me explota todo
+        if (!string.IsNullOrEmpty(ContactId)) Contacto = ObtenerApplicationUserUseCase.Ejecutar(ContactId); 
+        if (hubConnection == null) 
         {
             hubConnection = new HubConnectionBuilder().WithUrl(NavigationManager.ToAbsoluteUri(Constants.SignalRConstants.HubPath)).Build();
         }
@@ -127,10 +129,7 @@ public partial class Chat
     
     void LoadUserChat(string userId)
     {
-        Contacto = ObtenerApplicationUserUseCase.Ejecutar(userId)!;
         ContactId = Contacto.Id;
-        // NavigationManager.NavigateTo($"chat/{ContactId}");
-        messages = new List<MensajeChat>();
         messages = ObtenerMensajesEntreUseCase.Ejecutar(userId, CurrentUserId);
         Console.WriteLine($"Loaded user chat {Contacto.Email}");
     }

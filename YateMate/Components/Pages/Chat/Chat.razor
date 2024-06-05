@@ -39,18 +39,17 @@
                             {
                                 <MudText Typo="Typo.body2" Style=" padding: 15px;;border-radius: 5px;margin-top:5px">@message.Message</MudText>
                             }
-                            
+            
                         </div>
                     </div>
                 }
             </div>
             @if (!string.IsNullOrEmpty(ContactId))
             {
-                
+            
                 <MudPaper Elevation="25" Class="d-flex flex-row px-2 mx-4" Style="max-width: 90%">
                     <MudFileUpload T="IBrowserFile"
                                    FilesChanged="saveImage"
-                                   
                                    Context="EditButtonContext"
                                    Required="false"
                                    Accept="image/jpeg, image/jpg, image/png, image/webp">
@@ -64,25 +63,25 @@
                             </MudButton>
                         </ButtonTemplate>
                     </MudFileUpload>
-                        
+            
                     <MudTextField T="string" Placeholder="Ingresa un mensaje..."
                                   DisableUnderLine="true"
-                                  Class="mt-n2 mx-4" 
+                                  Class="mt-n2 mx-4"
                                   @bind-Value="CurrentMessage"
                                   For="@(() => CurrentMessage)"
                                   TextUpdateSuppression="false"
                                   OnKeyDown="Enter"
                                   Immediate="true"
                                   Disabled="@(!string.IsNullOrEmpty(img))" />
-                    
-                        
+            
+            
                     <MudButton OnClick="SubmitAsync" StartIcon="@Icons.Material.Outlined.Send" Color="Color.Secondary" ButtonType="ButtonType.Button">Enviar</MudButton>
-                    
+            
                 </MudPaper>
             }
             else
             {
-             
+            
                 <div class="d-flex justify-center">
                     <MudText Typo="Typo.body1">Selecciona a uno de tus contactos o inicia una conversación desde el menú de publicaciones </MudText>
                 </div>
