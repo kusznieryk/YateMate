@@ -11,7 +11,6 @@ public class EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
     private readonly ILogger _logger = logger;
 
     public AuthMessageSenderOptions Options { get; } = optionsAccessor.Value;
-
     
          public Task SendConfirmationLinkAsync(ApplicationUser user, string email, 
          string confirmationLink) => SendEmailAsync(email, "Confirma tu cuenta:", 
@@ -29,6 +28,10 @@ public class EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
         public Task SendMessageAceptacion(string Email, Bien bien, Publicacion publicacion) => SendEmailAsync(Email,
             "Una oferta ha sido aceptada"
             , $"Te aceptaron la oferta del bien {bien.Nombre}, en la publicacion {publicacion.Titulo}");
+
+        public Task SendMessageChat(string Email, ApplicationUser SendingUser)
+            => SendEmailAsync(Email, "¡Te han enviado un mensaje!",
+                $"Has recibido un mensaje de {SendingUser.Nombre} {SendingUser.Apellido}. Entra a la seccion de 'Chat' para verlo.");
         public Task SendPasswordResetCodeAsync(ApplicationUser user, string email, 
          string resetCode) => SendEmailAsync(email, "Cambia tu contraseña", 
          $"Cambia tu contraseña usando el siguiente codigo: {resetCode}");
@@ -60,7 +63,14 @@ public class EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
             EnableSsl = true
         };
         client.EnableSsl = true;
-        client.Send("YateMate@YateMate.com", toEmail, subject, message);
+        try
+        {
+            client.Send("YateMate@YateMate.com", toEmail, subject, message);
+        }
+        catch (SmtpException)
+        {
+            Console.WriteLine("Problemas al enviar el mail, fijate de tener la clave al dia y tener internet");
+        }
          
         _logger.LogInformation($"Email to {toEmail} sent!, with subject {subject} and message {message}");
      }
