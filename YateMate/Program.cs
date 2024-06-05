@@ -39,6 +39,7 @@ public class Program
         builder.Services.AddTransient<ObtenerEmbarcacionesDeUseCase>();
         builder.Services.AddTransient<ObtenerEmbarcacionPorMatriculaUseCase>();
         builder.Services.AddTransient<EliminarEmbarcacionUseCase>();
+        builder.Services.AddTransient<TienePublicacionUseCase>();
         builder.Services.AddScoped<IRepositorioEmbarcacion, RepositorioEmbarcacion>();
         
         builder.Services.AddTransient<EliminarApplicationUserUseCase>();
@@ -68,6 +69,7 @@ public class Program
         builder.Services.AddTransient<ObtenerTruequesAcordadosUseCase>();
         builder.Services.AddTransient<ObtenerOfertasAceptadasUseCase>();
         builder.Services.AddTransient<TieneOfertaAceptadaUseCase>();
+        builder.Services.AddTransient<RetrotraerTruequeUseCase>();
         builder.Services.AddScoped<IRepositorioOferta,RepositorioOferta>();
               
         builder.Services.AddTransient<ObtenerPublicacionUseCase>();
