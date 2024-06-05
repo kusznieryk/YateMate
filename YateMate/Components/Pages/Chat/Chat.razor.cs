@@ -79,7 +79,7 @@ public partial class Chat
     }
     protected override async Task OnInitializedAsync()
     {
-        //lo pongo aca porq adentro de loadUserChat se carga despues del rendereo de la pagina y me explota todo
+        //lo pongo aca porq adentro de loadUserChat se carga despues del rendereo de la pagina y las referencias estan en null
         if (!string.IsNullOrEmpty(ContactId)) Contacto = ObtenerApplicationUserUseCase.Ejecutar(ContactId); 
         if (hubConnection == null) 
         {
