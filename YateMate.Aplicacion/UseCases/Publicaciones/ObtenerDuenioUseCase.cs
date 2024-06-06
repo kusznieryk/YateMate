@@ -5,9 +5,8 @@ namespace YateMate.Aplicacion.UseCases.Publicaciones;
 
 public class ObtenerDuenioUseCase(IRepositorioEmbarcacion repo)
 {
-    public string Ejecutar(Publicacion publicacion)
+    public string? Ejecutar(Publicacion publicacion)
     {
-
-        return repo.ObtenerEmbarcacion(publicacion.EmbarcacionId).ClienteId;
+        return repo.ObtenerEmbarcacion(publicacion.EmbarcacionId)?.ClienteId;
     }
 }
