@@ -2,17 +2,10 @@ using YateMate.Aplicacion.Interfaces;
 using YateMate.Aplicacion.Entidades;
 namespace YateMate.Aplicacion.UseCases.Embarcaciones;
 
-public class ObtenerEmbarcacionUseCase
+public class ObtenerEmbarcacionUseCase(IRepositorioEmbarcacion repo)
 {
-    private readonly IRepositorioEmbarcacion _repo;
-
-    public ObtenerEmbarcacionUseCase(IRepositorioEmbarcacion repo)
+    public Embarcacion? Ejecutar(int embarcacionId)
     {
-        _repo = repo;
-    }
-
-    public Embarcacion Ejecutar(int embarcacionId)
-    {
-        return _repo.ObtenerEmbarcacion(embarcacionId);
+        return repo.ObtenerEmbarcacion(embarcacionId);
     }
 }

@@ -8,6 +8,7 @@
 @inject ObtenerEmbarcacionUseCase ObtenerEmbarcacion
 @inject ObtenerDuenioUseCase ObtenerDuenio
 @inject ObtenerContactosDeUseCase ObtenerContactosDeUseCase
+@inject ObtenerOfertasAceptadasUseCase ObtenerOfertasAceptadas
 
 
 <MudDialog>
@@ -30,17 +31,17 @@
                     <thead>
                     <tr>
                         
-                    <th>Calado(m)</th>
-                    <th>Eslora(m)</th>
-                    <th>Manga(m)</th>
+                    <th>Calado</th>
+                    <th>Eslora</th>
+                    <th>Manga</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
                         
-                    <th>@(Original.Calado)</th>
-                    <th>@(Original.Eslora)</th>
-                    <th>@(Original.Manga)</th>
+                    <th>@(Original.Calado)'</th>
+                    <th>@(Original.Eslora)'</th>
+                    <th>@(Original.Manga)'</th>
                     </tr>
                     </tbody>
                 </MudSimpleTable>
@@ -57,18 +58,21 @@
         {
             <MudButton Variant="Variant.Filled"
                        Href=""
-                       StartIcon="@Icons.Material.Filled.Delete"
-                       OnClick="EliminarHandler"
-                       Color="Color.Error"
-                       Size="Size.Small">Eliminar
-            </MudButton>
-            <MudButton Variant="Variant.Filled"
-                       Href=""
                        StartIcon="@Icons.Material.Filled.Edit"
                        OnClick="@((e) => NavigationManager.NavigateTo("/publicar/"+Publicacion.EmbarcacionId))"
                        Color="Color.Primary"
                        Size="Size.Small">Editar
             </MudButton>
+            @if (!ObtenerOfertasAceptadas.Ejecutar().Exists(o => o.PublicacionId == Publicacion.Id))
+            {
+                <MudButton Variant="Variant.Filled"
+                           Href=""
+                           StartIcon="@Icons.Material.Filled.Delete"
+                           OnClick="EliminarHandler"
+                           Color="Color.Error"
+                           Size="Size.Small">Eliminar
+                </MudButton>
+            }
         }
         else
         {
