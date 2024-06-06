@@ -120,7 +120,9 @@
     public void ValidSubmit()
     {
         Model.ClienteId = Id;
-        AgregarEmbarcacionUseCase.Ejecutar( new Embarcacion(Model.Nombre, Model.Eslora.Value, Model.Calado.Value, Id, Model.Matricula, Model.Manga.Value));
+        Embarcacion emb = new Embarcacion(Model.Nombre, Model.Eslora.Value, Model.Calado.Value, Model.ClienteId, Model.Matricula, Model.Manga.Value);
+        emb.Bandera = Model.Bandera.Value;
+        AgregarEmbarcacionUseCase.Ejecutar(emb);
         Navegador.NavigateTo("/ListarApplicationUsers");
     }
 

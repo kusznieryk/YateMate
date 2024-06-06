@@ -59,7 +59,7 @@ public class EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
         }
         var client = new SmtpClient("sandbox.smtp.mailtrap.io", 2525)
         {
-            Credentials = new NetworkCredential("b7680a9e8a9a3a", apiKey),
+            Credentials = new NetworkCredential("e4ec570ec78c2f", apiKey),
             EnableSsl = true
         };
         client.EnableSsl = true;

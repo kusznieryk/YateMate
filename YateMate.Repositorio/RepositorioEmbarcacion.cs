@@ -49,7 +49,7 @@ public class RepositorioEmbarcacion:IRepositorioEmbarcacion
         return embarcaciones;
     }
 
-    public Embarcacion ObtenerEmbarcacion(int embarcacionId)
+    public Embarcacion? ObtenerEmbarcacion(int embarcacionId)
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
