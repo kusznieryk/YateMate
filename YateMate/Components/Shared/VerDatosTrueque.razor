@@ -1,10 +1,15 @@
+@using YateMate.Aplicacion.UseCases.ApplicationUser
 @using YateMate.Aplicacion.UseCases.Bien
+@using YateMate.Aplicacion.UseCases.Embarcaciones
 @using YateMate.Aplicacion.UseCases.Oferta
+@using YateMate.Aplicacion.UseCases.Publicaciones
 @inject RetrotraerTruequeUseCase RetrotraerTruequeUseCase
 @inject ObtenerBienUseCase ObtenerBienUseCase
 @inject ObtenerPublicacionDeUseCase ObtenerPublicacion
 @inject NavigationManager NavigationManager
 @inject ApiCaller ApiCaller
+@inject ObtenerApplicationUserUseCase ObtenerApplicationUserUseCase
+@inject ObtenerEmbarcacionUseCase ObtenerEmbarcacionUseCase
 
 <MudDialog>
     <TitleContent>
@@ -59,23 +64,27 @@
 <p>@resultadoApi</p>
 @code {
     
-    [Parameter] public Oferta Oferta{ get; set; }
-    //agregar parameter de Usuuarios
+    [Parameter] public Oferta Oferta { get; set; }
+    [Parameter] public Publicacion Publicacion { get; set; } = null!;
+    [Parameter] public Bien Bien { get; set; } = null!;
+    
     
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
     void Cancel() => MudDialog!.Cancel();
 
     Inhabilitaciones _InhabilitacionesDuenioEmbarcacion;
     Inhabilitaciones _InhabilitacionesOfertante;
+    ApplicationUser _usuarioBien; 
+    ApplicationUser _usuarioPublicacion;
+    Embarcacion _embarcacionUsuario;
     
-    Bien Bien { get; set; } = null!;
-    Publicacion Publicacion { get; set; } = null!;
     string resultadoApi = "no tengo nada todavia";
     
     protected override void OnInitialized()
     {
-        Bien = ObtenerBienUseCase.Ejecutar(Oferta.BienId);
-        Publicacion = ObtenerPublicacion.Ejecutar(Oferta.PublicacionId);
+        _usuarioBien = ObtenerApplicationUserUseCase.Ejecutar(Bien.UsuarioId);
+        _embarcacionUsuario = ObtenerEmbarcacionUseCase.Ejecutar(Publicacion.EmbarcacionId);
+        _usuarioPublicacion = ObtenerApplicationUserUseCase.Ejecutar(_embarcacionUsuario.ClienteId);
     }
     public void RetrotraerTrueque()
     {
@@ -87,18 +96,26 @@
     {
         try
         {
-            // _InhabilitacionesDuenioEmbarcacion(await ApiCaller.EstaDuenioInhibido(), await ApiCaller.EstaBienInhabilitado(), !(await ApiCaller.EsDuenioDe()));
+            resultadoApi = "cargando";
+            _InhabilitacionesDuenioEmbarcacion = new Inhabilitaciones(
+                await ApiCaller.EstaDuenioInhibido(_usuarioPublicacion.Dni.Value),
+                await ApiCaller.EstaBienInhabilitado(_embarcacionUsuario.Matricula),
+                !(await ApiCaller.EsDuenioDe(_usuarioPublicacion.Dni.Value, _embarcacionUsuario.Matricula)));
             //checkeos del que pone la embarcacion
             // await ApiCaller.EstaDuenioInhibido();
             // await ApiCaller.EstaBienInhabilitado();
             // await ApiCaller.EsDuenioDe();
 
-            // _InhabilitacionesOfertante(await ApiCaller.EstaDuenioInhibido(), false, false);
+            _InhabilitacionesOfertante = new Inhabilitaciones(await ApiCaller.EstaDuenioInhibido(_usuarioBien.Dni.Value), false, false);
             //checkeos del que pone el bien, los ultimos 2 se van a ver en 3ra demo
             // await ApiCaller.EstaDuenioInhibido();
             // await ApiCaller.EstaBienInhabilitado();
             // await ApiCaller.EsDuenioDe();
-            resultadoApi = await ApiCaller.Prueba();
+            // resultadoApi = await ApiCaller.Prueba();
+            resultadoApi = $"Esta inhibido duenio barco? {_InhabilitacionesDuenioEmbarcacion.DuenioInhibido}," +
+                           $" esta inhabilitada la embarcion {_InhabilitacionesDuenioEmbarcacion.BienInhabilitado}" +
+                           $"no es realmemte el duenio del barco? {_InhabilitacionesDuenioEmbarcacion.NoEsDuenioDe}" +
+                           $"Esta inhibido dueño bien? {_InhabilitacionesOfertante.DuenioInhibido}";
         }
         catch(Exception)
         {
