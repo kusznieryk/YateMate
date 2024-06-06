@@ -8,6 +8,7 @@
 @inject ObtenerEmbarcacionUseCase ObtenerEmbarcacion
 @inject ObtenerDuenioUseCase ObtenerDuenio
 @inject ObtenerContactosDeUseCase ObtenerContactosDeUseCase
+@inject ObtenerOfertasAceptadasUseCase ObtenerOfertasAceptadas
 
 
 <MudDialog>
@@ -57,18 +58,21 @@
         {
             <MudButton Variant="Variant.Filled"
                        Href=""
-                       StartIcon="@Icons.Material.Filled.Delete"
-                       OnClick="EliminarHandler"
-                       Color="Color.Error"
-                       Size="Size.Small">Eliminar
-            </MudButton>
-            <MudButton Variant="Variant.Filled"
-                       Href=""
                        StartIcon="@Icons.Material.Filled.Edit"
                        OnClick="@((e) => NavigationManager.NavigateTo("/publicar/"+Publicacion.EmbarcacionId))"
                        Color="Color.Primary"
                        Size="Size.Small">Editar
             </MudButton>
+            @if (!ObtenerOfertasAceptadas.Ejecutar().Exists(o => o.PublicacionId == Publicacion.Id))
+            {
+                <MudButton Variant="Variant.Filled"
+                           Href=""
+                           StartIcon="@Icons.Material.Filled.Delete"
+                           OnClick="EliminarHandler"
+                           Color="Color.Error"
+                           Size="Size.Small">Eliminar
+                </MudButton>
+            }
         }
         else
         {
