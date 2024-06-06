@@ -139,6 +139,8 @@ public class Program
             hubOptions.MaximumReceiveMessageSize = Constants.SignalRConstants.MaximumMessageSize;
         });
         
+        builder.Services.AddHttpClient();
+        builder.Services.AddTransient<ApiCaller>();
         
         var app = builder.Build();
         

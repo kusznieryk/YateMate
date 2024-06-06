@@ -4,6 +4,7 @@
 @inject ObtenerBienUseCase ObtenerBienUseCase
 @inject ObtenerPublicacionDeUseCase ObtenerPublicacion
 @inject NavigationManager NavigationManager
+@inject ApiCaller ApiCaller
 
 <MudDialog>
     <TitleContent>
@@ -43,8 +44,10 @@
         <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
         <div style="flex-grow: 1;"></div>
         <MudButton Variant="Variant.Filled"
-                   Color="Color.Primary" StartIcon="@Icons.Material.Filled.Check"
-                   Size="Size.Small"> Confirmar Trueque
+                   Color="Color.Primary"
+                   StartIcon="@Icons.Material.Filled.Check"
+                   Size="Size.Small"
+                   OnClick="ConfirmarTrueque"> Confirmar Trueque
         </MudButton>
         <MudButton Variant="Variant.Filled"
                    OnClick="RetrotraerTrueque"
@@ -53,15 +56,22 @@
         </MudButton>
     </DialogActions>
 </MudDialog>
-
+<p>@resultadoApi</p>
 @code {
+    
     [Parameter] public Oferta Oferta{ get; set; }
+    //agregar parameter de Usuuarios
     
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
     void Cancel() => MudDialog!.Cancel();
 
+    Inhabilitaciones _InhabilitacionesDuenioEmbarcacion;
+    Inhabilitaciones _InhabilitacionesOfertante;
+    
     Bien Bien { get; set; } = null!;
     Publicacion Publicacion { get; set; } = null!;
+    string resultadoApi = "no tengo nada todavia";
+    
     protected override void OnInitialized()
     {
         Bien = ObtenerBienUseCase.Ejecutar(Oferta.BienId);
@@ -71,6 +81,30 @@
     {
         RetrotraerTruequeUseCase.Ejecutar(Oferta.Id);
         NavigationManager.NavigateTo("/ListadoTruequesAcordados", forceLoad:true);
+    }
+
+    public async Task ConfirmarTrueque()
+    {
+        try
+        {
+            // _InhabilitacionesDuenioEmbarcacion(await ApiCaller.EstaDuenioInhibido(), await ApiCaller.EstaBienInhabilitado(), !(await ApiCaller.EsDuenioDe()));
+            //checkeos del que pone la embarcacion
+            // await ApiCaller.EstaDuenioInhibido();
+            // await ApiCaller.EstaBienInhabilitado();
+            // await ApiCaller.EsDuenioDe();
+
+            // _InhabilitacionesOfertante(await ApiCaller.EstaDuenioInhibido(), false, false);
+            //checkeos del que pone el bien, los ultimos 2 se van a ver en 3ra demo
+            // await ApiCaller.EstaDuenioInhibido();
+            // await ApiCaller.EstaBienInhabilitado();
+            // await ApiCaller.EsDuenioDe();
+            resultadoApi = await ApiCaller.Prueba();
+        }
+        catch(Exception)
+        {
+            resultadoApi = "Problemas de conexion al conectarse con las apis";
+        }
+        
     }
 }
 <style>.card-container {
