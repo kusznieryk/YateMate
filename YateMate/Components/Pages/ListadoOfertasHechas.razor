@@ -39,13 +39,25 @@ else
                                 <MudCardContent Style="min-height: 100px">
                                     <MudText Typo="Typo.h5" Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@bien.Nombre</MudText>
                                     <MudText Typo="Typo.body2" Style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">@bien.Descripcion</MudText>
-                                    <MudText Typo="Typo.caption" Style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">Hecha a ---> @publicacion.Titulo</MudText>
                                 </MudCardContent>
                                 <MudCardActions Style="justify-content: space-between;">
                                     @if (!oferta.Aceptada)
                                     {
                                         <MudButton Variant="Variant.Text" OnClick="() => Eliminar(oferta)" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error"> Eliminar </MudButton>
                                     }
+                                    else
+                                    {
+                                        <MudStack Direction="Row" Spacing="1">
+                                            <MudText Color="Color.Success" Typo="Typo.h6">Aceptada
+                                                <MudIcon Icon="@Icons.Material.Filled.CheckCircle" Color="Color.Success"/>
+                                            </MudText>
+                                        </MudStack>
+                                    }
+                                    <MudStack Direction="Row" Spacing="1">
+                                        <MudText Color="Color.Info" size="Size.Small">Hecha a @publicacion.Titulo
+                                            <MudIcon Icon="@Icons.Material.Filled.DirectionsBoat" Color="Color.Info"/>
+                                        </MudText>
+                                    </MudStack>
                                 </MudCardActions>
                             </MudCard>
                         </MudPaper>

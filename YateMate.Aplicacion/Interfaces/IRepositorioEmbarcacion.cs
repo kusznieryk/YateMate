@@ -8,7 +8,7 @@ public interface IRepositorioEmbarcacion
     List<Embarcacion> ObtenerEmbarcaciones();
     List<Embarcacion> ObtenerEmbarcacionesDe(string clienteId);
     void ModificarEmbarcacion(Embarcacion embarcacion);
-    Embarcacion ObtenerEmbarcacion(int embarcacionId);
+    Embarcacion? ObtenerEmbarcacion(int embarcacionId);
     void EliminarEmbarcacion(int idEmbarcacion, bool tienePublicacion);
 
     Embarcacion? ObtenerEmbarcacionPorMatricula(string matricula);
