@@ -2,6 +2,7 @@
 @using YateMate.Aplicacion.UseCases.Bien
 @using YateMate.Aplicacion.UseCases.Oferta
 @using YateMate.Aplicacion.UseCases.Publicaciones
+@using YateMate.Components.Account.Shared
 @inject NavigationManager NavigationManager
 @inject ObtenerContactosDeUseCase ObtenerContactosDeUseCase
 @inject AceptarOfertaUseCase AceptarOferta
@@ -52,6 +53,16 @@
                            Color="Color.Error"
                            Size="Size.Small"> Eliminar
                 </MudButton>
+                @* <MudDialogProvider> *@
+                @*     <MudMessageBox @ref="Mbox" Title="Eliminar" CancelText="Cancelar"> *@
+                @*         <MessageContent> *@
+                @*             ¿Desea eliminar el bien @Bien.Nombre? *@
+                @*         </MessageContent> *@
+                @*         <YesButton> *@
+                @*             <MudButton Variant="Variant.Filled" Color="Color.Error" StartIcon="@Icons.Material.Filled.DeleteForever">Eliminar</MudButton> *@
+                @*         </YesButton> *@
+                @*     </MudMessageBox> *@
+                @* </MudDialogProvider> *@
             }
         }
         else if(oferta!=null)
@@ -79,11 +90,11 @@
         }
         @if(!_contactos.Select(u=> u.Id).Contains(Bien.UsuarioId) && !Duenio)
         {
-        <MudButton Variant="Variant.Filled"
-                   @onclick="@(() => NavigationManager.NavigateTo($"/chat/{Bien.UsuarioId}"))"
-                   Color="Color.Primary" StartIcon="@Icons.Material.Filled.ChatBubble"
-                   Size="Size.Small"> Iniciar Conversación
-        </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       @onclick="@(() => NavigationManager.NavigateTo($"/chat/{Bien.UsuarioId}"))"
+                       Color="Color.Primary" StartIcon="@Icons.Material.Filled.ChatBubble"
+                       Size="Size.Small"> Iniciar Conversación
+            </MudButton>
         }
     </DialogActions>
 </MudDialog>
@@ -111,35 +122,60 @@
     }
     
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
-
     void Submit() => MudDialog!.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog!.Cancel();
     
-    public void EliminarHandler(object e)
+    [Inject] private IDialogService? DialogService { get; set; }
+    // MudMessageBox? Mbox { get; set; } 
+
+    private async void EliminarHandler()
     {
-        EliminarBienUseCase.Ejecutar(Bien.Id);
-        NavigationManager.NavigateTo($"ListarMisBienes/lista", true);
+        bool? result = await DialogService.ShowMessageBox(
+            "Eliminar", 
+            $"¿Desea eliminar el bien \"{Bien.Nombre}\"?", 
+            yesText:"Eliminar", cancelText:"Cancelar");
+        StateHasChanged();
+        if (result is true)
+        {
+            EliminarBienUseCase.Ejecutar(Bien.Id);
+            NavigationManager.NavigateTo($"ListarMisBienes/lista", true);
+        }
     }
     
     void Editar(int id)
     {
         Submit();
         NavigationManager.NavigateTo($"bien/{id}");
-
     }
 
-    void HandlerRechazar()
+    private async void HandlerRechazar()
     {
-        EliminarOferta.Ejecutar(oferta.Id);
-        NavigationManager.NavigateTo($"listadoOfertas/{oferta.PublicacionId}", true);
+        bool? result = await DialogService.ShowMessageBox(
+            "Rechazar", 
+            $"¿Desea rechazar la oferta con el bien \"{Bien.Nombre}\"?", 
+            yesText:"Rechazar", cancelText:"Cancelar");
+        StateHasChanged();
+        if (result is true)
+        {
+            EliminarOferta.Ejecutar(oferta.Id);
+            NavigationManager.NavigateTo($"listadoOfertas/{oferta.PublicacionId}", true);
+        }
     }
     async Task HandlerAceptar()
     {
-        AceptarOferta.Ejecutar(oferta);
-        var duenio = ObtenerApplicationUserUseCase.Ejecutar(oferta.UsuarioId);
-        var pub = ObtenerPublicacion.Ejecutar(oferta.PublicacionId);
-        await EmailSender.SendMessageAceptacion(duenio.Email, Bien,pub );
-        NavigationManager.NavigateTo($"mis_publicaciones");
+        bool? result = await DialogService.ShowMessageBox(
+            "Aceptar", 
+            $"¿Desea aceptar la oferta con el bien \"{Bien.Nombre}\"?", 
+            yesText:"Aceptar", cancelText:"Cancelar");
+        StateHasChanged();
+        if (result is true)
+        {
+            AceptarOferta.Ejecutar(oferta);
+            var duenio = ObtenerApplicationUserUseCase.Ejecutar(oferta.UsuarioId);
+            var pub = ObtenerPublicacion.Ejecutar(oferta.PublicacionId);
+            await EmailSender.SendMessageAceptacion(duenio.Email, Bien,pub );
+            NavigationManager.NavigateTo($"mis_publicaciones");
+        }
     }
 
 }
