@@ -10,7 +10,6 @@
 @inject NavigationManager Navegador;
 @inject ListarOfertasHechasUseCase ListarOfertasHechasUseCase
 @inject EliminarOfertaUseCase EliminarOfertaUseCase
-@inject IDialogService Dialog
 
 <MudDialogProvider  FullWidth="true"
                     MaxWidth="MaxWidth.Small"
@@ -43,7 +42,7 @@ else
                                 <MudCardActions Style="justify-content: space-between;">
                                     @if (!oferta.Aceptada)
                                     {
-                                        <MudButton Variant="Variant.Text" OnClick="() => Eliminar(oferta)" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error"> Eliminar </MudButton>
+                                        <MudButton Variant="Variant.Text" OnClick="() => Eliminar(oferta,bien)" StartIcon="@Icons.Material.Filled.Delete" Color="Color.Error"> Eliminar </MudButton>
                                     }
                                     else
                                     {
@@ -97,13 +96,23 @@ else
         }
     }
 
-    private void Eliminar(Oferta oferta)
+    [Inject] private IDialogService? DialogService { get; set; }
+    
+    private async void Eliminar(Oferta oferta, Bien bien)
     {
-        _ofertaParaEliminar = oferta;
-        EliminarOfertaUseCase.Ejecutar(_ofertaParaEliminar.Id);
-        _lista = ListarOfertasHechasUseCase.Ejecutar(_userId!);
-        if (_lista.Count == 0)
-            _tieneElementos = false;
+        bool? result = await DialogService.ShowMessageBox(
+            "Eliminar", 
+            $"¿Desea eliminar la oferta con el bien \"{bien.Nombre}\"?", 
+            yesText:"Eliminar", cancelText:"Cancelar");
+        StateHasChanged();
+        if (result is true)
+        {
+            _ofertaParaEliminar = oferta;
+            EliminarOfertaUseCase.Ejecutar(_ofertaParaEliminar.Id);
+            _lista = ListarOfertasHechasUseCase.Ejecutar(_userId!);
+            if (_lista.Count == 0)
+                _tieneElementos = false;
+        }
     }
 
 }
