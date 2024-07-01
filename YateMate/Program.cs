@@ -85,19 +85,23 @@ public class Program
         builder.Services.AddScoped<IRepositorioPublicacion, RepositorioPublicacion>();
 
         builder.Services.AddTransient<ObtenerSubalquileresUseCase>();
+        builder.Services.AddTransient<ObtenerSubalquilerUseCase>();
         builder.Services.AddTransient<ObtenerSubalquileresDeUseCase>();
-        builder.Services.AddTransient <ObtenerSubalquileresEntreUseCase>();
+        builder.Services.AddTransient<ObtenerSubalquileresEntreUseCase>();
         builder.Services.AddTransient<ObtenerSubalquileresVigentesUseCase>();
         builder.Services.AddTransient<ObtenerSubalquileresDeLaAmarraUseCase>();
         builder.Services.AddTransient<AgregarSubalquilerUseCase>();
         builder.Services.AddTransient<ModificarSubalquilerUseCase>();
         builder.Services.AddTransient<EliminarSubalquilerUseCase>();
+        builder.Services.AddTransient<ObtenerDuenioSubalquilerUseCase>();
         builder.Services.AddScoped<IRepositorioSubalquiler, RepositorioSubalquiler>();
 
         builder.Services.AddTransient<HacerReservaUseCase>();
         builder.Services.AddTransient<CancelarReservaUseCase>();
         builder.Services.AddTransient<ModificarReservaUseCase>();
         builder.Services.AddTransient<ListarReservasDeUseCase>();
+        builder.Services.AddTransient<ObtenerReservaUseCase>();
+        builder.Services.AddTransient<ObtenerDuenioReservaUseCase>();
         builder.Services.AddScoped<IRepositorioReserva, RepositorioReserva>();
 
         builder.Services.AddTransient<AgregarMensajeUseCase>();

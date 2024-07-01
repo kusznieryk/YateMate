@@ -31,6 +31,13 @@ public class RepositorioSubalquiler : IRepositorioSubalquiler
         throw new NotImplementedException();
     }
 
+    public Subalquiler? ObtenerSubalquiler(int id)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Subalquileres.FirstOrDefault(s => s.Id == id);
+        }
+    }
     public List<Subalquiler> ObtenerSubalquileres()
     {
         using (var context = ApplicationDbContext.CrearContexto())
@@ -68,6 +75,14 @@ public class RepositorioSubalquiler : IRepositorioSubalquiler
         using (var context = ApplicationDbContext.CrearContexto())
         {
             return context.Subalquileres.Where(subalquiler => subalquiler.IdAmarra==idAmarra).ToList();
+        }
+    }
+
+    public ApplicationUser? ObtenerDuenioSubalquiler(string id)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.ApplicationUsers.FirstOrDefault(a => a.Id == id);
         }
     }
 }
