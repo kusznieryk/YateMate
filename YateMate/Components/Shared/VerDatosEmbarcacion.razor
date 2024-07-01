@@ -31,17 +31,17 @@
                     <thead>
                     <tr>
                         
-                    <th>Calado</th>
-                    <th>Eslora</th>
-                    <th>Manga</th>
+                        <th>Calado</th>
+                        <th>Eslora</th>
+                        <th>Manga</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr>
                         
-                    <th>@(Original.Calado)'</th>
-                    <th>@(Original.Eslora)'</th>
-                    <th>@(Original.Manga)'</th>
+                        <th>@(Original.Calado)'</th>
+                        <th>@(Original.Eslora)'</th>
+                        <th>@(Original.Manga)'</th>
                     </tr>
                     </tbody>
                 </MudSimpleTable>
@@ -126,17 +126,26 @@
 
     void Submit() => MudDialog!.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog!.Cancel();
+    
     void Editar(int id)
     {
         Submit();
         NavigationManager.NavigateTo($"publicacion/{id}");
 
     }
-
-    public void EliminarHandler(object e)
+    [Inject] private IDialogService? DialogService { get; set; }
+    private async void EliminarHandler(object e)
     {
-        EliminarPublicacion.Ejecutar(Publicacion);
-        Navegador.NavigateTo("/mis_publicaciones", true);
+        bool? result = await DialogService.ShowMessageBox(
+            "Eliminar", 
+            $"¿Desea eliminar la publicacion \"{Publicacion.Titulo}\"?", 
+            yesText:"Eliminar", cancelText:"Cancelar");
+        StateHasChanged();
+        if (result is true)
+        {
+            EliminarPublicacion.Ejecutar(Publicacion);
+            Navegador.NavigateTo("/mis_publicaciones", true);
+        }
     }
     
     public void HandleClickOferta(string id)
@@ -145,4 +154,3 @@
     }
 
 }
-
