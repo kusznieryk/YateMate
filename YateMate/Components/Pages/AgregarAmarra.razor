@@ -1,0 +1,94 @@
+@page "/AgregarAmarra/{UserId}"
+@using System.ComponentModel.DataAnnotations
+@using YateMate.Aplicacion.UseCases.Amarras
+@using YateMate.Components.Account.Pages
+@inject AgregarAmarraUseCase AgregarAmarr
+@inject NavigationManager Naviagation
+@rendermode InteractiveServer
+<h1>Agregar Amarra</h1>
+
+<EditForm Model="@Model" OnSubmit="HandleSubmit" FormName="AgregarAmarra" >
+    
+    <CustomValidator @ref="customValidator"></CustomValidator>
+    <div class="form-floating mb-3">
+        <InputNumber step="0.1" class="form-control" id="precio" @bind-Value="Model.Precio"/>
+        <label for="precio">Precio por dia</label>
+        <ValidationMessage For="() => Model.Precio" class="text-danger" />
+    </div>
+    <div class="form-floating mb-3">
+        <InputText @bind-Value="Model.Ubicacion" id="ubicacion" class="form-control"  />
+        <label for="ubicacion">Ubicacion</label>
+        <ValidationMessage For="() => Model.Ubicacion" class="text-danger" />
+    </div>
+    <div class="form-floating mb-3">
+        <InputSelect id="tamanio" @bind-Value="Model.Tamanio" class="form-select" aria-required="true" TValue="TamanioEstandar">
+            @foreach (TamanioEstandar tam in Enum.GetValues(typeof(TamanioEstandar)))
+            {
+            <option value=@tam> @tam </option>
+            }
+        </InputSelect>
+
+    </div>
+
+    <button type="submit" class="w-100 btn btn-lg btn-primary">Cargar amarra</button>
+</EditForm>
+
+@code{
+    [Parameter] public string UserId { get; set; } = null!;
+    private InputModel? Model { get; set; } =null;
+    private EditContext? editContext=null!;
+    public CustomValidator customValidator;
+
+    protected override void OnInitialized()
+    {
+        Model ??= new InputModel();
+        editContext = new(Model);
+    }
+
+    protected void HandleSubmit()
+    {
+        Console.WriteLine(Model.Precio);
+        Console.WriteLine(Model.Ubicacion);
+        var errors = new Dictionary<string, List<string>>();
+
+        foreach (var property in Model.GetType().GetProperties()) //me cago en microsoft
+        {
+            var value = property.GetValue(Model);
+            Console.WriteLine(value);
+            if (String.IsNullOrWhiteSpace(value?.ToString()))
+                errors.Add(property.Name, new List<string>() {"Este campo es obligatorio"});
+        }
+        
+        if (errors.Count > 0)
+        {
+            customValidator.DisplayErrors(errors);
+            return;
+        }
+        else
+        {
+            var nueva = new Amarra();
+            nueva.Ubicacion = Model.Ubicacion ?? "";
+            nueva.Precio = Model.Precio;
+            nueva.UsuarioId = UserId;
+            nueva.Tamanio = Model.Tamanio ;
+            AgregarAmarr.Ejecutar(nueva);
+            Naviagation.NavigateTo("/listarAmarras/" + UserId);
+        }
+    }
+
+    private  class InputModel
+    {
+        [Required(ErrorMessage = "Ingresa un Precio")]
+        [Display(Name = "Precio")]
+        public double Precio { get; set; } = 0;
+
+        [Required(ErrorMessage = "Ingresa un tamaño en M³")]
+        [Display(Name = "Tamaño")]
+        public TamanioEstandar Tamanio { get; set; } = TamanioEstandar.De20Piesx10Piesx10Pies;
+
+        [Required(ErrorMessage = "Ingresa la ubicacion")]
+        [Display(Name = "Ubicacion")]
+        public string Ubicacion { get; set;} = null!;
+    }
+
+}
