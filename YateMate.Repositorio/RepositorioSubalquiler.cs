@@ -5,6 +5,32 @@ namespace YateMate.Repositorio;
 
 public class RepositorioSubalquiler : IRepositorioSubalquiler
 {
+    public void AgregarSubalquiler(Subalquiler subalquiler)
+    {
+        using ( var context = ApplicationDbContext.CrearContexto())        
+        {
+            context.Add(subalquiler);
+            context.SaveChanges();
+        }
+    }
+
+    public void ModificarSubalquiler(Subalquiler subalquiler)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            var subalquilerViejo = context.Subalquileres.FirstOrDefault(s => s.Id == subalquiler.Id);
+            subalquilerViejo.FechaFin = subalquiler.FechaFin;
+            subalquilerViejo.FechaInicio = subalquiler.FechaInicio;
+            context.SaveChanges();
+
+        }
+    }
+
+    public void EliminarSubalquiler(string idSubalquiler)
+    {
+        throw new NotImplementedException();
+    }
+
     public List<Subalquiler> ObtenerSubalquileres()
     {
         using (var context = ApplicationDbContext.CrearContexto())

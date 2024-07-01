@@ -1,0 +1,23 @@
+@page "/ListadoSubalquileres"
+@rendermode InteractiveServer
+@using YateMate.Aplicacion.UseCases.Subalquiler
+@inject IDialogService Dialog
+
+<MudDialogProvider  FullWidth="true"
+                    MaxWidth="MaxWidth.Small"
+                    Position="DialogPosition.CenterLeft"/>
+
+<h3>ListadoSubalquileres</h3>
+
+@if (!_tieneElementos)
+{
+<h2>No hay subalquileres disponibles.</h2>
+}
+else
+{
+}
+
+@code {
+    List<Subalquiler> _lista = new();
+    bool _tieneElementos;
+}
