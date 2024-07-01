@@ -15,6 +15,8 @@ using YateMate.Aplicacion.UseCases.Embarcaciones;
 using YateMate.Aplicacion.UseCases.Oferta;
 using YateMate.Aplicacion.UseCases.Mensaje;
 using YateMate.Aplicacion.UseCases.Publicaciones;
+using YateMate.Aplicacion.UseCases.Reserva;
+using YateMate.Aplicacion.UseCases.Subalquiler;
 using YateMate.Components.Pages;
 using YateMate.Hubs;
 
@@ -82,6 +84,22 @@ public class Program
         builder.Services.AddTransient<EliminarPublicacionUseCase>();
         builder.Services.AddTransient<ObtenerDuenioUseCase>();
         builder.Services.AddScoped<IRepositorioPublicacion, RepositorioPublicacion>();
+
+        builder.Services.AddTransient<ObtenerSubalquileresUseCase>();
+        builder.Services.AddTransient<ObtenerSubalquileresDeUseCase>();
+        builder.Services.AddTransient <ObtenerSubalquileresEntreUseCase>();
+        builder.Services.AddTransient<ObtenerSubalquileresVigentesUseCase>();
+        builder.Services.AddTransient<ObtenerSubalquileresDeLaAmarraUseCase>();
+        builder.Services.AddTransient<AgregarSubalquilerUseCase>();
+        builder.Services.AddTransient<ModificarSubalquilerUseCase>();
+        builder.Services.AddTransient<EliminarSubalquilerUseCase>();
+        builder.Services.AddScoped<IRepositorioSubalquiler, RepositorioSubalquiler>();
+
+        builder.Services.AddTransient<HacerReservaUseCase>();
+        builder.Services.AddTransient<CancelarReservaUseCase>();
+        builder.Services.AddTransient<ModificarReservaUseCase>();
+        builder.Services.AddTransient<ListarReservasDeUseCase>();
+        builder.Services.AddScoped<IRepositorioReserva, RepositorioReserva>();
 
         builder.Services.AddTransient<AgregarMensajeUseCase>();
         builder.Services.AddTransient<ObtenerMensajesEntreUseCase>();

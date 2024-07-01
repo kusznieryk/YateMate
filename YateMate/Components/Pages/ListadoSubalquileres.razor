@@ -1,0 +1,53 @@
+@page "/ListadoSubalquileres"
+@rendermode InteractiveServer
+@using YateMate.Aplicacion.UseCases.Subalquiler
+@inject IDialogService Dialog
+@inject ObtenerSubalquileresUseCase ObtenerSubalquileresUseCase
+
+<MudDialogProvider  FullWidth="true"
+                    MaxWidth="MaxWidth.Small"
+                    Position="DialogPosition.CenterLeft"/>
+
+<h3>ListadoSubalquileres</h3>
+
+<MudContainer>
+    @if (!_tieneElementos)
+    {
+    <h2>No hay subalquileres disponibles.</h2>
+    }
+    else
+    {
+        <MudTable Items="_lista" Class="mt-4" Dense="true" Outlined="true">
+            <HeaderContent>
+                <MudTh>Fecha de inicio</MudTh>
+                <MudTh>Fecha de fin</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    @context.FechaInicio
+                </MudTd>
+                <MudTd>
+                    @context.FechaFin
+                </MudTd>
+                <MudTd>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => VerSubalquiler(@context))">Ver (no anda) </MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+</MudContainer>
+@code {
+    List<Subalquiler> _lista = new();
+    bool _tieneElementos;
+    
+    protected override void OnInitialized()
+    {
+        _lista = ObtenerSubalquileresUseCase.Ejecutar();
+        _tieneElementos = _lista.Count > 0;
+    }
+
+    public void VerSubalquiler(Subalquiler subalquiler)
+    {
+        
+    }
+}

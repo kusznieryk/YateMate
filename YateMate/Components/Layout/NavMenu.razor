@@ -44,10 +44,10 @@
                                     <path d="M3 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
                                 </svg> Ver mis publicaciones
                             </MudNavLink>
-                            @*<MudNavLink class="nav-link" Href="/ListadoPublicacionesDisponibles">
+                            <MudNavLink class="nav-link" Href="/ListadoPublicacionesDisponibles">
                             🚢
                             Publicaciones
-                        </MudNavLink>*@
+                        </MudNavLink>
                             <MudNavLink class="nav-link" Href="/embarcaciones">
                                 ⛵
                                 Ver mis embarcaciones
@@ -56,7 +56,14 @@
                                 <MudIcon Icon="@Icons.Material.Outlined.ChatBubble"></MudIcon>
                                 Chat
                             </MudNavLink>
-
+                            <MudNavLink class="nav-link" Href="/ListadoSubalquileres">
+                                <MudIcon Icon="@Icons.Material.Outlined.CalendarMonth"></MudIcon>
+                                Subalquileres
+                            </MudNavLink>
+                            <MudNavLink class="nav-link" Href="/ListadoMisSubalquileres">
+                                <MudIcon Icon="@Icons.Material.Outlined.CalendarMonth"></MudIcon>
+                                Mis Subalquileres
+                            </MudNavLink>
                         </Authorized>
                     </AuthorizeView>
 
@@ -78,6 +85,10 @@
                                         <path d="M7 2.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5zM2 1a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm0 8a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2zm.854-3.646a.5.5 0 0 1-.708 0l-1-1a.5.5 0 1 1 .708-.708l.646.647 1.646-1.647a.5.5 0 1 1 .708.708zm0 8a.5.5 0 0 1-.708 0l-1-1a.5.5 0 0 1 .708-.708l.646.647 1.646-1.647a.5.5 0 0 1 .708.708zM7 10.5a.5.5 0 0 1 .5-.5h7a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-7a.5.5 0 0 1-.5-.5zm0-5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5m0 8a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5"/>
                                     </svg> Trueques acordados
                                 </MudNavLink>
+                            <MudNavLink class="nav-link" Href="/ListadoSubalquileresVigentes">
+                                <MudIcon Icon="@Icons.Material.Outlined.CalendarMonth"></MudIcon>
+                                Subalquileres
+                            </MudNavLink>
                         </Authorized>
                     </AuthorizeView>
 
@@ -93,7 +104,7 @@
                                 <MudNavLink class="nav-link" Href="/roles">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-toggles" viewBox="0 0 16 16">
                                         <path d="M4.5 9a3.5 3.5 0 1 0 0 7h7a3.5 3.5 0 1 0 0-7zm7 6a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5m-7-14a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5m2.45 0A3.5 3.5 0 0 1 8 3.5 3.5 3.5 0 0 1 6.95 6h4.55a2.5 2.5 0 0 0 0-5zM4.5 0h7a3.5 3.5 0 1 1 0 7h-7a3.5 3.5 0 1 1 0-7"/>
-                                    </svg> Modificar roles 
+                                    </svg> Listar roles 
                                 </MudNavLink>
                         </Authorized>
                     </AuthorizeView>

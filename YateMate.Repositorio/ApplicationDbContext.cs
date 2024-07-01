@@ -66,8 +66,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
     public DbSet<Publicacion> Publicaciones { get; set; } 
     public DbSet<TruequeConfirmado> TruequesConfirmados { get; set; }
-    //public DbSet<Subalquiler> Subalquileres { get; set; }
-    
+    public DbSet<Subalquiler> Subalquileres { get; set; }
+    public DbSet<Reserva> Reservas { get; set; }
     public DbSet<ApplicationUser> ApplicationUsers { get; set; }
     #nullable enable
     

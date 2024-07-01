@@ -2,17 +2,20 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using YateMate.Repositorio;
 
 #nullable disable
 
-namespace YateMate.Migrations
+namespace YateMate.Repositorio.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240630215959_Subalquileres")]
+    partial class Subalquileres
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "8.0.4");
@@ -143,33 +146,6 @@ namespace YateMate.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
-                });
-
-            modelBuilder.Entity("YateMate.Aplicacion.Entidades.Amarra", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<double>("Precio")
-                        .HasColumnType("REAL");
-
-                    b.Property<string>("Tamanio")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("Ubicacion")
-                        .IsRequired()
-                        .HasMaxLength(60)
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("UsuarioId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Amarras");
                 });
 
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.ApplicationUser", b =>
@@ -432,24 +408,6 @@ namespace YateMate.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Publicaciones");
-                });
-
-            modelBuilder.Entity("YateMate.Aplicacion.Entidades.Reserva", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("SubalquilerId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("UsuarioId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Reservas");
                 });
 
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.Subalquiler", b =>
