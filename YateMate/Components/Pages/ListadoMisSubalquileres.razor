@@ -1,0 +1,90 @@
+@page "/ListadoMisSubalquileres"
+@rendermode InteractiveServer
+@using YateMate.Aplicacion.UseCases.Subalquiler
+@inject IDialogService Dialog
+@inject ObtenerSubalquileresDeUseCase ObtenerSubalquileresDeUseCase
+
+<MudDialogProvider  FullWidth="true"
+                    MaxWidth="MaxWidth.Small"
+                    Position="DialogPosition.CenterLeft"/>
+
+<h3>Listado de mis Subalquileres</h3>
+
+<MudContainer>
+    @if (!_tieneElementos)
+    {
+        <h2>No hay subalquileres disponibles.</h2>
+    }
+    else
+    {
+        <MudTable Items="_lista" Class="mt-4" Dense="true" Outlined="true">
+            <HeaderContent>
+                <MudTh>Fecha de inicio</MudTh>
+                <MudTh>Fecha de fin</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd>
+                    @context.FechaInicio
+                </MudTd>
+                <MudTd>
+                    @context.FechaFin
+                </MudTd>
+                
+                <MudTd>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => ModificarSubalquiler(@context))">Modificar (no anda) </MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => ConfirmarEliminacion(@context))">Eliminar (no anda) </MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => VerSubalquiler(@context))">Ver (no anda) </MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
+    }
+</MudContainer>
+
+@code {
+List<Subalquiler> _lista = new();
+bool _tieneElementos;
+
+[CascadingParameter]
+private Task<AuthenticationState>? _AuthenticationState { get; set; }
+
+private string? _userId;    
+    
+protected override async Task OnInitializedAsync()
+{
+    if (_AuthenticationState is not null)
+    {
+        var authState = await _AuthenticationState;
+        var user = authState.User;
+            
+        _userId = user.Claims.FirstOrDefault()?.Value;
+        _lista = ObtenerSubalquileresDeUseCase.Ejecutar(_userId);
+        _tieneElementos = _lista.Count > 0;
+    }
+    else
+    {
+        Console.WriteLine("Authstate es null, no se que decirte");
+    }
+}
+
+public void ModificarSubalquiler(Subalquiler subalquiler)
+{
+        
+}
+
+public void ConfirmarEliminacion(Subalquiler subalquiler)
+{
+    
+}
+
+public void VerSubalquiler(Subalquiler subalquiler)
+{
+        
+}
+
+private void ActualizarLista()
+{
+    _lista = ObtenerSubalquileresDeUseCase.Ejecutar(_userId);
+    _tieneElementos = _lista.Count > 0;
+}
+
+}

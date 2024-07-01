@@ -34,7 +34,7 @@ else
                                     <MudText Typo="Typo.body2" Style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">@bien.Descripcion</MudText>
                                 </MudCardContent>
                                 <MudCardActions Style="justify-content: space-between;">
-                                    <MudButton Variant="Variant.Text" @onclick="()=>OpenDialog(oferta)" Color="Color.Primary">Ver más</MudButton>
+                                    <MudButton Variant="Variant.Text" @onclick="()=>OpenDialog(oferta, bien, publicacion)" Color="Color.Primary">Ver más</MudButton>
                                 </MudCardActions>
                             </MudCard>
                         </MudPaper>
@@ -60,10 +60,12 @@ else
             _tieneElementos = true;
         }
     }
-    private void OpenDialog(Oferta oferta)
+    private void OpenDialog(Oferta oferta, Bien bien, Publicacion pub)
     {
         var parameters = new DialogParameters<VerDatosTrueque>();
         parameters.Add(x => x.Oferta, oferta);
+        parameters.Add(x => x.Publicacion, pub);
+        parameters.Add(x => x.Bien, bien);
         Dialog.Show<VerDatosTrueque>("Simple Dialog", parameters);
     }
 }
