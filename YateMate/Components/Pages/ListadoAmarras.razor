@@ -1,0 +1,81 @@
+@page "/ListadoAmarras"
+@using YateMate.Components.Shared
+@* @using YateMate.Aplicacion.UseCases.Amarra *@
+@* @inject ObtenerAmarrasDeUseCase ObtenerAmarrasDeUseCase *@
+@inject IDialogService Dialog
+
+@rendermode InteractiveServer
+
+<MudDialogProvider  FullWidth="true"
+                    MaxWidth="MaxWidth.Small"
+                    Position="DialogPosition.CenterLeft"/>
+
+<h3>ListadoAmarras</h3>
+<MudContainer>
+
+    @if (!_tieneElementos)
+    {
+    <MudText Typo="Typo.h6">No hay elementos</MudText>
+    }
+    else
+    {
+    <MudTable Items="_lista" Class="mt-4" Dense="true" Outlined="true">
+        <HeaderContent>
+            <MudTh>Precio por dia</MudTh>
+            <MudTh>Tamaño</MudTh>
+            <MudTh>Ubicacion</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                @* @context.Precio *@
+            </MudTd>
+            <MudTd>
+                @* @context.Tamaño *@
+            </MudTd>
+            <MudTd>
+                @* @context.Ubicacion *@
+            </MudTd>
+            
+            <MudTd>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => CrearSubalquiler(@context))">Subalquilar</MudButton>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+    }
+</MudContainer>
+
+
+@code {
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+    private string? _userId;
+    bool _tieneElementos;
+    private List<Amarra> _lista;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationState is not null)
+        {
+            var authState = await AuthenticationState;
+            var user = authState.User;
+            
+            _userId = user.Claims.FirstOrDefault()?.Value;
+        }
+        else
+        {
+            Console.WriteLine("Authstate es null, no se que decirte");
+        }
+
+        // _lista = ObtenerAmarrasDeUseCase.Ejecutar(_userId!);
+        // _tieneElementos = _lista.Count > 0;
+    }
+
+    public void CrearSubalquiler(Amarra amarra)
+    {
+        var parameters = new DialogParameters<PublicarSubalquiler>();
+        // parameters.Add(x => x.IdAmarra, amarra.Id);
+        parameters.Add(x=> x.IdDuenio, _userId);
+        Dialog.Show<PublicarSubalquiler>("Publicar", parameters);
+
+    }
+}
