@@ -7,7 +7,6 @@ public class Subalquiler(DateTime fechaInicio, DateTime fechaFin, string idDueni
     public DateTime FechaFin { get; set; } = fechaFin;
     public string IdDuenio { get; set; } = idDuenio;
     public string IdAmarra { get; set; } = idAmarra;
-    public string? IdAlquilante { get; set; } 
     public bool EstaEliminado { get; set; } = false;
     public List<Reserva> Reservas { get; set; } //esto es de manu pero yo no hice ninguna migracion con este atributo
 }
