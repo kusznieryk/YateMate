@@ -47,6 +47,9 @@
                     <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => AgregarEmbarcacion(context.Id))">Agregar Embarcación</MudButton>
                 </div>
                 <div class="button-container">
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => NavigationManager.NavigateTo("listarAmarras/"+@context.Id))">Listar amarras</MudButton>
+                </div>
+                <div class="button-container">
                     <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => ConfirmarEliminacion(context))">Eliminar Usuario</MudButton>
                 </div>
             </MudTd>

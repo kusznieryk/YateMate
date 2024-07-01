@@ -36,6 +36,12 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
                 v => v.ToString(),
                 v => (Nacionalidad)Enum.Parse(typeof(Nacionalidad), v));
         
+        
+        modelBuilder.Entity<Amarra>()
+            .Property(p => p.Tamanio)
+            .HasConversion(
+                v => v.ToString(),
+                v => (TamanioEstandar)Enum.Parse(typeof(TamanioEstandar), v));
         modelBuilder.Entity<MensajeChat>(entity =>
         {
             entity.HasOne(d => d.FromUser)
@@ -56,6 +62,8 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<Embarcacion> Embarcaciones { get; set; }
     public DbSet<MensajeChat> MensajesChats { get; set; }
     public DbSet<Oferta> Ofertas { get; set; }
+    public DbSet<Amarra> Amarras { get; set; }
+
     public DbSet<Publicacion> Publicaciones { get; set; } 
     public DbSet<TruequeConfirmado> TruequesConfirmados { get; set; }
     public DbSet<Subalquiler> Subalquileres { get; set; }

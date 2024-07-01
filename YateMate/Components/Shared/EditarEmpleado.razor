@@ -252,16 +252,10 @@
                 new Dictionary<string, object?> { ["userId"] = userId, ["email"] = Empleado.Email, ["code"] = code });
             message = "Hemos enviado un link de confirmación para el cambio de correo";
         }
-        
-        
 
         Console.WriteLine($"email enviado onValidSubmit Async con el link {callbackUrl}");
+        await EmailSender.SendConfirmationLinkAsync(Empleado, Empleado.Email, HtmlEncoder.Default.Encode(callbackUrl));
 
-        //await EmailSender.SendConfirmationLinkAsync(Empleado, Empleado.Email, HtmlEncoder.Default.Encode(callbackUrl));
-
-        
-        
-        
     }
 
     private IUserEmailStore<ApplicationUser> GetEmailStore()

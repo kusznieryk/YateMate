@@ -1,0 +1,79 @@
+@* @page "/publicarSubalquiler" *@
+@rendermode InteractiveServer
+@using YateMate.Aplicacion.UseCases.Subalquiler
+@inject AgregarSubalquilerUseCase AgregarSubalquilerUseCase
+@inject ObtenerSubalquileresDeLaAmarraUseCase ObtenerSubalquileresDeLaAmarraUseCase 
+@using System.ComponentModel.DataAnnotations
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
+            Editar embarcacion
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudCard>
+            <MudForm @ref="form" >
+                <MudCardContent>
+                    <MudDateRangePickerPicker For="@(() => _model.rango)" 
+                                   Validation="@(new Func<DateRange, IEnumerable<string>>(ValidarRango))"
+                                   Required="true"
+                                   RequiredError="Elegir un rango de fechas es obligatorio"
+                                   Label="Rango"/>
+                </MudCardContent>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" DropShadow="false" OnClick="@(()=>Submit())">Publicar</MudButton>
+            </MudForm>
+        </MudCard>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
+        
+    </DialogActions>
+</MudDialog>
+
+@code {
+    InputModel _model = new();
+    MudForm form;
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    [Parameter] public string IdDuenio { get; set; }
+    [Parameter] public string IdAmarra { get; set; }
+    
+    void Submit()
+    {
+        form.Validate();
+        if (form.IsValid)
+        {
+            var subalquiler = new Subalquiler(_model.rango.Start!.Value, _model.rango.End!.Value, IdDuenio, IdAmarra);
+            AgregarSubalquilerUseCase.Ejecutar(subalquiler);
+            MudDialog!.Close(DialogResult.Ok(true));
+        }
+            
+    }
+    
+    void Cancel() => MudDialog!.Cancel();
+
+    private IEnumerable<string> ValidarRango(DateRange rango)
+    {
+        if (rango.End is null || rango.Start is null)
+        {
+            yield return "Por favor, ingresa un rango";
+        }
+
+        var subalquileresDeLaAmarra = ObtenerSubalquileresDeLaAmarraUseCase.Ejecutar(IdAmarra);
+        var subalquilerInvalido = subalquileresDeLaAmarra.Find(s => (s.FechaInicio >= rango.Start && s.FechaInicio <= rango.End) || (s.FechaFin >= rango.Start && s.FechaFin <= rango.End));
+        if (subalquilerInvalido is not null)
+        {
+            yield return $"Las fechas seleccionadas no son validas, tenes un subalquiler publicado en el rango {subalquilerInvalido.FechaInicio} - {subalquilerInvalido.FechaFin}";
+        }
+    }
+    
+    public class InputModel
+    {
+        // public DateTime FechaInicio;
+        // public DateTime FechaFin;
+        public DateRange rango;
+        public string IdDuenio { get; set; }
+        public string IdAmarra { get; set; }
+        public bool EstaEliminado { get; set; } = false;
+    }
+}
