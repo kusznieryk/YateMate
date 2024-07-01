@@ -88,6 +88,9 @@ public class Program
         builder.Services.AddTransient <ObtenerSubalquileresEntreUseCase>();
         builder.Services.AddTransient<ObtenerSubalquileresVigentesUseCase>();
         builder.Services.AddTransient<ObtenerSubalquileresDeLaAmarraUseCase>();
+        builder.Services.AddTransient<AgregarSubalquilerUseCase>();
+        builder.Services.AddTransient<ModificarSubalquilerUseCase>();
+        builder.Services.AddTransient<EliminarSubalquilerUseCase>();
         builder.Services.AddScoped<IRepositorioSubalquiler, RepositorioSubalquiler>();
 
         builder.Services.AddTransient<AgregarMensajeUseCase>();
