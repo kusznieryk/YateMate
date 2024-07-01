@@ -8,6 +8,7 @@ using YateMate.Aplicacion.Entidades;
 using YateMate.Aplicacion.Interfaces;
 using YateMate.Aplicacion.UseCases;
 using MudBlazor.Services;
+using YateMate.Aplicacion.UseCases.Amarras;
 using YateMate.Aplicacion.UseCases.Bien;
 using YateMate.Aplicacion.UseCases.ApplicationUser;
 using YateMate.Aplicacion.UseCases.Embarcaciones;
@@ -85,6 +86,12 @@ public class Program
         builder.Services.AddTransient<AgregarMensajeUseCase>();
         builder.Services.AddTransient<ObtenerMensajesEntreUseCase>();
         builder.Services.AddScoped<IRepositorioMensaje, RepositorioMensaje>();
+        
+        builder.Services.AddTransient<ModificarAmarraUseCase>();
+        builder.Services.AddTransient<EliminarAmarraUseCase>();
+        builder.Services.AddTransient<ListarAmarraUseCase>();
+        builder.Services.AddTransient<AgregarAmarraUseCase>();
+        builder.Services.AddScoped<IRepositorioAmarra, RepositorioAmarra>();
 
             
         builder.Services.AddCascadingAuthenticationState();
