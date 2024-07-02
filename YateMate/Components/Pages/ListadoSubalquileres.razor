@@ -1,6 +1,7 @@
 @page "/ListadoSubalquileres"
 @rendermode InteractiveServer
 @using YateMate.Aplicacion.UseCases.Subalquiler
+@using YateMate.Components.Shared
 @inject IDialogService Dialog
 @inject ObtenerSubalquileresUseCase ObtenerSubalquileresUseCase
 
@@ -30,7 +31,7 @@
                     @context.FechaFin
                 </MudTd>
                 <MudTd>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => VerSubalquiler(@context))">Ver (no anda) </MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => VerSubalquiler(@context))">Ver Mas </MudButton>
                 </MudTd>
             </RowTemplate>
         </MudTable>
@@ -48,6 +49,9 @@
 
     public void VerSubalquiler(Subalquiler subalquiler)
     {
-        
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<VerDatosSubalquilerPublicado>();
+        parameters.Add(x => x.Subalquiler, subalquiler);
+        Dialog.Show<VerDatosSubalquilerPublicado>("Ver Datos", parameters, options);
     }
 }

@@ -1,0 +1,50 @@
+@page "/VerDatosSubalquilerPublicado"
+
+@using YateMate.Aplicacion.Entidades
+@using YateMate.Aplicacion.UseCases.Subalquiler
+@using MudBlazor
+@inject EliminarSubalquilerUseCase EliminarSubalquilerUseCase
+@inject NavigationManager NavigationManager
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
+            Viendo detalles del subalquiler
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Subalquiler</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>Fecha Inicio: @Subalquiler!.FechaInicio.ToShortDateString()</MudText>
+                <MudText>Fecha Fin: @Subalquiler.FechaFin.ToShortDateString()</MudText>
+            </MudCardContent>
+        </MudCard>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
+        <div style="flex-grow: 1;"></div>
+        <MudButton Variant="Variant.Filled"
+                   StartIcon="@Icons.Material.Filled.Bookmark"
+                   OnClick="HacerReserva"
+                   Color="Color.Primary"
+                   Size="Size.Small">Hacer Reserva
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public Subalquiler Subalquiler { get; set; } = null!;
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+
+    void Cancel() => MudDialog!.Cancel();
+
+    void HacerReserva()
+    {
+        MudDialog!.Close(DialogResult.Ok(true));
+        NavigationManager.NavigateTo($"/reserva");
+    }
+}

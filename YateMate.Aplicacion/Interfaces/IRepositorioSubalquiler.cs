@@ -6,7 +6,7 @@ public interface IRepositorioSubalquiler
 {
     public void AgregarSubalquiler(Subalquiler subalquiler);
     public void ModificarSubalquiler(Subalquiler subalquiler);
-    public void EliminarSubalquiler(string idSubalquiler);
+    public void EliminarSubalquiler(int idSubalquiler);
     public Subalquiler? ObtenerSubalquiler(int id);
     public List<Subalquiler> ObtenerSubalquileres();
     public List<Subalquiler> ObtenerSubalquileresDe(string idDuenio);

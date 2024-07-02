@@ -1,0 +1,72 @@
+@page "/VerDatosSubalquiler"
+@using YateMate.Aplicacion.Entidades
+@using YateMate.Aplicacion.UseCases.Subalquiler
+@using MudBlazor
+@inject EliminarSubalquilerUseCase EliminarSubalquilerUseCase
+@inject NavigationManager NavigationManager
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
+            Viendo datos del subalquiler
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Detalle de subalquiler</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>Fecha de Inicio: @Subalquiler!.FechaInicio.ToShortDateString()</MudText>
+                <MudText>Fecha de Fin: @Subalquiler.FechaFin.ToShortDateString()</MudText>
+            </MudCardContent>
+        </MudCard>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
+        <div style="flex-grow: 1;"></div>
+        <MudButton Variant="Variant.Filled"
+                   StartIcon="@Icons.Material.Filled.Edit"
+                   OnClick="@(() => Editar(Subalquiler.Id))"
+                   Color="Color.Primary"
+                   Size="Size.Small">Modificar
+        </MudButton>
+        @if (Subalquiler.Reservas == null || !Subalquiler.Reservas.Any())
+        {
+        <MudButton Variant="Variant.Filled"
+                   StartIcon="@Icons.Material.Filled.Delete"
+                   OnClick="EliminarHandler"
+                   Color="Color.Error"
+                   Size="Size.Small">Eliminar
+        </MudButton>
+        }
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public Subalquiler Subalquiler { get; set; } = null!;
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    void Cancel() => MudDialog!.Cancel();
+    
+    [Inject] private IDialogService? DialogService { get; set; }
+    private async void EliminarHandler()
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Eliminar", 
+            $"¿Desea eliminar el subalquiler?", 
+            yesText: "Eliminar", cancelText: "Cancelar");
+
+        if (result == true)
+        {
+            EliminarSubalquilerUseCase.Ejecutar(Subalquiler.Id);
+            NavigationManager.NavigateTo("/listadoSubalquileres", true);
+            MudDialog!.Close(DialogResult.Ok(true));
+        }
+    }
+    void Editar(int id)
+    {
+        MudDialog!.Close(DialogResult.Ok(true));
+        NavigationManager.NavigateTo($"subalquiler/{id}");
+    }
+}
