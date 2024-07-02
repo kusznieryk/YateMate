@@ -63,7 +63,7 @@ public class RepositorioSubalquiler : IRepositorioSubalquiler
         }
     }
 
-    public List<Subalquiler> ObtenerSubalquileresDeLaAmarra(string idAmarra)
+    public List<Subalquiler> ObtenerSubalquileresDeLaAmarra(int idAmarra)
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {

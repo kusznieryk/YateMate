@@ -4,7 +4,7 @@ namespace YateMate.Aplicacion.UseCases.Subalquiler;
 
 public class ObtenerSubalquileresDeLaAmarraUseCase(IRepositorioSubalquiler repo)
 {
-    public List<Entidades.Subalquiler> Ejecutar(string idAmarra)
+    public List<Entidades.Subalquiler> Ejecutar(int idAmarra)
     {
         return repo.ObtenerSubalquileresDeLaAmarra(idAmarra);
     }
