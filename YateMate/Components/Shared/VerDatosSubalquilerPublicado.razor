@@ -2,9 +2,11 @@
 
 @using YateMate.Aplicacion.Entidades
 @using YateMate.Aplicacion.UseCases.Subalquiler
+@using YateMate.Components.Pages
 @using MudBlazor
 @inject EliminarSubalquilerUseCase EliminarSubalquilerUseCase
 @inject NavigationManager NavigationManager
+@inject IDialogService Dialog
 <MudDialog>
     <TitleContent>
         <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
@@ -37,14 +39,30 @@
 </MudDialog>
 
 @code {
-    [Parameter] public Subalquiler Subalquiler { get; set; } = null!;
+    [Parameter] public Subalquiler Subalquiler { get; set; }
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+    private string? _userId;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationState is not null)
+        {
+            var authState = await AuthenticationState;
+            var user = authState.User;
+            _userId = user.Claims.FirstOrDefault()?.Value;
+        }
+    }
 
     void Cancel() => MudDialog!.Cancel();
 
     void HacerReserva()
     {
-        MudDialog!.Close(DialogResult.Ok(true));
-        NavigationManager.NavigateTo($"/reserva");
+        var parameters = new DialogParameters<HacerReserva>();
+        parameters.Add(x => x.Subalquiler2, Subalquiler);
+        parameters.Add(x => x.IdUsuario, _userId);
+        Dialog.Show<HacerReserva>("Hacer reserva", parameters);
     }
 }

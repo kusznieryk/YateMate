@@ -115,24 +115,24 @@ else
         }
     }
     
-     void Aceptar()
+    void Aceptar()
     {
-            bien.UsuarioId = _userId!;
-            bien.Nombre = Input.Nombre;
-            bien.Imagen = Input.Imagen;
-            bien.Descripcion = Input.Descripcion;
-            if(_userId is null)
-                Console.WriteLine("user id es null, no se q decirte");
-            if (_esNuevoBien)
-            {
+        bien.UsuarioId = _userId!;
+        bien.Nombre = Input.Nombre;
+        bien.Imagen = Input.Imagen;
+        bien.Descripcion = Input.Descripcion;
+        if(_userId is null)
+            Console.WriteLine("user id es null, no se q decirte");
+        if (_esNuevoBien)
+        {
                 
-                AgregarBienUseCase.Ejecutar(bien);
-            }
-            else
-            {
-                ModificarBienUseCase.Ejecutar(bien);
-            }
-            Navegador.NavigateTo("/ListarMisBienes/lista");
+            AgregarBienUseCase.Ejecutar(bien);
+        }
+        else
+        {
+            ModificarBienUseCase.Ejecutar(bien);
+        }
+        Navegador.NavigateTo("/ListarMisBienes/lista");
             
     }
 

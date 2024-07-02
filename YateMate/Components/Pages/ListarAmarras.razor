@@ -8,17 +8,17 @@
 <DialogoConfirmacion @ref="_dialogo" OnConfirmado="EliminarAmarra" />
 
 <h1>Listado de Amarras</h1>
-<MudButton Variant="Variant.Filled"
-           Color="Color.Primary"
-           Size="Size.Large">
-<MudLink href="@{"/AgregarAmarra/"+UserId}" Color="Color.Tertiary" > Agregar Amarra</MudLink>
-</MudButton>
 <title>Listado de Amarras</title>
 
 <MudContainer>
     @if (!_amarras.Any())
     {
     <MudText Typo="Typo.h5">No hay Amarras cargadas</MudText>
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               Size="Size.Large">
+        <MudLink href="@{"/AgregarAmarra/"+UserId}" Color="Color.Tertiary" > Agregar Amarra</MudLink>
+    </MudButton>
     }
     else
     {

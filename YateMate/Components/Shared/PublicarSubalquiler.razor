@@ -3,6 +3,7 @@
 @using YateMate.Aplicacion.UseCases.Subalquiler
 @inject AgregarSubalquilerUseCase AgregarSubalquilerUseCase
 @inject ObtenerSubalquileresDeLaAmarraUseCase ObtenerSubalquileresDeLaAmarraUseCase 
+@inject NavigationManager Navegador
 @using System.ComponentModel.DataAnnotations
 @using YateMate.Components.Account.Pages
 
@@ -35,7 +36,7 @@
                 <ValidationMessage For="@(() => dateModel.FechaFin)"/>
             </div>
 
-            <button type="submit" class="btn btn-primary">Submit</button>
+            <button type="submit" class="btn btn-primary">Publicar</button>
         </EditForm>
     </DialogContent>
     <DialogActions>
@@ -72,6 +73,7 @@
             var subalquiler = new Subalquiler(dateModel.FechaInicio.Value, dateModel.FechaFin.Value, IdDuenio, IdAmarra);
             AgregarSubalquilerUseCase.Ejecutar(subalquiler);
             MudDialog!.Close(DialogResult.Ok(true));
+            Navegador.NavigateTo("/ListadoMisSubalquileres");
         }
             
     }
@@ -98,7 +100,7 @@
         {
             errors.Add("FechaInicio", new List<string>()
             {
-                $"Fecha de inicio invalida, tenes un subalquiler publicado en el rango {subalquilerInvalido.FechaInicio:yyyy-MM-dd} - {subalquilerInvalido.FechaFin:yyyy-MM-dd}"
+                $"Fecha de inicio invalida, tenes un subalquiler publicado en el rango {subalquilerInvalido.FechaInicio:dd/MM/yyyy} - {subalquilerInvalido.FechaFin:dd/MM/yyyy}"
             });
             customValidator.DisplayErrors(errors);
             return;
@@ -107,7 +109,7 @@
         subalquilerInvalido = subalquileresDeLaAmarra.Find(s => (s.FechaFin >= dateModel.FechaInicio && s.FechaFin <= dateModel.FechaFin));
         if (subalquilerInvalido is not null)
         {
-            errors.Add("FechaFin", new List<string>(){$"Fecha de fin invalida, tenes un subalquiler publicado en el rango {subalquilerInvalido.FechaInicio:yyyy-MM-dd} - {subalquilerInvalido.FechaFin:yyyy-MM-dd}"});
+            errors.Add("FechaFin", new List<string>(){$"Fecha de fin invalida, tenes un subalquiler publicado en el rango {subalquilerInvalido.FechaInicio:dd/MM/yyyy} - {subalquilerInvalido.FechaFin:dd/MM/yyyy}"});
             customValidator.DisplayErrors(errors);
             return;
         }
