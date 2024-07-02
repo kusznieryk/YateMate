@@ -112,6 +112,7 @@ public class Program
         builder.Services.AddTransient<ModificarAmarraUseCase>();
         builder.Services.AddTransient<EliminarAmarraUseCase>();
         builder.Services.AddTransient<ListarAmarraUseCase>();
+        builder.Services.AddTransient<ObtenerAmarraUseCase>();
         builder.Services.AddTransient<AgregarAmarraUseCase>();
         builder.Services.AddScoped<IRepositorioAmarra, RepositorioAmarra>();
 

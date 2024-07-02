@@ -20,7 +20,7 @@ public class RepositorioAmarra:IRepositorioAmarra
         {
              var elim=context.Amarras.FirstOrDefault(b => b.Id== id);
              if (elim != null)
-                 context.Remove(elim);
+                 elim.Borrado = true;
              context.SaveChanges();
         }    
     }
@@ -45,7 +45,7 @@ public class RepositorioAmarra:IRepositorioAmarra
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
-            return context.Amarras.Where(b => b.UsuarioId.Equals(id)).ToList();
+            return context.Amarras.Where(b => b.UsuarioId.Equals(id)&&!b.Borrado).ToList();
         }
     }
 

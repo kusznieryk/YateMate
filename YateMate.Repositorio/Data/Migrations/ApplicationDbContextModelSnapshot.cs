@@ -151,6 +151,9 @@ namespace YateMate.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("Borrado")
+                        .HasColumnType("INTEGER");
+
                     b.Property<double>("Precio")
                         .HasColumnType("REAL");
 

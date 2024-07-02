@@ -1,9 +1,11 @@
-@page "/AgregarAmarra/{UserId}"
+@page "/AgregarAmarra/{UserId}/{AmarraIdString?}"
 @using System.ComponentModel.DataAnnotations
 @using YateMate.Aplicacion.UseCases.Amarras
 @using YateMate.Components.Account.Pages
 @inject AgregarAmarraUseCase AgregarAmarr
 @inject NavigationManager Naviagation
+@inject ObtenerAmarraUseCase ObtenerAmarra
+@inject ModificarAmarraUseCase ModificarAmarra
 @rendermode InteractiveServer
 <h1>Agregar Amarra</h1>
 
@@ -30,31 +32,50 @@
 
     </div>
 
-    <button type="submit" class="w-100 btn btn-lg btn-primary">Cargar amarra</button>
+<button type="submit" class="w-100 btn btn-lg btn-primary">
+     @(AmarraId == null ? "Cargar" : "Modificar")
+    amarra
+</button>
 </EditForm>
 
 @code{
     [Parameter] public string UserId { get; set; } = null!;
+    [Parameter] public string? AmarraIdString { get; set; } = null;
+    int? AmarraId { get;set;}
     private InputModel? Model { get; set; } =null;
     private EditContext? editContext=null!;
     public CustomValidator customValidator;
+    private Amarra? viejaAmarra;
+    protected override void OnParametersSet()
+    {
+        AmarraId= int.Parse(AmarraIdString??"0");
+        Model ??= new InputModel();
+        if (AmarraId != null)
+        {
+            viejaAmarra = ObtenerAmarra.Ejecutar(AmarraId??0);
+            if (viejaAmarra != null)
+            {
+                Model.Ubicacion = viejaAmarra.Ubicacion;
+                Model.Precio = viejaAmarra.Precio;
+                Model.Tamanio = viejaAmarra.Tamanio;
+            }
+            else AmarraId = null;
+        }
+        editContext = new(Model);
+        base.OnParametersSet();
+    }
 
     protected override void OnInitialized()
     {
-        Model ??= new InputModel();
-        editContext = new(Model);
+        
     }
 
     protected void HandleSubmit()
     {
-        Console.WriteLine(Model.Precio);
-        Console.WriteLine(Model.Ubicacion);
         var errors = new Dictionary<string, List<string>>();
-
         foreach (var property in Model.GetType().GetProperties()) //me cago en microsoft
         {
             var value = property.GetValue(Model);
-            Console.WriteLine(value);
             if (String.IsNullOrWhiteSpace(value?.ToString()))
                 errors.Add(property.Name, new List<string>() {"Este campo es obligatorio"});
         }
@@ -64,16 +85,19 @@
             customValidator.DisplayErrors(errors);
             return;
         }
-        else
-        {
             var nueva = new Amarra();
             nueva.Ubicacion = Model.Ubicacion ?? "";
             nueva.Precio = Model.Precio;
             nueva.UsuarioId = UserId;
-            nueva.Tamanio = Model.Tamanio ;
-            AgregarAmarr.Ejecutar(nueva);
-            Naviagation.NavigateTo("/listarAmarras/" + UserId);
-        }
+            nueva.Tamanio = Model.Tamanio;
+            if (AmarraId == null)
+                AgregarAmarr.Ejecutar(nueva);
+            else
+            {
+                nueva.Id = AmarraId??0;
+                ModificarAmarra.Ejecutar(nueva);
+            }
+            Naviagation.NavigateTo("/listarAmarras/" + UserId, true);
     }
 
     private  class InputModel

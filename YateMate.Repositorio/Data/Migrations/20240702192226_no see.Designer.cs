@@ -8,11 +8,11 @@ using YateMate.Repositorio;
 
 #nullable disable
 
-namespace YateMate.Repositorio.Migrations
+namespace YateMate.Repositorio.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240701191534_CorreccionesSubalquilerYReserva")]
-    partial class CorreccionesSubalquilerYReserva
+    [Migration("20240702192226_no see")]
+    partial class nosee
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -146,6 +146,36 @@ namespace YateMate.Repositorio.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("YateMate.Aplicacion.Entidades.Amarra", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Borrado")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<double>("Precio")
+                        .HasColumnType("REAL");
+
+                    b.Property<string>("Tamanio")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Ubicacion")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UsuarioId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Amarras");
                 });
 
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.ApplicationUser", b =>

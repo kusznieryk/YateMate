@@ -8,11 +8,11 @@ using YateMate.Repositorio;
 
 #nullable disable
 
-namespace YateMate.Repositorio.Migrations
+namespace YateMate.Repositorio.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20240701015412_Reservas")]
-    partial class Reservas
+    [Migration("20240702033223_Propiedad de borrado")]
+    partial class Propiedaddeborrado
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -146,6 +146,36 @@ namespace YateMate.Repositorio.Migrations
                     b.HasKey("UserId", "LoginProvider", "Name");
 
                     b.ToTable("AspNetUserTokens", (string)null);
+                });
+
+            modelBuilder.Entity("YateMate.Aplicacion.Entidades.Amarra", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("Borrado")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<double>("Precio")
+                        .HasColumnType("REAL");
+
+                    b.Property<string>("Tamanio")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Ubicacion")
+                        .IsRequired()
+                        .HasMaxLength(60)
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("UsuarioId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Amarras");
                 });
 
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.ApplicationUser", b =>
@@ -416,6 +446,12 @@ namespace YateMate.Repositorio.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
+                    b.Property<DateTime>("FechaFin")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaInicio")
+                        .HasColumnType("TEXT");
+
                     b.Property<int>("SubalquilerId")
                         .HasColumnType("INTEGER");
 
@@ -424,6 +460,8 @@ namespace YateMate.Repositorio.Migrations
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("SubalquilerId");
 
                     b.ToTable("Reservas");
                 });
@@ -441,9 +479,6 @@ namespace YateMate.Repositorio.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<DateTime>("FechaInicio")
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("IdAlquilante")
                         .HasColumnType("TEXT");
 
                     b.Property<string>("IdAmarra")
@@ -571,6 +606,15 @@ namespace YateMate.Repositorio.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("YateMate.Aplicacion.Entidades.Reserva", b =>
+                {
+                    b.HasOne("YateMate.Aplicacion.Entidades.Subalquiler", null)
+                        .WithMany("Reservas")
+                        .HasForeignKey("SubalquilerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.ApplicationUser", b =>
                 {
                     b.Navigation("Bienes");
@@ -585,6 +629,11 @@ namespace YateMate.Repositorio.Migrations
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.Publicacion", b =>
                 {
                     b.Navigation("Ofertas");
+                });
+
+            modelBuilder.Entity("YateMate.Aplicacion.Entidades.Subalquiler", b =>
+                {
+                    b.Navigation("Reservas");
                 });
 #pragma warning restore 612, 618
         }
