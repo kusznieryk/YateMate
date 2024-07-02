@@ -3,6 +3,7 @@
 @using YateMate.Aplicacion.UseCases.Embarcaciones
 @using YateMate.Aplicacion.UseCases.Oferta
 @using YateMate.Aplicacion.UseCases.Publicaciones
+@using YateMate.Components.Pages
 @inject RetrotraerTruequeUseCase RetrotraerTruequeUseCase
 @inject ObtenerBienUseCase ObtenerBienUseCase
 @inject ObtenerPublicacionDeUseCase ObtenerPublicacion
@@ -10,59 +11,71 @@
 @inject ApiCaller ApiCaller
 @inject ObtenerApplicationUserUseCase ObtenerApplicationUserUseCase
 @inject ObtenerEmbarcacionUseCase ObtenerEmbarcacionUseCase
+@inject IDialogService Dialog
+
+<MudDialogProvider />
 
 <MudDialog>
-    <TitleContent>
-        <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
-            Viendo datos del trueque
-        </MudText>
-    </TitleContent>
+    
     <DialogContent>
-        <div class="card-container">
-            <MudCard>
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6">Bien a intercambiar: @Bien!.Nombre</MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudImage Fluid="true" Src="@Bien!.Imagen" Alt="Image"/>
-                    <MudText Typo="Typo.h6">Descripcion: @Bien.Descripcion</MudText>
-                </MudCardContent>
-            </MudCard>
-        </div>
-        <div class="card-container">
-            <MudCard>
-                <MudCardHeader>
-                    <CardHeaderContent>
-                        <MudText Typo="Typo.h6">Publicacion: @Publicacion!.Titulo</MudText>
-                    </CardHeaderContent>
-                </MudCardHeader>
-                <MudCardContent>
-                    <MudImage Fluid="true" Src="@Publicacion!.Image" Alt="Image"/>
-                    <MudText Typo="Typo.h6">Descripcion: @Publicacion!.Descripcion</MudText>
-                </MudCardContent>
-            </MudCard>
-        </div>
+        @if (!_confirmacionEnCurso)
+        {
+            <div class="card-container">
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">Bien a intercambiar: @Bien!.Nombre</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudImage Fluid="true" Src="@Bien!.Imagen" Alt="Image"/>
+                        <MudText Typo="Typo.h6">Descripcion: @Bien.Descripcion</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </div>
+            <div class="card-container">
+                <MudCard>
+                    <MudCardHeader>
+                        <CardHeaderContent>
+                            <MudText Typo="Typo.h6">Publicacion: @Publicacion!.Titulo</MudText>
+                        </CardHeaderContent>
+                    </MudCardHeader>
+                    <MudCardContent>
+                        <MudImage Fluid="true" Src="@Publicacion!.Image" Alt="Image"/>
+                        <MudText Typo="Typo.h6">Descripcion: @Publicacion!.Descripcion</MudText>
+                    </MudCardContent>
+                </MudCard>
+            </div>
+        }
+        else
+        {
+            @_resultadoApi
+        }
+        
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
         <div style="flex-grow: 1;"></div>
-        @*<MudButton Variant="Variant.Filled"
-                   Color="Color.Primary"
-                   StartIcon="@Icons.Material.Filled.Check"
-                   Size="Size.Small"
-                   OnClick="ConfirmarTrueque"> Confirmar Trueque
-        </MudButton>*@
-        <MudButton Variant="Variant.Filled"
-                   OnClick="RetrotraerTrueque"
-                   Color="Color.Primary" StartIcon="@Icons.Material.Filled.Redo"
-                   Size="Size.Small"> Retrotraer Trueque
-        </MudButton>
+        @if (!_confirmacionEnCurso)
+        {
+            <MudButton Variant="Variant.Filled"
+                       Color="Color.Primary"
+                       StartIcon="@Icons.Material.Filled.Check"
+                       Size="Size.Small"
+                       OnClick="()=>ConfirmarTrueque(_usuarioPublicacion, _usuarioBien, _embarcacionUsuario, Bien)"> Confirmar Trueque
+            </MudButton>
+            <MudButton Variant="Variant.Filled"
+                       OnClick="RetrotraerTrueque"
+                       Color="Color.Primary" StartIcon="@Icons.Material.Filled.Redo"
+                       Size="Size.Small"> Retrotraer Trueque
+            </MudButton>
+        }
+        
     </DialogActions>
 </MudDialog>
 @code {
-    
+
+    bool _confirmacionEnCurso;
     [Parameter] public Oferta Oferta { get; set; }
     [Parameter] public Publicacion Publicacion { get; set; } = null!;
     [Parameter] public Bien Bien { get; set; } = null!;
@@ -71,14 +84,16 @@
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
     void Cancel() => MudDialog!.Cancel();
 
-    Inhabilitaciones _InhabilitacionesDuenioEmbarcacion;
-    Inhabilitaciones _InhabilitacionesOfertante;
+    
     ApplicationUser _usuarioBien; 
     ApplicationUser _usuarioPublicacion;
     Embarcacion _embarcacionUsuario;
     
-    string resultadoApi = "no tengo nada todavia";
+    Inhabilitaciones _InhabilitacionesDuenioEmbarcacion;
+    Inhabilitaciones _InhabilitacionesOfertante;
     
+    string _resultadoApi = "Cargando...";
+    string _textoTitulo = "Viendo Datos del Trueque";
     protected override void OnInitialized()
     {
         _usuarioBien = ObtenerApplicationUserUseCase.Ejecutar(Bien.UsuarioId);
@@ -91,35 +106,47 @@
         NavigationManager.NavigateTo("/ListadoTruequesAcordados", forceLoad:true);
     }
 
-    public async Task ConfirmarTrueque()
+    public async Task ConfirmarTrueque(ApplicationUser usuarioPub, ApplicationUser usuarioBien, Embarcacion barco, Bien bien)
     {
+
+        _confirmacionEnCurso = true;
+        MudDialog.SetTitle("Confirmando trueque");
+        StateHasChanged();
         try
         {
-            resultadoApi = "cargando";
             _InhabilitacionesDuenioEmbarcacion = new Inhabilitaciones(
                 await ApiCaller.EstaDuenioInhibido(_usuarioPublicacion.Dni.Value),
                 await ApiCaller.EstaBienInhabilitado(_embarcacionUsuario.Matricula),
                 !(await ApiCaller.EsDuenioDe(_usuarioPublicacion.Dni.Value, _embarcacionUsuario.Matricula)));
             //checkeos del que pone la embarcacion
-            // await ApiCaller.EstaDuenioInhibido();
+            // resultadoApi = (await ApiCaller.EstaDuenioInhibido(_usuarioPublicacion.Dni.Value)).ToString();
             // await ApiCaller.EstaBienInhabilitado();
             // await ApiCaller.EsDuenioDe();
-
-            _InhabilitacionesOfertante = new Inhabilitaciones(await ApiCaller.EstaDuenioInhibido(_usuarioBien.Dni.Value), false, false);
+            _resultadoApi = $"El usuario {_usuarioPublicacion.Nombre}, con la embarcación {_embarcacionUsuario.Nombre} {_InhabilitacionesDuenioEmbarcacion.MensajeError()}";
+            Console.WriteLine("primer checkeo hecho");
+            
+            if (!_InhabilitacionesDuenioEmbarcacion.AlgunError())
+            {
+                _InhabilitacionesOfertante = new Inhabilitaciones(await ApiCaller.EstaDuenioInhibido(_usuarioBien.Dni.Value), false, false);
+                _resultadoApi +=  $"{Environment.NewLine} El usuario {_usuarioBien.Nombre}, dueño del bien {Bien.Nombre} {_InhabilitacionesOfertante.MensajeError()}";
+            }
             //checkeos del que pone el bien, los ultimos 2 se van a ver en 3ra demo
             // await ApiCaller.EstaDuenioInhibido();
             // await ApiCaller.EstaBienInhabilitado();
             // await ApiCaller.EsDuenioDe();
-            // resultadoApi = await ApiCaller.Prueba();
-            resultadoApi = $"Esta inhibido duenio barco? {_InhabilitacionesDuenioEmbarcacion.DuenioInhibido}," +
-                           $" esta inhabilitada la embarcion {_InhabilitacionesDuenioEmbarcacion.BienInhabilitado}" +
-                           $"no es realmemte el duenio del barco? {_InhabilitacionesDuenioEmbarcacion.NoEsDuenioDe}" +
-                           $"Esta inhibido dueño bien? {_InhabilitacionesOfertante.DuenioInhibido}";
+            
+            Console.WriteLine(_resultadoApi);
         }
-        catch(Exception)
+        catch(Exception e)
         {
-            resultadoApi = "Problemas de conexion al conectarse con las apis";
+            _resultadoApi = $"Problemas de conexion: {e.Message}";
         }
+            // var parameters = new DialogParameters<ConfirmacionTrueque>();
+            // parameters.Add(x => x._usuarioPublicacion, usuarioPub);
+            // parameters.Add(x => x._usuarioBien, usuarioBien);
+            // parameters.Add(x => x.Bien, bien);
+            // parameters.Add(x => x._embarcacionUsuario, barco);
+            // Dialog.Show<ConfirmacionTrueque>("Esperando confirmacion", parameters);
         
     }
 }
