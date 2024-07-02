@@ -1,6 +1,7 @@
 @page "/ListadoSubalquileresVigentes"
 @using YateMate.Aplicacion.UseCases.Subalquiler
 @inject ObtenerSubalquileresVigentesUseCase ObtenerSubalquileresVigentesUseCase
+@inject ObtenerDuenioSubalquilerUseCase ObtenerDuenio
 @rendermode InteractiveServer
 
 <h3>ListadoSubalquileresVigentes</h3>
@@ -16,6 +17,8 @@
         <HeaderContent>
             <MudTh>Fecha de inicio</MudTh>
             <MudTh>Fecha de fin</MudTh>
+            <MudTh>Dueño</MudTh>
+            <MudTh>Acción</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd>
@@ -24,7 +27,12 @@
             <MudTd>
                 @context.FechaFin
             </MudTd>
-
+            @{
+                duenio = ObtenerDuenio.Ejecutar(context.IdDuenio);
+            }
+            <MudTd>
+                @duenio.Nombre @duenio.Apellido
+            </MudTd>
             <MudTd>
                 <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => VerSubalquiler(@context))">Ver (no anda) </MudButton>
             </MudTd>
@@ -36,6 +44,7 @@
 @code {
     List<Subalquiler> _lista = new();
     bool _tieneElementos;
+    ApplicationUser duenio;
     
     protected override void OnInitialized()
     {

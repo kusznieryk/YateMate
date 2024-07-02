@@ -1,3 +1,4 @@
+@using Microsoft.EntityFrameworkCore.Scaffolding
 @using YateMate.Aplicacion.UseCases.ApplicationUser
 @using YateMate.Aplicacion.UseCases.Subalquiler
 @using YateMate.Aplicacion.UseCases.Reserva
@@ -35,7 +36,7 @@
         <MudButton Variant="Variant.Filled"
                    Href=""
                    StartIcon="@Icons.Material.Filled.Edit"
-                   OnClick="@(() => Editar(Reserva.Id))"
+                   OnClick="@(() => EditarReserva(Reserva))"
                    Color="Color.Primary"
                    Size="Size.Small">Editar
         </MudButton>
@@ -82,11 +83,13 @@
     void Submit() => MudDialog!.Close(DialogResult.Ok(true));
     void Cancel() => MudDialog!.Cancel();
     
-    void Editar(int id)
+    public void EditarReserva(Reserva reserva)
     {
-        Submit();
-        NavigationManager.NavigateTo($"/reserva/{id}");
+        var parameters = new DialogParameters<EditarReserva>();
+        parameters.Add(x => x.Reserva, reserva);
+        Dialog.Show<EditarReserva>("Editar", parameters);
     }
+    
     
     [Inject] private IDialogService? DialogService { get; set; }
 
