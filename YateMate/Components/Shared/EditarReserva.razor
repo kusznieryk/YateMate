@@ -1,5 +1,3 @@
-@page "/reserva/{Id:int?}"
-
 @using System.ComponentModel.DataAnnotations
 @using YateMate.Aplicacion.UseCases.Reserva
 @using YateMate.Aplicacion.UseCases.Subalquiler
@@ -10,203 +8,127 @@
 @inject NavigationManager Navegador
 @inject ModificarReservaUseCase ModificarReservaUseCase
 @inject ObtenerDuenioSubalquilerUseCase ObtenerDuenioSubalquilerUseCase
-@inject ObtenerReservaUseCase ObtenerReservaUseCase
-@inject HacerReservaUseCase HacerReservaUseCase
 @inject ObtenerDuenioReservaUseCase ObtenerDuenioReservaUseCase
 @inject ObtenerSubalquilerUseCase ObtenerSubalquilerUseCase
 @inject EmailSender EmailSender
 
 @rendermode InteractiveServer
-
-
 <MudDialog>
     <TitleContent>
-        @if (_err.Length > 1)
-        {
-            <h3>@_err</h3>
-        }
-        @if (_esNuevoReserva)
-        {
-            <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
-                Haciendo una nueva reserva
-            </MudText>
-        }
-        else
-        {
-            <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
-                Editando la reserva para la amarra "@_subalquiler.IdAmarra"
-            </MudText>
-        }
+        <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
+            Editar reserva
+        </MudText>
     </TitleContent>
     <DialogContent>
-    <EditForm OnValidSubmit="Aceptar" Model="Input" Enhance>
-        <DataAnnotationsValidator/>
-
-        <MudCard>
-            <MudCardContent>
-                <MudDatePicker HelperText="Fecha de inicio"
-                               @bind-Value="Input.FechaInicio" For="@(() => Input.FechaInicio)" Required="true"/>
-                <MudDatePicker HelperText="Fecha de fin" Variant="Variant.Text"
-                               @bind-Value="Input.FechaFin" For="@(()=>Input.FechaFin)"/>
-            </MudCardContent>
-            <MudCardActions>
-                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Cargar reserva</MudButton>
-            </MudCardActions>
-        </MudCard>
-    </EditForm>
+        <EditForm OnSubmit="HandleSubmit" EditContext="editContext" FormName="EditarReserva">
+            <CustomValidator @ref="customValidator" ></CustomValidator>
+            <div class="form-floating mb-3">
+                <InputDate class="form-control" id="fechaInicio" @bind-Value="Model.FechaInicio" />
+                <label for="fechaInicio">Fecha de inicio</label>
+                <ValidationMessage For="() => Model.FechaInicio" class="text-danger" />
+            </div>
+            <div class="form-floating mb-3">
+                <InputDate class="form-control" id="fechaFin" @bind-Value="Model.FechaFin" />
+                <label for="fechaFin">Fecha de fin</label>
+                <ValidationMessage For="() => Model.FechaFin" class="text-danger" />
+            </div>
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Cargar reserva</button>
+        </EditForm>
     </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
+    </DialogActions>
 </MudDialog>
 
 
-@code {
-    [Parameter] public int? Id { get; set; }
+@code{
+    [Parameter] public Reserva Reserva { get; set; }
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
     
     [CascadingParameter]
     private Task<AuthenticationState>? _AuthenticationState { get; set; }
 
-    private string? _userId;    
-    
-    protected override async Task OnInitializedAsync()
-    {
-        if (_AuthenticationState is not null)
-        {
-            var authState = await _AuthenticationState;
-            var user = authState.User;
-            _userId = user.Claims.FirstOrDefault()?.Value;
-        }
-    }
+    private string? _userId; 
     
     bool _esNuevoReserva = true;
-    InputModel Input = new ();
-    Reserva _reserva = new Reserva();
     Subalquiler? _subalquiler;
     string _err = "";
     
-    protected override void OnParametersSet()
+    async Task Submit()
     {
-        if (Id != null)
-        {
-            var reservaHallado = ObtenerReservaUseCase.Ejecutar(Id.Value);
-            if (reservaHallado != null)
-            {
-                _esNuevoReserva = false;
-                _reserva = reservaHallado;
-                _subalquiler = ObtenerSubalquilerUseCase.Ejecutar(_reserva.SubalquilerId);
-                Input.FechaInicio = _reserva.FechaInicio;
-                Input.FechaFin = _reserva.FechaFin;
-            }
-        }
+        _subalquiler = ObtenerSubalquilerUseCase.Ejecutar(Reserva.SubalquilerId);
+        var mailDuenio = ObtenerDuenioSubalquilerUseCase.Ejecutar(_subalquiler.IdDuenio).Email;
+        var duenioReserva = ObtenerDuenioReservaUseCase.Ejecutar(Reserva.UsuarioId);
+        await EmailSender.SendMessageCambioReserva(mailDuenio, Reserva, duenioReserva,_subalquiler);
+        Navegador.Refresh(forceReload: true);
+        MudDialog!.Close(DialogResult.Ok(true));
     }
     
-    void Aceptar()
+    void Cancel() => MudDialog!.Cancel();
+    
+    [SupplyParameterFromForm] private InputModel Model { get; set; } = new();
+    private EditContext? editContext;
+    public CustomValidator customValidator;
+    
+    protected override void OnInitialized()
     {
-        _reserva.UsuarioId = _userId!;
-        _reserva.FechaInicio = Input.FechaInicio;
-        _reserva.FechaFin = Input.FechaFin;
-        _reserva.SubalquilerId = Input.SubalquilerId;
-        if (_esNuevoReserva)
+        Model ??= new InputModel();
+        Model.UsuarioId ??= Reserva.UsuarioId;
+        Model.SubalquilerId ??= Reserva.SubalquilerId;
+        Model.FechaInicio ??= Reserva.FechaInicio;
+        Model.FechaFin ??= Reserva.FechaFin;
+        editContext = new(Model);
+    }
+    
+    public void HandleSubmit()
+    {
+        customValidator.ClearErrors();
+        Model.UsuarioId = Reserva.UsuarioId;
+        var errors = new Dictionary<string, List<string>>();
+        foreach (var property in Model.GetType().GetProperties()) //me cago en microsoft
         {
-            HacerReserva(_reserva);
+            var value = property.GetValue(Model);
+            if (String.IsNullOrWhiteSpace(value?.ToString()))
+            {
+                Console.WriteLine($"El campo {property.Name} estaba vacio");
+                errors.Add(property.Name, new List<string>() {"Este campo es obligatorio"});
+            }
         }
-        else
+        if (errors.Count > 0)
         {
-            ModificarReserva(_reserva);
+            Console.WriteLine($"Hay {errors.Count} errores");
+            foreach (var error in errors)
+            {
+                Console.WriteLine($"Error {error.Key} {error.Value}");
+            }
+            customValidator.DisplayErrors(errors);
+            return;
         }
-        Navegador.NavigateTo("/ListadoReservas");
-            
+        ValidSubmit();
     }
-
-    async Task ModificarReserva(Reserva reserva)
+    
+    public void ValidSubmit()
     {
-        ModificarReservaUseCase.Ejecutar(reserva);
-        var mailDuenio = ObtenerDuenioSubalquilerUseCase.Ejecutar(_subalquiler.IdDuenio).Email;
-        var duenioReserva = ObtenerDuenioReservaUseCase.Ejecutar(reserva.UsuarioId);
-        await EmailSender.SendMessageCambioReserva(mailDuenio, reserva, duenioReserva,_subalquiler);
+        Model.UsuarioId = Reserva.UsuarioId;
+        var reservaQueVaABaseDeDatos = new Reserva(Model.SubalquilerId.Value, Model.UsuarioId, Model.FechaInicio.Value, Model.FechaFin.Value);
+        reservaQueVaABaseDeDatos.Id = Reserva.Id;
+        ModificarReservaUseCase.Ejecutar(reservaQueVaABaseDeDatos);
+        Submit();
     }
-
-    async Task HacerReserva(Reserva reserva)
-    {
-        HacerReservaUseCase.Ejecutar(reserva);
-        var mailDuenio = ObtenerDuenioSubalquilerUseCase.Ejecutar(_subalquiler.IdDuenio).Email;
-        var duenioReserva = ObtenerDuenioReservaUseCase.Ejecutar(reserva.UsuarioId);
-        await EmailSender.SendMessageReserva(mailDuenio, reserva, duenioReserva, _subalquiler);
-    }
-
-    // protected override void OnInitialized()
-    // {
-    //     Model ??= new InputModel();
-    //     Model.FechaInicio ??= Reserva.FechaInicio;
-    //     Model.FechaFin ??= Reserva.FechaFin;
-    //     editContext = new(Model);
-    // }
-    //
-    // async Task Submit()
-    // {
-    //     var mailDuenio = ObtenerDuenioSubalquilerUseCase.Ejecutar(Subalquiler.IdDuenio).Email;
-    //     var duenioReserva = ObtenerDuenioReservaUseCase.Ejecutar(Reserva.UsuarioId);
-    //     await EmailSender.SendMessageCambioReserva(mailDuenio, Reserva, duenioReserva,Subalquiler);
-    //     NavigationManager.Refresh(forceReload: true);
-    //     MudDialog!.Close(DialogResult.Ok(true));
-    // }
-    //
-    // void Cancel() => MudDialog!.Cancel();
-    //
-    // [SupplyParameterFromForm] private InputModel Model { get; set; } = new();
-    //
-    // private EditContext? editContext;
-    // public CustomValidator customValidator;
-    //
-    // public void HandleSubmit()
-    // {
-    //     customValidator.ClearErrors();
-    //     Model.UsuarioId = Reserva.UsuarioId;
-    //     var errors = new Dictionary<string, List<string>>();
-    //     foreach (var property in Model.GetType().GetProperties()) //me cago en microsoft
-    //     {
-    //         var value = property.GetValue(Model);
-    //         if (String.IsNullOrWhiteSpace(value?.ToString()))
-    //         {
-    //             Console.WriteLine($"El campo {property.Name} estaba vacio");
-    //             errors.Add(property.Name, new List<string>() {"Este campo es obligatorio"});
-    //         }
-    //     }
-    //     
-    //     if (errors.Count > 0)
-    //     {
-    //         Console.WriteLine($"Hay {errors.Count} errores");
-    //         foreach (var error in errors)
-    //         {
-    //             Console.WriteLine($"Error {error.Key} {error.Value}");
-    //         }
-    //         customValidator.DisplayErrors(errors);
-    //         return;
-    //     }
-    //     ValidSubmit();
-    // }
-    //
-    // public void ValidSubmit()
-    // {
-    //     Model.UsuarioId = Reserva.UsuarioId;
-    //     var reservaQueVaABaseDeDatos = new Reserva(Model.SubalquilerId, Model.UsuarioId, Model.FechaInicio.Value, Model.FechaFin.Value);
-    //     reservaQueVaABaseDeDatos.Id = Reserva.Id;
-    //     ModificarReservaUseCase.Ejecutar(reservaQueVaABaseDeDatos);
-    //     Submit();
-    // }
-    //
+    
     
     private sealed class InputModel
     {
         [Required(ErrorMessage = "Ingresa una fecha de inicio")]
         [Display(Name = "Fecha de inicio")]
-        public DateTime FechaInicio { get; set; }
+        public DateTime? FechaInicio { get; set; }
     
         [Required(ErrorMessage = "Ingresa una fecha de fin")]
         [Display(Name = "Fecha de fin")]
-        public DateTime FechaFin { get; set; }
-        
-        public int SubalquilerId;
-        public string UsuarioId;
+        public DateTime? FechaFin { get; set; }
+
+        public string? UsuarioId { get; set; } = null;
+        public int? SubalquilerId { get; set; } = null;
     }
 
 }

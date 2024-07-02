@@ -10,7 +10,7 @@
                     MaxWidth="MaxWidth.Small"
                     Position="DialogPosition.CenterLeft"/>
 
-<h3>ListadoAmarras</h3>
+<h1>Mis amarras</h1>
 <MudContainer>
 
     @if (!_tieneElementos)
@@ -24,6 +24,7 @@
             <MudTh>Precio por dia</MudTh>
             <MudTh>Tamaño</MudTh>
             <MudTh>Ubicacion</MudTh>
+            <MudTh>Acción</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd>
@@ -75,6 +76,5 @@
         parameters.Add(x => x.IdAmarra, amarra.Id);
         parameters.Add(x=> x.IdDuenio, _userId);
         Dialog.Show<PublicarSubalquiler>("Publicar", parameters);
-
     }
 }

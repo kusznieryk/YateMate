@@ -1,0 +1,237 @@
+@using System.ComponentModel.DataAnnotations
+@using YateMate.Aplicacion.UseCases.Reserva
+@using YateMate.Components.Account.Pages
+@inject HacerReservaUseCase HacerReservaUseCase
+@inject NavigationManager Navegador
+@rendermode InteractiveServer
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
+            Hacer reserva
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        
+        <EditForm OnSubmit="HandleSubmit" EditContext="editContext" FormName="HacerReserva">
+            <CustomValidator @ref="customValidator" ></CustomValidator>
+            <div class="form-group">
+                <label for="startDate">Fecha inicio:</label>
+                <InputDate id="startDate"
+                           @bind-Value="dateModel.FechaInicio"
+                           class="form-control"
+                           min="@DateTime.Now.ToString("yyyy-MM-dd")"/>
+                <ValidationMessage For="@(() => dateModel.FechaInicio)"/>
+            </div>
+            <div class="form-group">
+                <label for="endDate">Fecha fin:</label>
+                <InputDate id="endDate"
+                           @bind-Value="dateModel.FechaFin"
+                           class="form-control"
+                           min="@dateModel.FechaInicio?.ToString("yyyy-MM-dd")"/>
+                <ValidationMessage For="@(() => dateModel.FechaFin)"/>
+            </div>
+            <button type="submit" class="btn btn-primary">Confirmar</button>
+        </EditForm>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    [Parameter] public Subalquiler Subalquiler2 { get; set; }
+    [Parameter] public string IdUsuario { get; set; }
+    
+    private EditContext? editContext;
+    public CustomValidator customValidator;
+    private Model dateModel = new Model();
+
+
+    protected override void OnInitialized()
+    {
+        dateModel.FechaInicio = Subalquiler2.FechaInicio;
+        dateModel.FechaFin = Subalquiler2.FechaFin;
+        editContext = new(dateModel);
+        // foreach (var property in dateModel.GetType().GetProperties()) //me cago en microsoft
+        // {
+        //     Console.WriteLine(property);
+        // }
+        // Console.WriteLine(IdDuenio);
+        // Console.WriteLine(IdAmarra);
+    }
+    void ValidSubmit()
+    {
+        var reserva = new Reserva(Subalquiler2.Id, IdUsuario, dateModel.FechaInicio.Value, dateModel.FechaFin.Value);
+        Console.WriteLine($"{dateModel.FechaFin}{dateModel.FechaInicio}");
+        HacerReservaUseCase.Ejecutar(reserva, Subalquiler2);
+        MudDialog!.Close(DialogResult.Ok(true));
+        Navegador.NavigateTo("/ListadoReservas");
+    }
+    
+    void Cancel() => MudDialog!.Cancel();
+
+    public void HandleSubmit()
+    {
+        customValidator.ClearErrors();
+        var errors = new Dictionary<string, List<string>>();
+        foreach (var property in dateModel.GetType().GetProperties()) //me cago en microsoft
+        {
+            var value = property.GetValue(dateModel);
+            if (String.IsNullOrWhiteSpace(value?.ToString()))
+            {
+                Console.WriteLine($"el campo {property.Name} estaba vacio");
+                errors.Add(property.Name, new List<string>() {"Este campo es obligatorio"});
+            }
+        }
+        if (dateModel.FechaInicio < Subalquiler2.FechaInicio )
+        {
+            errors.Add("FechaInicio", new List<string>()
+            {
+                $"Fecha de inicio invalida, la reserva debe ser en el rango {Subalquiler2.FechaInicio:dd/MM/yyyy} - {Subalquiler2.FechaFin:dd/MM/yyyy}"
+            });
+            customValidator.DisplayErrors(errors);
+            return;
+        }
+        if (dateModel.FechaFin > Subalquiler2.FechaFin)
+        {
+            errors.Add("FechaFin", new List<string>()
+            {
+                $"Fecha de fin invalida, la reserva debe ser en el rango {Subalquiler2.FechaInicio:dd/MM/yyyy} - {Subalquiler2.FechaFin:dd/MM/yyyy}"
+            });
+            customValidator.DisplayErrors(errors);
+            return;
+        }
+        
+        if (errors.Count > 0)
+        {
+            Console.WriteLine($"hay {errors.Count} errores");
+            foreach (var error in errors)
+            {
+                Console.WriteLine($"error {error.Key} {error.Value}");
+            }
+            customValidator.DisplayErrors(errors);
+            return;
+        }
+
+        ValidSubmit();
+    }
+
+    public class Model
+    {
+        [Required(ErrorMessage = "Obligatorio.")]
+        public DateTime? FechaInicio { get; set; }
+
+        [Required(ErrorMessage = "obligatorio")]
+        public DateTime? FechaFin { get; set; }
+    }
+}
+@* @page "/reserva/{Id:int?}" *@
+@* *@
+@* *@
+@* @if (_err.Length > 1) *@
+@* { *@
+@*     <h3>@_err</h3> *@
+@* } *@
+@* @if (_esNuevoReserva) *@
+@* { *@
+@*     <h1>Haciendo una nueva reserva</h1> *@
+@* } *@
+@* else *@
+@* { *@
+@*     <h1>Editando la reserva para la amarra "@_subalquiler.IdAmarra"</h1> *@
+@* } *@
+@* *@
+@* <EditForm OnValidSubmit="Aceptar" Model="Input" Enhance> *@
+@*     <DataAnnotationsValidator/> *@
+@* *@
+@*     <MudCard> *@
+@*         <MudCardContent> *@
+@*             <MudDatePicker HelperText="Fecha de inicio" *@
+@*                            @bind-Value="Input.FechaInicio" For="@(() => Input.FechaInicio)" Required="true"/> *@
+@*             <MudDatePicker HelperText="Fecha de fin" Variant="Variant.Text" *@
+@*                            @bind-Value="Input.FechaFin" For="@(()=>Input.FechaFin)"/> *@
+@*             <br/> *@
+@*         </MudCardContent> *@
+@*         <MudCardActions> *@
+@*             <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">Cargar reserva</MudButton> *@
+@*         </MudCardActions> *@
+@*     </MudCard> *@
+@* </EditForm> *@
+@* *@
+@* *@
+@* @code { *@
+@*     [Parameter] public int? Id { get; set; } *@
+@*     [CascadingParameter] MudDialogInstance? MudDialog { get; set; } *@
+@*      *@
+@*     [CascadingParameter] *@
+@*     private Task<AuthenticationState>? _AuthenticationState { get; set; } *@
+@* *@
+@*     private string? _userId;     *@
+@*      *@
+@*     protected override async Task OnInitializedAsync() *@
+@*     { *@
+@*         if (_AuthenticationState is not null) *@
+@*         { *@
+@*             var authState = await _AuthenticationState; *@
+@*             var user = authState.User; *@
+@*             _userId = user.Claims.FirstOrDefault()?.Value; *@
+@*         } *@
+@*     } *@
+@*      *@
+@*     bool _esNuevoReserva = true; *@
+@*     InputModel Input = new (); *@
+@*     Reserva _reserva = new Reserva(); *@
+@*     Subalquiler2? _subalquiler; *@
+@*     string _err = ""; *@
+@*      *@
+@*     protected override void OnParametersSet() *@
+@*     { *@
+@*         if (Id != null) *@
+@*         { *@
+@*             var reservaHallado = ObtenerReservaUseCase.Ejecutar(Id.Value); *@
+@*             if (reservaHallado != null) *@
+@*             { *@
+@*                 _esNuevoReserva = false; *@
+@*                 _reserva = reservaHallado; *@
+@*                 _subalquiler = ObtenerSubalquiler2UseCase.Ejecutar(_reserva.Subalquiler2Id); *@
+@*                 Input.FechaInicio = _reserva.FechaInicio; *@
+@*                 Input.FechaFin = _reserva.FechaFin; *@
+@*             } *@
+@*         } *@
+@*     } *@
+@*      *@
+@*     void Aceptar() *@
+@*     { *@
+@*         _reserva.UsuarioId = _userId!; *@
+@*         _reserva.FechaInicio = Input.FechaInicio; *@
+@*         _reserva.FechaFin = Input.FechaFin; *@
+@*         if (_esNuevoReserva) *@
+@*         { *@
+@*             HacerReserva(_reserva); *@
+@*         } *@
+@*         else *@
+@*         { *@
+@*             ModificarReserva(_reserva); *@
+@*         } *@
+@*         Navegador.NavigateTo("/ListadoReservas"); *@
+@*              *@
+@*     } *@
+@* *@
+@*     async Task ModificarReserva(Reserva reserva) *@
+@*     { *@
+@*         ModificarReservaUseCase.Ejecutar(reserva); *@
+@*         var mailDuenio = ObtenerDuenioSubalquiler2UseCase.Ejecutar(_subalquiler.IdDuenio).Email; *@
+@*         var duenioReserva = ObtenerDuenioReservaUseCase.Ejecutar(reserva.UsuarioId); *@
+@*         await EmailSender.SendMessageCambioReserva(mailDuenio, reserva, duenioReserva,_subalquiler); *@
+@*     } *@
+@* *@
+@*     async Task HacerReserva(Reserva reserva) *@
+@*     { *@
+@*         HacerReservaUseCase.Ejecutar(reserva); *@
+@*         var mailDuenio = ObtenerDuenioSubalquiler2UseCase.Ejecutar(_subalquiler.IdDuenio).Email; *@
+@*         var duenioReserva = ObtenerDuenioReservaUseCase.Ejecutar(reserva.UsuarioId); *@
+@*         await EmailSender.SendMessageReserva(mailDuenio, reserva, duenioReserva, _subalquiler); *@
+@*     } *@

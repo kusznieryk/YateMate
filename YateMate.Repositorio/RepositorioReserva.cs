@@ -6,17 +6,16 @@ namespace YateMate.Repositorio;
 
 public class RepositorioReserva : IRepositorioReserva
 {
-    public void HacerReserva(Reserva reserva)
+    public void HacerReserva(Reserva reserva, Subalquiler? subalquiler)
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
-            var subalquiler = context.Subalquileres.FirstOrDefault(s => s.Id == reserva.SubalquilerId);
             if (subalquiler != null)
             {
                 if (CheckearDisponibilidad(reserva, subalquiler))
                 {
-                    subalquiler.Reservas.Add(reserva);
                     context.Add(reserva);
+                    // subalquiler.Reservas.Add(reserva);
                     context.SaveChanges();
                 }
             }
@@ -72,10 +71,18 @@ public class RepositorioReserva : IRepositorioReserva
         }
     }
 
-    private bool CheckearDisponibilidad(Reserva reserva, Subalquiler subalquiler)
+    private bool CheckearDisponibilidad(Reserva reserva, Subalquiler? subalquiler)
     {
-        return !subalquiler.Reservas.Any(r => (r.FechaInicio >= reserva.FechaInicio && r.FechaInicio <= reserva.FechaFin) 
-                                             || (r.FechaFin >= reserva.FechaInicio && r.FechaFin <= reserva.FechaFin));
+        if (subalquiler == null)
+        {
+            return false;
+        }
+        var reservasSubalquiler = subalquiler.Reservas;
+        if (reservasSubalquiler == null || !reservasSubalquiler.Any())
+        {
+            return true; // Está disponible si no hay reservas existentes
+        }
+        return !reservasSubalquiler.Any(r => (r.FechaInicio >= reserva.FechaInicio && r.FechaInicio <= reserva.FechaFin) 
+                                            || (r.FechaFin >= reserva.FechaInicio && r.FechaFin <= reserva.FechaFin));
     }
-    
 }
