@@ -63,7 +63,6 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
     public DbSet<MensajeChat> MensajesChats { get; set; }
     public DbSet<Oferta> Ofertas { get; set; }
     public DbSet<Amarra> Amarras { get; set; }
-
     public DbSet<Publicacion> Publicaciones { get; set; } 
     public DbSet<TruequeConfirmado> TruequesConfirmados { get; set; }
     public DbSet<Subalquiler> Subalquileres { get; set; }

@@ -1,0 +1,68 @@
+@page "/VerDatosSubalquilerPublicado"
+
+@using YateMate.Aplicacion.Entidades
+@using YateMate.Aplicacion.UseCases.Subalquiler
+@using YateMate.Components.Pages
+@using MudBlazor
+@inject EliminarSubalquilerUseCase EliminarSubalquilerUseCase
+@inject NavigationManager NavigationManager
+@inject IDialogService Dialog
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
+            Viendo detalles del subalquiler
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Subalquiler</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>Fecha Inicio: @Subalquiler!.FechaInicio.ToShortDateString()</MudText>
+                <MudText>Fecha Fin: @Subalquiler.FechaFin.ToShortDateString()</MudText>
+            </MudCardContent>
+        </MudCard>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
+        <div style="flex-grow: 1;"></div>
+        <MudButton Variant="Variant.Filled"
+                   StartIcon="@Icons.Material.Filled.Bookmark"
+                   OnClick="HacerReserva"
+                   Color="Color.Primary"
+                   Size="Size.Small">Hacer Reserva
+        </MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public Subalquiler Subalquiler { get; set; }
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+    private string? _userId;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationState is not null)
+        {
+            var authState = await AuthenticationState;
+            var user = authState.User;
+            _userId = user.Claims.FirstOrDefault()?.Value;
+        }
+    }
+
+    void Cancel() => MudDialog!.Cancel();
+
+    void HacerReserva()
+    {
+        var parameters = new DialogParameters<HacerReserva>();
+        parameters.Add(x => x.Subalquiler2, Subalquiler);
+        parameters.Add(x => x.IdUsuario, _userId);
+        Dialog.Show<HacerReserva>("Hacer reserva", parameters);
+    }
+}

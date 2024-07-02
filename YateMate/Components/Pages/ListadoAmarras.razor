@@ -1,7 +1,7 @@
 @page "/ListadoAmarras"
 @using YateMate.Components.Shared
-@* @using YateMate.Aplicacion.UseCases.Amarra *@
-@* @inject ObtenerAmarrasDeUseCase ObtenerAmarrasDeUseCase *@
+@using YateMate.Aplicacion.UseCases.Amarras
+@inject ListarAmarraUseCase ListarAmarraUseCase 
 @inject IDialogService Dialog
 
 @rendermode InteractiveServer
@@ -10,7 +10,7 @@
                     MaxWidth="MaxWidth.Small"
                     Position="DialogPosition.CenterLeft"/>
 
-<h3>ListadoAmarras</h3>
+<h1>Mis amarras</h1>
 <MudContainer>
 
     @if (!_tieneElementos)
@@ -24,16 +24,17 @@
             <MudTh>Precio por dia</MudTh>
             <MudTh>Tamaño</MudTh>
             <MudTh>Ubicacion</MudTh>
+            <MudTh>Acción</MudTh>
         </HeaderContent>
         <RowTemplate>
             <MudTd>
-                @* @context.Precio *@
+                @context.Precio
             </MudTd>
             <MudTd>
-                @* @context.Tamaño *@
+                @context.Tamanio
             </MudTd>
             <MudTd>
-                @* @context.Ubicacion *@
+                @context.Ubicacion
             </MudTd>
             
             <MudTd>
@@ -43,7 +44,6 @@
     </MudTable>
     }
 </MudContainer>
-
 
 @code {
     [CascadingParameter]
@@ -66,16 +66,15 @@
             Console.WriteLine("Authstate es null, no se que decirte");
         }
 
-        // _lista = ObtenerAmarrasDeUseCase.Ejecutar(_userId!);
-        // _tieneElementos = _lista.Count > 0;
+        _lista = ListarAmarraUseCase.Ejecutar(_userId!);
+        _tieneElementos = _lista.Count > 0;
     }
 
     public void CrearSubalquiler(Amarra amarra)
     {
         var parameters = new DialogParameters<PublicarSubalquiler>();
-        // parameters.Add(x => x.IdAmarra, amarra.Id);
+        parameters.Add(x => x.IdAmarra, amarra.Id);
         parameters.Add(x=> x.IdDuenio, _userId);
         Dialog.Show<PublicarSubalquiler>("Publicar", parameters);
-
     }
 }

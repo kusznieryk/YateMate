@@ -1,14 +1,17 @@
 @page "/ListadoSubalquileres"
 @rendermode InteractiveServer
 @using YateMate.Aplicacion.UseCases.Subalquiler
+@using YateMate.Components.Shared
 @inject IDialogService Dialog
 @inject ObtenerSubalquileresUseCase ObtenerSubalquileresUseCase
+@inject ObtenerDuenioSubalquilerUseCase ObtenerDuenio
 
 <MudDialogProvider  FullWidth="true"
                     MaxWidth="MaxWidth.Small"
                     Position="DialogPosition.CenterLeft"/>
 
-<h3>ListadoSubalquileres</h3>
+<h3>Subalquileres disponibles</h3>
+<title>Subalquileres</title>
 
 <MudContainer>
     @if (!_tieneElementos)
@@ -21,16 +24,24 @@
             <HeaderContent>
                 <MudTh>Fecha de inicio</MudTh>
                 <MudTh>Fecha de fin</MudTh>
+                <MudTh>Dueño</MudTh>
+                <MudTh>Acción</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>
-                    @context.FechaInicio
+                    @context.FechaInicio.ToString("d")
                 </MudTd>
                 <MudTd>
-                    @context.FechaFin
+                    @context.FechaFin.ToString("d")
+                </MudTd>
+                @{
+                    duenio = ObtenerDuenio.Ejecutar(context.IdDuenio);
+                }
+                <MudTd>
+                    @duenio.Nombre @duenio.Apellido
                 </MudTd>
                 <MudTd>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => VerSubalquiler(@context))">Ver (no anda) </MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => VerSubalquiler(@context))">Ver Mas </MudButton>
                 </MudTd>
             </RowTemplate>
         </MudTable>
@@ -39,6 +50,7 @@
 @code {
     List<Subalquiler> _lista = new();
     bool _tieneElementos;
+    ApplicationUser duenio;
     
     protected override void OnInitialized()
     {
@@ -48,6 +60,9 @@
 
     public void VerSubalquiler(Subalquiler subalquiler)
     {
-        
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<VerDatosSubalquilerPublicado>();
+        parameters.Add(x => x.Subalquiler, subalquiler);
+        Dialog.Show<VerDatosSubalquilerPublicado>("Ver Datos", parameters, options);
     }
 }

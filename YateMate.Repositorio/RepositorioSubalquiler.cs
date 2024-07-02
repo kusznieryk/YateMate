@@ -26,9 +26,17 @@ public class RepositorioSubalquiler : IRepositorioSubalquiler
         }
     }
 
-    public void EliminarSubalquiler(string idSubalquiler)
+    public void EliminarSubalquiler(int idSubalquiler)
     {
-        throw new NotImplementedException();
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            var subalquilerAEliminar= context.Subalquileres.FirstOrDefault(s => s.Id== idSubalquiler);
+            if (subalquilerAEliminar != null)
+            {
+                context.Remove(subalquilerAEliminar);
+            }
+            context.SaveChanges();
+        }    
     }
 
     public Subalquiler? ObtenerSubalquiler(int id)
@@ -70,7 +78,7 @@ public class RepositorioSubalquiler : IRepositorioSubalquiler
         }
     }
 
-    public List<Subalquiler> ObtenerSubalquileresDeLaAmarra(string idAmarra)
+    public List<Subalquiler> ObtenerSubalquileresDeLaAmarra(int idAmarra)
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
