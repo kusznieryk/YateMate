@@ -1,0 +1,107 @@
+@using YateMate.Aplicacion.UseCases.ApplicationUser
+@using YateMate.Aplicacion.UseCases.Subalquiler
+@using YateMate.Aplicacion.UseCases.Reserva
+@using YateMate.Aplicacion.UseCases.Publicaciones
+@using YateMate.Components.Account.Shared
+@inject NavigationManager NavigationManager
+@inject EmailSender EmailSender
+@inject CancelarReservaUseCase CancelarReservaUseCase
+@inject ObtenerDuenioSubalquilerUseCase ObtenerDuenioSubalquilerUseCase
+@inject ObtenerContactosDeUseCase ObtenerContactosDeUseCase
+@inject NavigationManager Navegador;
+@inject IDialogService Dialog
+
+<MudDialog>
+    <TitleContent>
+        <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
+            Viendo datos
+        </MudText>
+    </TitleContent>
+    <DialogContent>
+        <MudCard>
+            <MudCardHeader>
+                <CardHeaderContent>
+                    <MudText Typo="Typo.h6">Amarra Nº @Subalquiler.IdAmarra</MudText>
+                </CardHeaderContent>
+            </MudCardHeader>
+            <MudCardContent>
+                <MudText>Dueño de la amarra: @ObtenerDuenioSubalquilerUseCase.Ejecutar(Subalquiler.IdDuenio).Nombre</MudText>
+            </MudCardContent>
+        </MudCard>
+    </DialogContent>
+    <DialogActions>
+        <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
+        <div style="flex-grow: 1;"></div>
+        <MudButton Variant="Variant.Filled"
+                   Href=""
+                   StartIcon="@Icons.Material.Filled.Edit"
+                   OnClick="@(() => Editar(Reserva.Id))"
+                   Color="Color.Primary"
+                   Size="Size.Small">Editar
+        </MudButton>
+        <MudButton Variant="Variant.Filled"
+                   Href=""
+                   StartIcon="@Icons.Material.Filled.Delete"
+                   OnClick="CancelarHandler"
+                   Color="Color.Error"
+                   Size="Size.Small"> Cancelar reserva
+        </MudButton>
+        @* @if (!_contactos.Select(u => u.Id).Contains(Subalquiler.IdDuenio)) *@
+        @* { *@
+        @* <MudButton Variant="Variant.Filled" *@
+        @*            @onclick="@(() => Navegador.NavigateTo($"/chat/{Subalquiler.IdDuenio}"))" *@
+        @*            Color="Color.Primary" StartIcon="@Icons.Material.Filled.ChatBubble" *@
+        @*            Size="Size.Small"> Iniciar Conversación *@
+        @* </MudButton> *@
+        @* } *@
+    </DialogActions>
+</MudDialog>
+
+@code {
+    [Parameter] public Subalquiler Subalquiler { get; set; } = null!;
+    [Parameter] public Reserva? Reserva { get; set; }
+    
+    [CascadingParameter] 
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+    private string? _userId;
+    List<ApplicationUser> _contactos = new List<ApplicationUser>();
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AuthenticationState is not null)
+        {
+            var authState = await AuthenticationState;
+            var user = authState.User;
+            _userId = user.Claims.FirstOrDefault()?.Value;
+            _contactos = ObtenerContactosDeUseCase.Ejecutar(_userId);
+        }
+    }
+    
+    [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+    void Submit() => MudDialog!.Close(DialogResult.Ok(true));
+    void Cancel() => MudDialog!.Cancel();
+    
+    void Editar(int id)
+    {
+        Submit();
+        NavigationManager.NavigateTo($"/reserva/{id}");
+    }
+    
+    [Inject] private IDialogService? DialogService { get; set; }
+
+    private async void CancelarHandler()
+    {
+        bool? result = await DialogService.ShowMessageBox(
+            "Cancelar", 
+            $"¿Desea confirmar la cancelación de la reserva al subalquiler de la amarra \"{Subalquiler.IdAmarra}\"?", 
+            yesText:"Confirmar", cancelText:"Salir");
+        StateHasChanged();
+        if (result is true)
+        {
+            CancelarReservaUseCase.Ejecutar(Reserva.Id);
+            NavigationManager.NavigateTo($"/ListadoReservas", true);
+        }
+    }
+
+}

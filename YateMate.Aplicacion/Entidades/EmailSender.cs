@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using Microsoft.Extensions.Logging;
 using System.Net.Mail;
+using System.Resources;
 
 namespace YateMate.Aplicacion.Entidades;
 public class EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
@@ -32,6 +33,16 @@ public class EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
         public Task SendMessageChat(string Email, ApplicationUser SendingUser)
             => SendEmailAsync(Email, "¡Te han enviado un mensaje!",
                 $"Has recibido un mensaje de {SendingUser.Nombre} {SendingUser.Apellido}. Entra a la seccion de 'Chat' para verlo.");
+
+        public Task SendMessageReserva(string Email, Reserva reserva, ApplicationUser duenioReserva,
+            Subalquiler subalquiler)
+            => SendEmailAsync(Email, "¡Han reservado tu amarra!",
+                $"El usuario '{duenioReserva.Nombre} {duenioReserva.Apellido}' ha reservado tu amarra de Nº{subalquiler.IdAmarra} desde {reserva.FechaInicio:d} hasta {reserva.FechaFin:d}");
+
+        public Task SendMessageCambioReserva(string Email, Reserva reserva, ApplicationUser duenioReserva,
+            Subalquiler subalquiler)
+            => SendEmailAsync(Email, "Cambio de fecha de reserva",
+                $"El usuario '{duenioReserva.Nombre} {duenioReserva.Apellido}' ha efectuado un cambio de fecha para la reserva del subalquiler de la amarra Nº{subalquiler.IdAmarra}. Ahora la reserva es entre {reserva.FechaInicio:d} y {reserva.FechaFin:d}");
         public Task SendPasswordResetCodeAsync(ApplicationUser user, string email, 
          string resetCode) => SendEmailAsync(email, "Cambia tu contraseña", 
          $"Cambia tu contraseña usando el siguiente codigo: {resetCode}");

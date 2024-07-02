@@ -56,9 +56,26 @@ public class RepositorioReserva : IRepositorioReserva
         }
     }
 
+    public Reserva? ObtenerReserva(int id)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Reservas.FirstOrDefault(r => r.Id == id);
+        }
+    }
+
+    public ApplicationUser? ObtenerDuenioReserva(string id)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.ApplicationUsers.FirstOrDefault(a => a.Id == id);
+        }
+    }
+
     private bool CheckearDisponibilidad(Reserva reserva, Subalquiler subalquiler)
     {
         return !subalquiler.Reservas.Any(r => (r.FechaInicio >= reserva.FechaInicio && r.FechaInicio <= reserva.FechaFin) 
                                              || (r.FechaFin >= reserva.FechaInicio && r.FechaFin <= reserva.FechaFin));
     }
+    
 }
