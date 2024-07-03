@@ -6,6 +6,6 @@ public class ObtenerSubalquileresUseCase(IRepositorioSubalquiler repo)
 {
     public List<Entidades.Subalquiler> Ejecutar()
     {
-       return repo.ObtenerSubalquileres();
+       return repo.ObtenerSubalquileres().Where(s => !s.EstaEliminado).ToList();
     }
 }
