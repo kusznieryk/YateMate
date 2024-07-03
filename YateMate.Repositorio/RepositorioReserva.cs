@@ -93,4 +93,12 @@ public class RepositorioReserva : IRepositorioReserva
         return !reservasSubalquiler.Any(r => (r.FechaInicio >= reserva.FechaInicio && r.FechaInicio <= reserva.FechaFin) 
                                             || (r.FechaFin >= reserva.FechaInicio && r.FechaFin <= reserva.FechaFin));
     }
+
+    public List<Reserva> ObtenerReservasDeSubalquiler(int id)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Reservas.Where(r => r.SubalquilerId == id).ToList();
+        }
+    }
 }
