@@ -1,0 +1,69 @@
+@page "/ListadoTruequesConfirmados"
+@using YateMate.Aplicacion.UseCases.TruequesConfirmados
+@using YateMate.Aplicacion.UseCases.Bien
+@using YateMate.Aplicacion.UseCases.Oferta
+@using YateMate.Aplicacion.UseCases.Publicaciones
+@inject ObtenerTruequesConfirmadosUseCase ObtenerTruequesConfirmados
+@inject ObtenerBienUseCase ObtenerBienUseCase
+@inject ObtenerPublicacionDeUseCase ObtenerPublicacion
+
+<h3>ListadoTruequesConfirmados</h3>
+
+@if (!_tieneElementos)
+{
+<h2>No hay trueques confirmados</h2>
+}   
+else
+{
+    <br/>
+    <MudText Typo="Typo.h5" Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Trueques confirmados:</MudText>
+    <MudPaper Width="100%" Class="darkbackground" MinHeight="350" Style="border: none; box-shadow: none;">
+    <MudContainer>
+        <MudGrid>
+            @foreach (var oferta in _lista)
+            {
+            var bien = ObtenerBienUseCase.Ejecutar(oferta.BienId);
+            var publicacion = ObtenerPublicacion.Ejecutar(oferta.PublicacionId);
+            <MudItem xs="4" Style="display:flex;">
+                <MudPaper Width="100%" Square="false" Class="pa-10 ma-2 infobox" Style="border: none; box-shadow: none;">
+                    <MudText Typo="Typo.h5" Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Oferta: </MudText>
+                    <MudCard>
+                        <MudCardMedia Image=@bien.Imagen Height="200" Style="object-fit: contain;"/>
+                        <MudCardContent Style="min-height: 100px">
+                            <MudText Typo="Typo.h5" Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@bien.Nombre</MudText>
+                        </MudCardContent>
+                        <MudText Typo="Typo.body2" Style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;"></MudText>
+                    </MudCard>
+                </MudPaper>
+            </MudItem>
+            
+            <MudItem xs="4" Style="display:flex;">
+                <MudPaper Width="100%" Square="false" Class="pa-10 ma-2 infobox" Style="border: none; box-shadow: none;">
+                    <MudText Typo="Typo.h5" Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Publicación:</MudText>
+                    <MudCard>
+                        <MudCardMedia Image=@publicacion.Image Height="200" Style="object-fit: contain;"/>
+                        <MudCardContent Style="min-height: 100px">
+                            <MudText Typo="Typo.h5" Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">@publicacion.Titulo</MudText>
+                        </MudCardContent>
+                        <MudText Typo="Typo.body2" Style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;"></MudText>
+                    </MudCard>
+                </MudPaper>
+            </MudItem>
+            }
+        </MudGrid>
+    </MudContainer>
+</MudPaper>
+
+}
+
+@code {
+    List<TruequeConfirmado> _lista = new();
+    bool _tieneElementos;
+
+    protected override void OnInitialized()
+    {
+        _lista = ObtenerTruequesConfirmados.Ejecutar();
+        _tieneElementos = _lista.Count > 0;
+    }
+
+}

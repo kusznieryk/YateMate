@@ -14,53 +14,44 @@ public class ApiCaller
     public async Task<bool> EstaDuenioInhibido(int dni)
     {
         var request = new HttpRequestMessage(HttpMethod.Get,
-            "http://127.0.0.1:1880/");
+            $"http://127.0.0.1:1880/duenioinhabilitado/");
         
         request.Headers.Add("Dni", $"{dni}");
         
         var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
         var responseBody = await response.Content.ReadAsStringAsync();
+        Console.WriteLine("duenio" + responseBody);
         return JsonSerializer.Deserialize<bool>(responseBody);
     }
 
     public async Task<bool> EstaBienInhabilitado(string identificador)
     {
-        // var request = new HttpRequestMessage(HttpMethod.Get,
-        //     "http://127.0.0.1:1880/");
-        //
-        // request.Headers.Add("identificador", $"{identificador}");
-        //
-        // var response = await _httpClient.SendAsync(request);
-        // response.EnsureSuccessStatusCode();
-        // var responseBody = await response.Content.ReadAsStringAsync();
-        // return JsonSerializer.Deserialize<bool>(responseBody);
-        return false;
-    }
-    
-    public async Task<bool> EsDuenioDe(int dni, string identificador)
-    {
-        // var request = new HttpRequestMessage(HttpMethod.Get,
-        //     "http://127.0.0.1:1880/");
-        //
-        // request.Headers.Add("identificador", $"{identificador}");
-        //
-        // var response = await _httpClient.SendAsync(request);
-        // response.EnsureSuccessStatusCode();
-        // var responseBody = await response.Content.ReadAsStringAsync();
-        // return JsonSerializer.Deserialize<bool>(responseBody);
-        return false;
-    }
-    
-    public async Task<string> Prueba()
-    {
         var request = new HttpRequestMessage(HttpMethod.Get,
-            "https://jsonplaceholder.typicode.com/todos/1");
+            $"http://127.0.0.1:1880/bieninhibido/");
+        
+        request.Headers.Add("identificador", $"{identificador}");
         
         var response = await _httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
         var responseBody = await response.Content.ReadAsStringAsync();
-        return responseBody;
+        Console.WriteLine("Bien" + responseBody);
+        return JsonSerializer.Deserialize<bool>(responseBody);
+    }
+    
+    public async Task<bool> EsDuenioDe(int dni, string identificador)
+    {
+        var request = new HttpRequestMessage(HttpMethod.Get,
+            $"http://127.0.0.1:1880/esduenio/");
+        
+        request.Headers.Add("Dni", $"{dni}");
+        request.Headers.Add("identificador", $"{identificador}");
+        
+        var response = await _httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        var responseBody = await response.Content.ReadAsStringAsync();
+        Console.WriteLine("duenio y bien" + responseBody);
+        return JsonSerializer.Deserialize<bool>(responseBody);
     }
     
 }

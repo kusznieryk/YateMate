@@ -17,6 +17,7 @@ using YateMate.Aplicacion.UseCases.Mensaje;
 using YateMate.Aplicacion.UseCases.Publicaciones;
 using YateMate.Aplicacion.UseCases.Reserva;
 using YateMate.Aplicacion.UseCases.Subalquiler;
+using YateMate.Aplicacion.UseCases.TruequesConfirmados;
 using YateMate.Components.Pages;
 using YateMate.Hubs;
 
@@ -118,7 +119,11 @@ public class Program
         builder.Services.AddTransient<AgregarAmarraUseCase>();
         builder.Services.AddScoped<IRepositorioAmarra, RepositorioAmarra>();
 
-            
+        builder.Services.AddTransient<AgregarTruequeConfirmadoUseCase>();
+        builder.Services.AddTransient<ObtenerTruequesConfirmadosUseCase>();
+        builder.Services.AddTransient <ObtenerTruequesConfirmadosDeLaPublicacionUseCase>();
+        builder.Services.AddScoped<IRepositorioTruequeConfirmado, RepositorioTruequeConfirmado>();    
+        
         builder.Services.AddCascadingAuthenticationState();
         builder.Services.AddScoped<IdentityUserAccessor>();
         builder.Services.AddScoped<IdentityRedirectManager>();

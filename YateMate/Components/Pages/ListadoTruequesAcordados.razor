@@ -2,12 +2,15 @@
 <MudDialogProvider />
 @using YateMate.Aplicacion.UseCases.Bien
 @using YateMate.Aplicacion.UseCases.Oferta
+@using YateMate.Aplicacion.UseCases.TruequesConfirmados
 @using YateMate.Components.Shared
 @rendermode InteractiveServer
 @inject ObtenerTruequesAcordadosUseCase ObtenerTruequesAcordadosUseCase
 @inject ObtenerBienUseCase ObtenerBienUseCase
 @inject ObtenerPublicacionDeUseCase ObtenerPublicacion
 @inject IDialogService Dialog
+@inject ObtenerTruequesConfirmadosUseCase ObtenerTruequesConfirmados
+@inject NavigationManager NavigationManager 
 
 <h1>Listado trueques acordados</h1>
 <title>Ofertas</title>
@@ -48,10 +51,14 @@ else
 @code {
     List<Oferta> _lista = new List<Oferta>();
     bool _tieneElementos;
-    
     protected override void OnInitialized()
     {
         _lista = ObtenerTruequesAcordadosUseCase.Ejecutar();
+        var listaTruequesConfirmados = ObtenerTruequesConfirmados.Ejecutar();
+        _lista = _lista.
+            Where(trueque => !listaTruequesConfirmados
+                .Exists(tc => tc.PublicacionId == trueque.PublicacionId))
+            .ToList();
     }
     protected override void OnParametersSet()
     {
@@ -66,6 +73,7 @@ else
         parameters.Add(x => x.Oferta, oferta);
         parameters.Add(x => x.Publicacion, pub);
         parameters.Add(x => x.Bien, bien);
-        Dialog.Show<VerDatosTrueque>("Simple Dialog", parameters);
+        Dialog.Show<VerDatosTrueque>("Viendo datos del trueque", parameters);
+        
     }
 }
