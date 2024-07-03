@@ -2,12 +2,14 @@
 <MudDialogProvider />
 @using YateMate.Aplicacion.UseCases.Bien
 @using YateMate.Aplicacion.UseCases.Oferta
+@using YateMate.Aplicacion.UseCases.TruequesConfirmados
 @using YateMate.Components.Shared
 @rendermode InteractiveServer
 @inject ObtenerTruequesAcordadosUseCase ObtenerTruequesAcordadosUseCase
 @inject ObtenerBienUseCase ObtenerBienUseCase
 @inject ObtenerPublicacionDeUseCase ObtenerPublicacion
 @inject IDialogService Dialog
+@inject ObtenerTruequesConfirmadosUseCase ObtenerTruequesConfirmados
 
 <h1>Listado trueques acordados</h1>
 <title>Ofertas</title>
@@ -52,6 +54,11 @@ else
     protected override void OnInitialized()
     {
         _lista = ObtenerTruequesAcordadosUseCase.Ejecutar();
+        var listaTruequesConfirmados = ObtenerTruequesConfirmados.Ejecutar();
+        _lista = _lista.
+            Where(trueque => !listaTruequesConfirmados
+                .Exists(tc => tc.PublicacionId == trueque.PublicacionId))
+            .ToList();
     }
     protected override void OnParametersSet()
     {
