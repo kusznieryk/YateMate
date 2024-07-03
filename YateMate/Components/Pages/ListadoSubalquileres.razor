@@ -17,71 +17,71 @@
 <h1>Subalquileres disponibles</h1>
 <title>Subalquileres</title>
 
-    @if (!_tieneElementos)
-    {
+@if (!_tieneElementos)
+{
     <h2>No hay subalquileres disponibles.</h2>
+}
+else
+{
+    <MudGrid>
+        <MudItem sm="12" md="6">
+            <h5>Filtrar por fecha</h5>
+            <MudStack>
+                <MudDateRangePicker PickerVariant="PickerVariant.Dialog" @bind-DateRange="_dateRange"  MinDate="DateTime.Now"/>
+            </MudStack>
+        </MudItem>
+        <MudItem sm="12" md="6">
+            <h5>Filtrar por Tamaño</h5>
+
+            <MudToggleGroup T="TamanioEstandar" SelectionMode="SelectionMode.MultiSelection" @bind-Values="opciones" Color="Color.Secondary" CheckMark Vertical Outline="false">
+                @foreach (TamanioEstandar tam in Enum.GetValues(typeof(TamanioEstandar)))
+                {
+                    <MudToggleItem T="TamanioEstandar" Value="@tam" UnselectedIcon="@Icons.Material.Filled.CheckBoxOutlineBlank" SelectedIcon="@Icons.Material.Filled.CheckBox">
+                        @(tam.ToString())
+                    </MudToggleItem>
+                }
+            </MudToggleGroup>
+
+        </MudItem>
+        <MudItem sm="12" md="6">
+            <MudButton Variant="Variant.Filled" DisableElevation="true" Color="Color.Primary" OnClick="AplicarFiltros">Aplicar filtros</MudButton>
+            <MudButton Variant="Variant.Outlined" DisableElevation="true" Color="Color.Primary" OnClick="BorrarFiltros">Borrar filtros</MudButton>
+        </MudItem>
+    </MudGrid>
+    @if (_lista.Count==0)
+    {
+        <h2>No hay subalquileres que cumplan con los requisitos.</h2>
     }
     else
     {
-            <MudGrid>
-                <MudItem sm="12" md="6">
-                    <h5>Filtrar por fecha</h5>
-                    <MudStack>
-                        <MudDateRangePicker PickerVariant="PickerVariant.Dialog" @bind-DateRange="_dateRange"  MinDate="DateTime.Now"/>
-                    </MudStack>
-                </MudItem>
-                <MudItem sm="12" md="6">
-                    <h5>Filtrar por Tamaño</h5>
-
-                    <MudToggleGroup T="TamanioEstandar" SelectionMode="SelectionMode.MultiSelection" @bind-Values="opciones" Color="Color.Secondary" CheckMark Vertical Outline="false">
-                        @foreach (TamanioEstandar tam in Enum.GetValues(typeof(TamanioEstandar)))
-                        {
-                            <MudToggleItem T="TamanioEstandar" Value="@tam" UnselectedIcon="@Icons.Material.Filled.CheckBoxOutlineBlank" SelectedIcon="@Icons.Material.Filled.CheckBox">
-                                @(tam.ToString())
-                            </MudToggleItem>
-                        }
-                    </MudToggleGroup>
-
-                </MudItem>
-                <MudItem sm="12" md="6">
-                    <MudButton Variant="Variant.Filled" DisableElevation="true" Color="Color.Primary" OnClick="AplicarFiltros">Aplicar filtros</MudButton>
-                    <MudButton Variant="Variant.Outlined" DisableElevation="true" Color="Color.Primary" OnClick="BorrarFiltros">Borrar filtros</MudButton>
-                </MudItem>
-            </MudGrid>
-        @if (_lista.Count==0)
-        {
-            <h2>No hay subalquileres que cumplan con los requisitos.</h2>
-        }
-        else
-        {
-            <MudTable Items="_lista" Class="mt-4" Dense="true" Outlined="true">
-                <HeaderContent>
-                    <MudTh>Fecha de inicio</MudTh>
-                    <MudTh>Fecha de fin</MudTh>
-                    <MudTh>Dueño</MudTh>
-                    <MudTh>Acción</MudTh>
-                </HeaderContent>
-                <RowTemplate>
-                    @{
-                        _reservasSub = ListarReservasDeSubalquilerUseCase.Ejecutar(context.Id);
-                        duenio = ObtenerDuenio.Ejecutar(context.IdDuenio);
-                    }
-                    <MudTd>
-                        @context.FechaInicio.ToString("d")
-                    </MudTd>
-                    <MudTd>
-                        @context.FechaFin.ToString("d")
-                    </MudTd>
-                    <MudTd>
-                        @duenio.Nombre @duenio.Apellido
-                    </MudTd>
-                    <MudTd>
-                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => VerSubalquiler(@context))">Ver Mas </MudButton>
-                    </MudTd>
-                </RowTemplate>
-            </MudTable>
-        }
+        <MudTable Items="_lista" Class="mt-4" Dense="true" Outlined="true">
+            <HeaderContent>
+                <MudTh>Fecha de inicio</MudTh>
+                <MudTh>Fecha de fin</MudTh>
+                <MudTh>Dueño</MudTh>
+                <MudTh>Acción</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                @{
+                    duenio = ObtenerDuenio.Ejecutar(context.IdDuenio);
+                }
+                <MudTd>
+                    @context.FechaInicio.ToString("d")
+                </MudTd>
+                <MudTd>
+                    @context.FechaFin.ToString("d")
+                </MudTd>
+                <MudTd>
+                    @duenio.Nombre @duenio.Apellido
+                </MudTd>
+                <MudTd>
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => VerSubalquiler(@context))">Ver Mas </MudButton>
+                </MudTd>
+            </RowTemplate>
+        </MudTable>
     }
+}
+        
 @code {
     List<Subalquiler> _lista = new();
     List<Subalquiler> _listaOriginal = new();
@@ -90,12 +90,12 @@
     private DateRange _dateRange { get; set; }
     private IEnumerable<TamanioEstandar> opciones = new List<TamanioEstandar>();
     ApplicationUser duenio;
-    List<Reserva> _reservasSub;
 
     protected override void OnInitialized()
     {
         _listaOriginal = ObtenerSubalquileresUseCase.Ejecutar();
         _lista = new List<Subalquiler>(_listaOriginal);
+        _lista = _lista.Where(s => TieneDiasLibres(s)).ToList();
         _tieneElementos = _lista.Count > 0;
     }
 
@@ -124,6 +124,22 @@
         opciones = new List<TamanioEstandar>();
         _dateRange = new DateRange();
         _lista = new List<Subalquiler>(_listaOriginal);
+    }
+
+    private bool TieneDiasLibres(Subalquiler sub)
+    {
+        var _reservasSub = ListarReservasDeSubalquilerUseCase.Ejecutar(sub.Id);
+        var todasLasFechas = new HashSet<DateTime>(
+            Enumerable.Range(0, (sub.FechaFin - sub.FechaInicio).Days + 1)
+                .Select(offset => sub.FechaInicio.AddDays(offset).Date)
+        );
+        foreach (var reserva in _reservasSub)
+        {
+            var fechasReservadas = Enumerable.Range(0, (reserva.FechaFin - reserva.FechaInicio).Days + 1)
+                .Select(offset => reserva.FechaInicio.AddDays(offset).Date);
+            todasLasFechas.ExceptWith(fechasReservadas);
+        }
+        return  ((double)todasLasFechas.Count / (sub.FechaFin - sub.FechaInicio).Days) > 0;
     }
 
 }
