@@ -89,12 +89,22 @@
     private DateRange _dateRange { get; set; }
     private IEnumerable<TamanioEstandar> opciones = new List<TamanioEstandar>();
     ApplicationUser duenio;
-
-    protected override void OnInitialized()
+    
+    [CascadingParameter]
+    private Task<AuthenticationState>? AuthenticationState { get; set; }
+    private string? _userId;    
+    
+    protected override async Task OnInitializedAsync()
     {
-        _listaOriginal = ObtenerSubalquileresUseCase.Ejecutar();
-        _lista = new List<Subalquiler>(_listaOriginal);
-        _tieneElementos = _lista.Count > 0;
+        if (AuthenticationState is not null)
+        {
+            var authState = await AuthenticationState;
+            var user = authState.User;
+            _userId = user.Claims.FirstOrDefault()?.Value;
+            _listaOriginal = ObtenerSubalquileresUseCase.Ejecutar().Where(s => !s.IdDuenio.Equals(_userId)).ToList();
+            _lista = new List<Subalquiler>(_listaOriginal);
+            _tieneElementos = _lista.Count > 0;
+        }
     }
 
     public void VerSubalquiler(Subalquiler subalquiler)
