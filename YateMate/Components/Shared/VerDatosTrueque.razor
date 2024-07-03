@@ -4,6 +4,8 @@
 @using YateMate.Aplicacion.UseCases.Oferta
 @using YateMate.Aplicacion.UseCases.Publicaciones
 @using YateMate.Components.Pages
+@using YateMate.Aplicacion.UseCases.TruequesConfirmados
+
 @inject RetrotraerTruequeUseCase RetrotraerTruequeUseCase
 @inject ObtenerBienUseCase ObtenerBienUseCase
 @inject ObtenerPublicacionDeUseCase ObtenerPublicacion
@@ -11,6 +13,7 @@
 @inject ApiCaller ApiCaller
 @inject ObtenerApplicationUserUseCase ObtenerApplicationUserUseCase
 @inject ObtenerEmbarcacionUseCase ObtenerEmbarcacionUseCase
+@inject  AgregarTruequeConfirmadoUseCase AgregarTruequeConfirmadoUseCase
 @inject IDialogService Dialog
 
 <MudDialogProvider />
@@ -62,7 +65,7 @@
                        Color="Color.Primary"
                        StartIcon="@Icons.Material.Filled.Check"
                        Size="Size.Small"
-                       OnClick="()=>ConfirmarTrueque(_usuarioPublicacion, _usuarioBien, _embarcacionUsuario, Bien)"> Confirmar Trueque
+                       OnClick="()=>ConfirmarTrueque(_usuarioPublicacion, _usuarioBien, _embarcacionUsuario, Bien, Oferta, Publicacion)"> Confirmar Trueque
             </MudButton>
             <MudButton Variant="Variant.Filled"
                        OnClick="RetrotraerTrueque"
@@ -73,8 +76,9 @@
         
     </DialogActions>
 </MudDialog>
-@code {
 
+@code {
+    bool _confirmacionExitosa; 
     bool _confirmacionEnCurso;
     [Parameter] public Oferta Oferta { get; set; }
     [Parameter] public Publicacion Publicacion { get; set; } = null!;
@@ -82,7 +86,13 @@
     
     
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
-    void Cancel() => MudDialog!.Cancel();
+
+    void Cancel()
+    {
+        MudDialog!.Cancel();
+        if(_confirmacionExitosa)
+            NavigationManager.Refresh(forceReload:true);
+    }
 
     
     ApplicationUser _usuarioBien; 
@@ -106,12 +116,11 @@
         NavigationManager.NavigateTo("/ListadoTruequesAcordados", forceLoad:true);
     }
 
-    public async Task ConfirmarTrueque(ApplicationUser usuarioPub, ApplicationUser usuarioBien, Embarcacion barco, Bien bien)
+    public async Task ConfirmarTrueque(ApplicationUser usuarioPub, ApplicationUser usuarioBien, Embarcacion barco, Bien bien, Oferta oferta, Publicacion publicacion)
     {
 
         _confirmacionEnCurso = true;
         MudDialog.SetTitle("Confirmando trueque");
-        StateHasChanged();
         try
         {
             _InhabilitacionesDuenioEmbarcacion = new Inhabilitaciones(
@@ -123,30 +132,37 @@
             // await ApiCaller.EstaBienInhabilitado();
             // await ApiCaller.EsDuenioDe();
             _resultadoApi = $"El usuario {_usuarioPublicacion.Nombre}, con la embarcación {_embarcacionUsuario.Nombre} {_InhabilitacionesDuenioEmbarcacion.MensajeError()}";
-            Console.WriteLine("primer checkeo hecho");
-            
+            // Console.WriteLine("primer checkeo hecho");
+            //
             if (!_InhabilitacionesDuenioEmbarcacion.AlgunError())
             {
-                _InhabilitacionesOfertante = new Inhabilitaciones(await ApiCaller.EstaDuenioInhibido(_usuarioBien.Dni.Value), false, false);
-                _resultadoApi +=  $"{Environment.NewLine} El usuario {_usuarioBien.Nombre}, dueño del bien {Bien.Nombre} {_InhabilitacionesOfertante.MensajeError()}";
+                // _InhabilitacionesOfertante = new Inhabilitaciones(await ApiCaller.EstaDuenioInhibido(_usuarioBien.Dni.Value), false, false);
+                // _resultadoApi +=  $"{Environment.NewLine} El usuario {_usuarioBien.Nombre}, dueño del bien {Bien.Nombre} {_InhabilitacionesOfertante.MensajeError()}";
+
+                _resultadoApi = "Ninguna inhabilitación detectada. El trueque se confirmó con éxito.";
+                AgregarTruequeConfirmadoUseCase.Ejecutar(new TruequeConfirmado(bien.Id,publicacion.Id));
+                _confirmacionExitosa = true;
             }
             //checkeos del que pone el bien, los ultimos 2 se van a ver en 3ra demo
             // await ApiCaller.EstaDuenioInhibido();
             // await ApiCaller.EstaBienInhabilitado();
             // await ApiCaller.EsDuenioDe();
-            
+
             Console.WriteLine(_resultadoApi);
         }
-        catch(Exception e)
+
+        catch (HttpRequestException)
         {
-            _resultadoApi = $"Problemas de conexion: {e.Message}";
+            _resultadoApi = "No se pudo establecer conexión con el servidor";
         }
-            // var parameters = new DialogParameters<ConfirmacionTrueque>();
-            // parameters.Add(x => x._usuarioPublicacion, usuarioPub);
-            // parameters.Add(x => x._usuarioBien, usuarioBien);
-            // parameters.Add(x => x.Bien, bien);
-            // parameters.Add(x => x._embarcacionUsuario, barco);
-            // Dialog.Show<ConfirmacionTrueque>("Esperando confirmacion", parameters);
+        catch (TaskCanceledException)
+        {
+            _resultadoApi = "Se estableció conexion con el servidor pero este no respondió";
+        }
+        // catch(Exception e)
+        // {
+        //     _resultadoApi = $"Problemas de conexion: {e.Message}";
+        // }
         
     }
 }

@@ -5,14 +5,15 @@ namespace YateMate.Repositorio;
 
 public class RepositorioTruequeConfirmado : IRepositorioTruequeConfirmado
 {
-    public void AgregarTruequeConfirmado(Oferta oferta)
+    public void AgregarTruequeConfirmado(TruequeConfirmado truequeConfirmado)
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
-            TruequeConfirmado? confirmado = context.TruequesConfirmados.FirstOrDefault(p => p.PublicacionId == oferta.PublicacionId);
-            if (confirmado != null)
+            Console.WriteLine("debug");
+            Console.WriteLine(truequeConfirmado.PublicacionId);
+            if (!context.TruequesConfirmados.Any() || context.TruequesConfirmados.FirstOrDefault(tc => tc.PublicacionId == truequeConfirmado.PublicacionId) != null)
             {
-                context.Add(new TruequeConfirmado( oferta.BienId, oferta.PublicacionId));
+                context.Add(truequeConfirmado);
                 context.SaveChanges();
             }
         }

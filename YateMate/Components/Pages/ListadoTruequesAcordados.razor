@@ -10,6 +10,7 @@
 @inject ObtenerPublicacionDeUseCase ObtenerPublicacion
 @inject IDialogService Dialog
 @inject ObtenerTruequesConfirmadosUseCase ObtenerTruequesConfirmados
+@inject NavigationManager NavigationManager 
 
 <h1>Listado trueques acordados</h1>
 <title>Ofertas</title>
@@ -50,7 +51,6 @@ else
 @code {
     List<Oferta> _lista = new List<Oferta>();
     bool _tieneElementos;
-    
     protected override void OnInitialized()
     {
         _lista = ObtenerTruequesAcordadosUseCase.Ejecutar();
@@ -74,5 +74,6 @@ else
         parameters.Add(x => x.Publicacion, pub);
         parameters.Add(x => x.Bien, bien);
         Dialog.Show<VerDatosTrueque>("Viendo datos del trueque", parameters);
+        
     }
 }

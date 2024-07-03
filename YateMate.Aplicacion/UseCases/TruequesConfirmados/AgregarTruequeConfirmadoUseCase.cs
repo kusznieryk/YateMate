@@ -4,8 +4,8 @@ namespace YateMate.Aplicacion.UseCases.TruequesConfirmados;
 
 public class AgregarTruequeConfirmadoUseCase(IRepositorioTruequeConfirmado repo)
 {
-    public void Ejecutar(Entidades.Oferta oferta)
+    public void Ejecutar(Entidades.TruequeConfirmado tc)
     {
-        repo.AgregarTruequeConfirmado(oferta);
+        repo.AgregarTruequeConfirmado(tc);
     }
 }
