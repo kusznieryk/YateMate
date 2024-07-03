@@ -172,7 +172,7 @@ namespace YateMate.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Amarras", (string)null);
+                    b.ToTable("Amarras");
                 });
 
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.ApplicationUser", b =>
@@ -298,7 +298,7 @@ namespace YateMate.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Bienes", (string)null);
+                    b.ToTable("Bienes");
                 });
 
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.Embarcacion", b =>
@@ -345,7 +345,7 @@ namespace YateMate.Migrations
 
                     b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("Embarcaciones", (string)null);
+                    b.ToTable("Embarcaciones");
                 });
 
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.MensajeChat", b =>
@@ -378,7 +378,7 @@ namespace YateMate.Migrations
 
                     b.HasIndex("ToUserId");
 
-                    b.ToTable("MensajesChats", (string)null);
+                    b.ToTable("MensajesChats");
                 });
 
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.Oferta", b =>
@@ -393,6 +393,9 @@ namespace YateMate.Migrations
                     b.Property<int>("BienId")
                         .HasColumnType("INTEGER");
 
+                    b.Property<bool>("EstaEliminado")
+                        .HasColumnType("INTEGER");
+
                     b.Property<int>("PublicacionId")
                         .HasColumnType("INTEGER");
 
@@ -404,7 +407,7 @@ namespace YateMate.Migrations
 
                     b.HasIndex("PublicacionId");
 
-                    b.ToTable("Ofertas", (string)null);
+                    b.ToTable("Ofertas");
                 });
 
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.Publicacion", b =>
@@ -434,7 +437,60 @@ namespace YateMate.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Publicaciones", (string)null);
+                    b.ToTable("Publicaciones");
+                });
+
+            modelBuilder.Entity("YateMate.Aplicacion.Entidades.Reserva", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("FechaFin")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaInicio")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("SubalquilerId")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("UsuarioId")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SubalquilerId");
+
+                    b.ToTable("Reservas");
+                });
+
+            modelBuilder.Entity("YateMate.Aplicacion.Entidades.Subalquiler", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<bool>("EstaEliminado")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<DateTime>("FechaFin")
+                        .HasColumnType("TEXT");
+
+                    b.Property<DateTime>("FechaInicio")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("IdAmarra")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("IdDuenio")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Subalquileres");
                 });
 
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.TruequeConfirmado", b =>
@@ -455,7 +511,7 @@ namespace YateMate.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("TruequesConfirmados", (string)null);
+                    b.ToTable("TruequesConfirmados");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -549,6 +605,15 @@ namespace YateMate.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("YateMate.Aplicacion.Entidades.Reserva", b =>
+                {
+                    b.HasOne("YateMate.Aplicacion.Entidades.Subalquiler", null)
+                        .WithMany("Reservas")
+                        .HasForeignKey("SubalquilerId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.ApplicationUser", b =>
                 {
                     b.Navigation("Bienes");
@@ -563,6 +628,11 @@ namespace YateMate.Migrations
             modelBuilder.Entity("YateMate.Aplicacion.Entidades.Publicacion", b =>
                 {
                     b.Navigation("Ofertas");
+                });
+
+            modelBuilder.Entity("YateMate.Aplicacion.Entidades.Subalquiler", b =>
+                {
+                    b.Navigation("Reservas");
                 });
 #pragma warning restore 612, 618
         }
