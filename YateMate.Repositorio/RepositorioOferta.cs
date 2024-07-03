@@ -12,7 +12,7 @@ public class RepositorioOferta : IRepositorioOferta
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
-            return context.Publicaciones.ToList();
+            return context.Publicaciones.Where(p => !p.EstaEliminado).ToList();
         }
     }
 
@@ -43,8 +43,7 @@ public class RepositorioOferta : IRepositorioOferta
             var oferta = context.Ofertas.FirstOrDefault(o => o.Id == id);
             if (oferta != null)
             {
-                context.Remove(oferta);
-                context.SaveChanges();
+                oferta.EstaEliminado = true;
             }
         }
     }
@@ -53,7 +52,7 @@ public class RepositorioOferta : IRepositorioOferta
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
-            return context.Ofertas.Where(o => o.PublicacionId == publicacionId).ToList();
+            return context.Ofertas.Where(o => o.PublicacionId == publicacionId && !o.EstaEliminado).ToList();
         }
     }
 
@@ -61,7 +60,7 @@ public class RepositorioOferta : IRepositorioOferta
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
-            return context.Ofertas.Where(o => o.UsuarioId == userId).ToList();
+            return context.Ofertas.Where(o => o.UsuarioId == userId && !o.EstaEliminado).ToList();
         }
     }
 
@@ -81,7 +80,7 @@ public class RepositorioOferta : IRepositorioOferta
             if (!ofertas.Any()) return;
             foreach (var oferta in ofertas)
             {
-                context.Remove(oferta);
+                oferta.EstaEliminado = true;
             }
             context.SaveChanges();
         }
@@ -94,7 +93,7 @@ public class RepositorioOferta : IRepositorioOferta
             if (!ofertas.Any()) return;
             foreach (var oferta in ofertas)
             {
-                context.Remove(oferta);
+                oferta.EstaEliminado = true;
             }
             context.SaveChanges();
         }

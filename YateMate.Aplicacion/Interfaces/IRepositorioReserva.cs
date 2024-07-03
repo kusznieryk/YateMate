@@ -12,4 +12,6 @@ public interface IRepositorioReserva
     Reserva? ObtenerReserva(int id);
     ApplicationUser? ObtenerDuenioReserva(string id);
     Task<List<(DateTime Start, DateTime End)>> ObtenerFechasOcupadas(int subalquilerId);
+    List<Reserva> ObtenerReservasDeSubalquiler(int id);
+ 
 }

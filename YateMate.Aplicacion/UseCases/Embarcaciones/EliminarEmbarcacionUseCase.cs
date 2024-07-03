@@ -25,6 +25,6 @@ public class EliminarEmbarcacionUseCase
         bool tienePublicacion = _tienePublicacionUseCase.Ejecutar(embarcacionId);
         if(tienePublicacion)
             _eliminarPublicacionUseCase.Ejecutar(_obtenerPublicacionUseCase.Ejecutar(embarcacionId)!);
-        _repo.EliminarEmbarcacion(embarcacionId, tienePublicacion);
+        _repo.EliminarEmbarcacion(embarcacionId, true);
     }
 }

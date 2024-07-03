@@ -6,6 +6,6 @@ public class ObtenerSubalquileresVigentesUseCase(IRepositorioSubalquiler repo)
 {
     public List<Entidades.Subalquiler> Ejecutar()
     {
-        return repo.ObtenerSubalquileresVigentes();
+        return repo.ObtenerSubalquileresVigentes().Where(s => !s.EstaEliminado).ToList();
     }
 }

@@ -7,6 +7,7 @@ public class Oferta
     public int PublicacionId { get; set; }
     public string UsuarioId { get; set; }
     public bool Aceptada { get; set; }
+    public bool EstaEliminado { get; set; }
 
 public Oferta(int bienId, int publicacionId, string usuarioId)
     {
