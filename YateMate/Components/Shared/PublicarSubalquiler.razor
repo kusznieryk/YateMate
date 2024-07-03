@@ -1,139 +1,113 @@
-@* @page "/publicarSubalquiler" *@
 @rendermode InteractiveServer
 @using YateMate.Aplicacion.UseCases.Subalquiler
-@inject AgregarSubalquilerUseCase AgregarSubalquilerUseCase
-@inject ObtenerSubalquileresDeLaAmarraUseCase ObtenerSubalquileresDeLaAmarraUseCase 
-@inject NavigationManager Navegador
 @using System.ComponentModel.DataAnnotations
 @using YateMate.Components.Account.Pages
 
-<MudDialog>
+@inject AgregarSubalquilerUseCase AgregarSubalquilerUseCase
+@inject ObtenerSubalquileresDeLaAmarraUseCase ObtenerSubalquileresDeLaAmarraUseCase 
+@inject NavigationManager Navegador
+@inject ObtenerFechasReservadasUseCase ObtenerFechasReservadasUseCase
+
+<MudDialog Style="max-width: 660px;">
     <TitleContent>
         <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
-            Publicar Subalquiler
+            Publicar subalquiler
         </MudText>
     </TitleContent>
     <DialogContent>
-        
         <EditForm OnSubmit="HandleSubmit" EditContext="editContext" FormName="PublicarSubalquiler">
-            <CustomValidator @ref="customValidator" ></CustomValidator>
+            <CustomValidator @ref="customValidator"></CustomValidator>
 
-            <div class="form-group">
-                <label for="startDate">Fecha inicio:</label>
-                <InputDate id="startDate"
-                           @bind-Value="dateModel.FechaInicio"
-                           class="form-control"
-                           min="@DateTime.Now.ToString("yyyy-MM-dd")"/>
-                <ValidationMessage For="@(() => dateModel.FechaInicio)"/>
-            </div>
-
-            <div class="form-group">
-                <label for="endDate">Fecha fin:</label>
-                <InputDate id="endDate"
-                           @bind-Value="dateModel.FechaFin"
-                           class="form-control"
-                           min="@dateModel.FechaInicio.Value.ToString("yyyy-MM-dd")"/>
-                <ValidationMessage For="@(() => dateModel.FechaFin)"/>
-            </div>
-
-            <button type="submit" class="btn btn-primary">Publicar</button>
+            <MudDateRangePicker T="DateTime?"
+                                @bind-DateRange="dateModel.FechaRango"
+                                PickerVariant="PickerVariant.Static"
+                                MinDate="DateTime.Today"
+                                IsDateDisabledFunc="IsDateDisabled"
+                                />
+            <ValidationMessage For="@(() => dateModel.FechaRango)"/>
         </EditForm>
     </DialogContent>
     <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleSubmit">Confirmar</MudButton>
         <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
     </DialogActions>
 </MudDialog>
 
 @code {
-    
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
     [Parameter] public string IdDuenio { get; set; }
     [Parameter] public int IdAmarra { get; set; }
+    
     private EditContext? editContext;
     public CustomValidator customValidator;
-    private Model dateModel = new Model();
-
+    private Model dateModel = new();
+    private List<(DateTime Start, DateTime End)> fechasOcupadas = new ();
 
     protected override void OnInitialized()
     {
-        dateModel.FechaInicio = DateTime.Today;
-        editContext = new(dateModel);
-        // foreach (var property in dateModel.GetType().GetProperties()) //me cago en microsoft
-        // {
-        //     Console.WriteLine(property);
-        // }
-        // Console.WriteLine(IdDuenio);
-        // Console.WriteLine(IdAmarra);
-
+        editContext = new EditContext(dateModel);
+        fechasOcupadas = ObtenerFechasReservadasUseCase.Ejecutar(IdAmarra);
     }
+
+
+    private bool IsDateDisabled(DateTime date)
+    {
+        foreach (var fecha in fechasOcupadas)
+        {
+            if (date >= fecha.Start && date <= fecha.End)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
     void ValidSubmit()
     {
-        if (true)
-        {
-            var subalquiler = new Subalquiler(dateModel.FechaInicio.Value, dateModel.FechaFin.Value, IdDuenio, IdAmarra);
-            AgregarSubalquilerUseCase.Ejecutar(subalquiler);
-            MudDialog!.Close(DialogResult.Ok(true));
-            Navegador.NavigateTo("/ListadoMisSubalquileres");
-        }
-            
+        var subalquiler = new Subalquiler(dateModel.FechaRango.Start.Value, dateModel.FechaRango.End.Value, IdDuenio, IdAmarra);
+        AgregarSubalquilerUseCase.Ejecutar(subalquiler);
+        MudDialog!.Close(DialogResult.Ok(true));
+        Navegador.NavigateTo("/ListadoMisSubalquileres");
     }
-    
+
     void Cancel() => MudDialog!.Cancel();
 
     public void HandleSubmit()
     {
         customValidator.ClearErrors();
         var errors = new Dictionary<string, List<string>>();
-        foreach (var property in dateModel.GetType().GetProperties()) //me cago en microsoft
+        if (dateModel.FechaRango != null)
         {
-            var value = property.GetValue(dateModel);
-            if (String.IsNullOrWhiteSpace(value?.ToString()))
+            
+            if (IsDateDisabled(dateModel.FechaRango.Start!.Value) || IsDateDisabled(dateModel.FechaRango.End!.Value))
             {
-                Console.WriteLine($"el campo {property.Name} estaba vacio");
-                errors.Add(property.Name, new List<string>() {"Este campo es obligatorio"});
+                errors.Add("FechaRango", new List<string> {
+                    $"El periodo seleccionado ya fue publicado por otro de tus subalquiler, por favor ingrese otro."
+                });
+                customValidator.DisplayErrors(errors);
+                return;
             }
         }
-        
-        var subalquileresDeLaAmarra = ObtenerSubalquileresDeLaAmarraUseCase.Ejecutar(IdAmarra);
-        var subalquilerInvalido =  subalquileresDeLaAmarra.Find(s => (s.FechaInicio >= dateModel.FechaInicio && s.FechaInicio <= dateModel.FechaFin));
-        if (subalquilerInvalido is not null)
+        else
         {
-            errors.Add("FechaInicio", new List<string>()
+            errors.Add("FechaRango", new List<string>
             {
-                $"Fecha de inicio invalida, tenes un subalquiler publicado en el rango {subalquilerInvalido.FechaInicio:dd/MM/yyyy} - {subalquilerInvalido.FechaFin:dd/MM/yyyy}"
+                "Por favor ingrese un rango de fechas para su reserva."
             });
-            customValidator.DisplayErrors(errors);
-            return;
         }
-        
-        subalquilerInvalido = subalquileresDeLaAmarra.Find(s => (s.FechaFin >= dateModel.FechaInicio && s.FechaFin <= dateModel.FechaFin));
-        if (subalquilerInvalido is not null)
-        {
-            errors.Add("FechaFin", new List<string>(){$"Fecha de fin invalida, tenes un subalquiler publicado en el rango {subalquilerInvalido.FechaInicio:dd/MM/yyyy} - {subalquilerInvalido.FechaFin:dd/MM/yyyy}"});
-            customValidator.DisplayErrors(errors);
-            return;
-        }
-        
         if (errors.Count > 0)
         {
-            Console.WriteLine($"hay {errors.Count} errores");
-            foreach (var error in errors)
-            {
-                Console.WriteLine($"error {error.Key} {error.Value}");
-            }
             customValidator.DisplayErrors(errors);
             return;
         }
-
         ValidSubmit();
     }
+
 
     public class Model
     {
         [Required(ErrorMessage = "Obligatorio.")]
-        public DateTime? FechaInicio { get; set; }
-
-        [Required(ErrorMessage = "obligatorio")]
-        public DateTime? FechaFin { get; set; }
+        public DateRange? FechaRango { get; set; }
     }
+    
 }

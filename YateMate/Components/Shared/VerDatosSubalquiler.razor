@@ -60,7 +60,7 @@
         if (result == true)
         {
             EliminarSubalquilerUseCase.Ejecutar(Subalquiler.Id);
-            NavigationManager.NavigateTo("/listadoSubalquileres", true);
+            NavigationManager.Refresh(forceReload: true);
             MudDialog!.Close(DialogResult.Ok(true));
         }
     }

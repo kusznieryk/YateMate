@@ -93,4 +93,17 @@ public class RepositorioSubalquiler : IRepositorioSubalquiler
             return context.ApplicationUsers.FirstOrDefault(a => a.Id == id);
         }
     }
+
+    public List<(DateTime Start, DateTime End)> ObtenerFechasReservadas(int idAmarra)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Subalquileres
+                .Where(subalquiler => subalquiler.IdAmarra == idAmarra)
+                .Select(r => new { r.FechaInicio, r.FechaFin })
+                .AsEnumerable()
+                .Select(r => (r.FechaInicio, r.FechaFin))
+                .ToList();
+        }
+    }
 }

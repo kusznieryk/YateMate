@@ -14,4 +14,5 @@ public interface IRepositorioSubalquiler
     public List<Subalquiler> ObtenerSubalquileresVigentes();
     public List<Subalquiler> ObtenerSubalquileresDeLaAmarra(int idAmarra);
     public ApplicationUser ObtenerDuenioSubalquiler(string id);
+    public List<(DateTime Start, DateTime End)> ObtenerFechasReservadas(int idAmarra);
 }
