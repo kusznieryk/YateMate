@@ -85,6 +85,7 @@
     {
         var parameters = new DialogParameters<EditarReserva>();
         parameters.Add(x => x.Reserva, reserva);
+        parameters.Add(x=>x.Subalquiler,Subalquiler);
         Dialog.Show<EditarReserva>("Editar", parameters);
     }
     

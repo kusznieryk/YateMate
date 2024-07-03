@@ -11,8 +11,8 @@ public class HacerReservaUseCase
         this._repo = repo;
     }
 
-    public void Ejecutar(Entidades.Reserva reserva, Entidades.Subalquiler? subalquiler)
+    public void Ejecutar(Entidades.Reserva reserva)
     {
-        _repo.HacerReserva(reserva, subalquiler);
+        _repo.HacerReserva(reserva);
     }
 }

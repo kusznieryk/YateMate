@@ -1,5 +1,6 @@
 @page "/ListadoSubalquileres"
 @rendermode InteractiveServer
+@using YateMate.Aplicacion.UseCases.Reserva
 @using YateMate.Aplicacion.UseCases.Subalquiler
 @using YateMate.Components.Shared
 @inject IDialogService Dialog
@@ -7,7 +8,7 @@
 @inject ObtenerDuenioSubalquilerUseCase ObtenerDuenio
 @inject FiltrarPorTamanioUseCase FiltrarPorTamanio
 @inject FiltrarPorFechaUseCase FiltrarPorFecha
-@rendermode InteractiveServer
+@inject ListarReservasDeSubalquilerUseCase ListarReservasDeSubalquilerUseCase
 
 <MudDialogProvider  FullWidth="true"
                     MaxWidth="MaxWidth.Small"
@@ -61,15 +62,16 @@
                     <MudTh>Acción</MudTh>
                 </HeaderContent>
                 <RowTemplate>
+                    @{
+                        _reservasSub = ListarReservasDeSubalquilerUseCase.Ejecutar(context.Id);
+                        duenio = ObtenerDuenio.Ejecutar(context.IdDuenio);
+                    }
                     <MudTd>
                         @context.FechaInicio.ToString("d")
                     </MudTd>
                     <MudTd>
                         @context.FechaFin.ToString("d")
                     </MudTd>
-                    @{
-                        duenio = ObtenerDuenio.Ejecutar(context.IdDuenio);
-                    }
                     <MudTd>
                         @duenio.Nombre @duenio.Apellido
                     </MudTd>
@@ -80,7 +82,6 @@
             </MudTable>
         }
     }
-</MudContainer>
 @code {
     List<Subalquiler> _lista = new();
     List<Subalquiler> _listaOriginal = new();
@@ -89,6 +90,7 @@
     private DateRange _dateRange { get; set; }
     private IEnumerable<TamanioEstandar> opciones = new List<TamanioEstandar>();
     ApplicationUser duenio;
+    List<Reserva> _reservasSub;
 
     protected override void OnInitialized()
     {
