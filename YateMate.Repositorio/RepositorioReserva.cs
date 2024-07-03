@@ -55,6 +55,14 @@ public class RepositorioReserva : IRepositorioReserva
         }
     }
 
+    public List<Reserva> ListarReservasDeSubalquiler(int subalquilerId)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Reservas.Where(r => r.SubalquilerId.Equals(subalquilerId)).ToList();
+        }
+    }
+
     public Reserva? ObtenerReserva(int id)
     {
         using (var context = ApplicationDbContext.CrearContexto())
