@@ -6,6 +6,6 @@ public class ObtenerSubalquileresDeUseCase(IRepositorioSubalquiler repo)
 {
     public List<Entidades.Subalquiler> Ejecutar(string idDuenio)
     {
-        return repo.ObtenerSubalquileresDe(idDuenio);
+        return repo.ObtenerSubalquileresDe(idDuenio).Where(s => !s.EstaEliminado).ToList();
     }
 }
