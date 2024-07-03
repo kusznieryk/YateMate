@@ -1,8 +1,13 @@
 @using System.ComponentModel.DataAnnotations
+@using Microsoft.AspNetCore.Identity.UI.Services
 @using YateMate.Aplicacion.UseCases.Reserva
+@using YateMate.Aplicacion.UseCases.Subalquiler
 @using YateMate.Components.Account.Pages
 @inject HacerReservaUseCase HacerReservaUseCase
 @inject NavigationManager Navegador
+@inject ObtenerDuenioSubalquilerUseCase ObtenerDuenioSubalquilerUseCase
+@inject ObtenerDuenioReservaUseCase ObtenerDuenioReservaUseCase
+@inject EmailSender EmailSender
 @rendermode InteractiveServer
 
 <MudDialog>
@@ -12,7 +17,6 @@
         </MudText>
     </TitleContent>
     <DialogContent>
-        
         <EditForm OnSubmit="HandleSubmit" EditContext="editContext" FormName="HacerReserva">
             <CustomValidator @ref="customValidator" ></CustomValidator>
             <div class="form-group">
@@ -55,20 +59,17 @@
         dateModel.FechaInicio = Subalquiler2.FechaInicio;
         dateModel.FechaFin = Subalquiler2.FechaFin;
         editContext = new(dateModel);
-        // foreach (var property in dateModel.GetType().GetProperties()) //me cago en microsoft
-        // {
-        //     Console.WriteLine(property);
-        // }
-        // Console.WriteLine(IdDuenio);
-        // Console.WriteLine(IdAmarra);
     }
-    void ValidSubmit()
+    async Task ValidSubmit()
     {
         var reserva = new Reserva(Subalquiler2.Id, IdUsuario, dateModel.FechaInicio.Value, dateModel.FechaFin.Value);
         Console.WriteLine($"{dateModel.FechaFin}{dateModel.FechaInicio}");
         HacerReservaUseCase.Ejecutar(reserva, Subalquiler2);
+        var mailDuenio = ObtenerDuenioSubalquilerUseCase.Ejecutar(Subalquiler2.IdDuenio).Email;
+        var duenioReserva = ObtenerDuenioReservaUseCase.Ejecutar(reserva.UsuarioId);
+        // await EmailSender.SendMessageReserva(mailDuenio, reserva, duenioReserva, Subalquiler2);
         MudDialog!.Close(DialogResult.Ok(true));
-        Navegador.NavigateTo("/ListadoReservas");
+        Navegador.NavigateTo("/ListadoMisReservas");
     }
     
     void Cancel() => MudDialog!.Cancel();
@@ -216,7 +217,7 @@
 @*         { *@
 @*             ModificarReserva(_reserva); *@
 @*         } *@
-@*         Navegador.NavigateTo("/ListadoReservas"); *@
+@*         Navegador.NavigateTo("/ListadoMisReservas"); *@
 @*              *@
 @*     } *@
 @* *@

@@ -1,11 +1,11 @@
-@page "/ListadoReservas"
+@page "/ListadoMisReservas"
 
 @rendermode InteractiveServer
 @using YateMate.Components.Shared
 @using YateMate.Aplicacion.UseCases.Reserva
 @using YateMate.Aplicacion.UseCases.Subalquiler
 @inject ListarReservasDeUseCase ListarReservasDeUseCase
-@inject CancelarReservaUseCase CancelarReservaUseCase
+@inject ObtenerDuenioSubalquilerUseCase ObtenerDuenioSubalquilerUseCase
 @inject ObtenerSubalquilerUseCase ObtenerSubalquilerUseCase
 @inject IDialogService Dialog
 @inject NavigationManager Navegador;
@@ -28,17 +28,31 @@ else
             <MudGrid>
                 @foreach (var reserva in _lista)
                 {
-                    var subalquiler = ObtenerSubalquilerUseCase.Ejecutar(reserva.SubalquilerId);
+                    subalquiler = ObtenerSubalquilerUseCase.Ejecutar(reserva.SubalquilerId);
+                    duenio = ObtenerDuenioSubalquilerUseCase.Ejecutar(subalquiler.IdDuenio);
                     <MudItem xs="4" Style="display:flex;">
                         <MudPaper Width="100%" Square="false" Class="pa-10 ma-2 infobox" Style="border: none; box-shadow: none;">
                             <MudCard>
-                                <MudCardContent Style="min-height: 100px">
-                                    <MudText Typo="Typo.h5" Style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">ID AMARRA: @subalquiler?.IdAmarra</MudText>
-                                    <MudText Typo="Typo.body2" Style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">Desde: @reserva.FechaInicio.ToString("d")</MudText>
-                                    <MudText Typo="Typo.body2" Style="overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical;">Hasta: @reserva.FechaFin.ToString("d")</MudText>
+                                <MudCardContent>
+                                    <MudStack Spacing="2" AlignItems="AlignItems.Center">
+                                        <MudText Typo="Typo.h6" Align="Align.Center">
+                                            Amarra Nº @subalquiler?.IdAmarra
+                                        </MudText>
+                                        <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Info" Size="Size.Large" />
+                                        <MudText Typo="Typo.body2" Align="Align.Center">
+                                            @duenio.Nombre @duenio.Apellido
+                                        </MudText>
+                                        <MudDivider />
+                                        <MudText Typo="Typo.body2" Align="Align.Center">
+                                            Desde: @reserva.FechaInicio.ToString("d")
+                                        </MudText>
+                                        <MudText Typo="Typo.body2" Align="Align.Center">
+                                            Hasta: @reserva.FechaFin.ToString("d")
+                                        </MudText>
+                                    </MudStack>
                                 </MudCardContent>
-                                <MudCardActions Style="justify-content: space-between;">
-                                    <MudButton Variant="Variant.Text" @onclick="@((e) => OpenDialog(reserva, subalquiler))" Color="Color.Primary">Ver más</MudButton> 
+                                <MudCardActions Style="justify-content: center;">
+                                    <MudButton Variant="Variant.Text" @onclick="@(() => OpenDialog(reserva, subalquiler))" Color="Color.Primary">Ver más</MudButton>
                                 </MudCardActions>
                             </MudCard>
                         </MudPaper>
@@ -54,6 +68,9 @@ else
     List<Reserva> _lista = new List<Reserva>();
     Reserva? _reservaParaCancelar;
     bool _tieneElementos;
+
+    Subalquiler subalquiler;
+    ApplicationUser duenio;
 
     [CascadingParameter]
     private Task<AuthenticationState>? AuthenticationState { get; set; }

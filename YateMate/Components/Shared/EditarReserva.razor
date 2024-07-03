@@ -32,7 +32,7 @@
                 <label for="fechaFin">Fecha de fin</label>
                 <ValidationMessage For="() => Model.FechaFin" class="text-danger" />
             </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Cargar reserva</button>
+            <button type="submit" class="w-100 btn btn-lg btn-primary">Confirmar cambio</button>
         </EditForm>
     </DialogContent>
     <DialogActions>
@@ -53,13 +53,14 @@
     bool _esNuevoReserva = true;
     Subalquiler? _subalquiler;
     string _err = "";
+    Reserva reservaQueVaABaseDeDatos;
     
     async Task Submit()
     {
-        _subalquiler = ObtenerSubalquilerUseCase.Ejecutar(Reserva.SubalquilerId);
+        _subalquiler = ObtenerSubalquilerUseCase.Ejecutar(reservaQueVaABaseDeDatos.SubalquilerId);
         var mailDuenio = ObtenerDuenioSubalquilerUseCase.Ejecutar(_subalquiler.IdDuenio).Email;
-        var duenioReserva = ObtenerDuenioReservaUseCase.Ejecutar(Reserva.UsuarioId);
-        await EmailSender.SendMessageCambioReserva(mailDuenio, Reserva, duenioReserva,_subalquiler);
+        var duenioReserva = ObtenerDuenioReservaUseCase.Ejecutar(reservaQueVaABaseDeDatos.UsuarioId);
+        // await EmailSender.SendMessageCambioReserva(mailDuenio, reservaQueVaABaseDeDatos, duenioReserva,_subalquiler);
         Navegador.Refresh(forceReload: true);
         MudDialog!.Close(DialogResult.Ok(true));
     }
@@ -110,7 +111,7 @@
     public void ValidSubmit()
     {
         Model.UsuarioId = Reserva.UsuarioId;
-        var reservaQueVaABaseDeDatos = new Reserva(Model.SubalquilerId.Value, Model.UsuarioId, Model.FechaInicio.Value, Model.FechaFin.Value);
+        reservaQueVaABaseDeDatos = new Reserva(Model.SubalquilerId.Value, Model.UsuarioId, Model.FechaInicio.Value, Model.FechaFin.Value);
         reservaQueVaABaseDeDatos.Id = Reserva.Id;
         ModificarReservaUseCase.Ejecutar(reservaQueVaABaseDeDatos);
         Submit();

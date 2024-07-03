@@ -43,6 +43,11 @@ public class EmailSender(IOptions<AuthMessageSenderOptions> optionsAccessor,
             Subalquiler subalquiler)
             => SendEmailAsync(Email, "Cambio de fecha de reserva",
                 $"El usuario '{duenioReserva.Nombre} {duenioReserva.Apellido}' ha efectuado un cambio de fecha para la reserva del subalquiler de la amarra Nº{subalquiler.IdAmarra}. Ahora la reserva es entre {reserva.FechaInicio:d} y {reserva.FechaFin:d}");
+        public Task SendMessageCancelacion(string Email, Reserva reserva, ApplicationUser duenioReserva,
+            Subalquiler subalquiler)
+            => SendEmailAsync(Email, "Cancelado de reserva",
+                $"El usuario '{duenioReserva.Nombre} {duenioReserva.Apellido}' ha cancelado su reserva para tu amarra de Nº{subalquiler.IdAmarra}. El rango {reserva.FechaInicio:d} - {reserva.FechaFin:d} vuelve a estar disponible para reservas.");
+
         public Task SendPasswordResetCodeAsync(ApplicationUser user, string email, 
          string resetCode) => SendEmailAsync(email, "Cambia tu contraseña", 
          $"Cambia tu contraseña usando el siguiente codigo: {resetCode}");

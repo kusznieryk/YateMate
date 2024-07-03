@@ -4,24 +4,26 @@
 @using YateMate.Components.Shared
 @inject IDialogService Dialog
 @inject ObtenerSubalquileresDeUseCase ObtenerSubalquileresDeUseCase
+@inject NavigationManager Navegador
 
 <MudDialogProvider  FullWidth="true"
                     MaxWidth="MaxWidth.Small"
                     Position="DialogPosition.CenterLeft"/>
 
-<h3>Listado de mis Subalquileres</h3>
+<h1>Mis subalquileres</h1>
 
-<MudContainer>
-    @if (!_tieneElementos)
-    {
-        <h2>No hay subalquileres disponibles.</h2>
-    }
-    else
-    {
+@if (!_tieneElementos)
+{
+    <h2>No tiene subalquileres vigentes.</h2>
+}
+else
+{
+    <MudContainer>
         <MudTable Items="_lista" Class="mt-4" Dense="true" Outlined="true">
             <HeaderContent>
                 <MudTh>Fecha de inicio</MudTh>
                 <MudTh>Fecha de fin</MudTh>
+                <MudTh>Acción</MudTh>
             </HeaderContent>
             <RowTemplate>
                 <MudTd>
@@ -30,63 +32,63 @@
                 <MudTd>
                     @context.FechaFin.ToString("d")
                 </MudTd>
-                
                 <MudTd>
                     <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => VerSubalquiler(@context))">Ver Mas </MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Secondary" OnClick="@(() => Navegador.NavigateTo($"/ListarReservas/{context.Id}"))">Listar reservas </MudButton>
                 </MudTd>
             </RowTemplate>
         </MudTable>
-    }
-</MudContainer>
+    </MudContainer>
+}
 
 @code {
-List<Subalquiler> _lista = new();
-bool _tieneElementos;
+    List<Subalquiler> _lista = new();
+    bool _tieneElementos;
 
-[CascadingParameter]
-private Task<AuthenticationState>? _AuthenticationState { get; set; }
+    [CascadingParameter]
+    private Task<AuthenticationState>? _AuthenticationState { get; set; }
 
-private string? _userId;    
+    private string? _userId;    
     
-protected override async Task OnInitializedAsync()
-{
-    if (_AuthenticationState is not null)
+    protected override async Task OnInitializedAsync()
     {
-        var authState = await _AuthenticationState;
-        var user = authState.User;
+        if (_AuthenticationState is not null)
+        {
+            var authState = await _AuthenticationState;
+            var user = authState.User;
             
-        _userId = user.Claims.FirstOrDefault()?.Value;
+            _userId = user.Claims.FirstOrDefault()?.Value;
+            _lista = ObtenerSubalquileresDeUseCase.Ejecutar(_userId);
+            _tieneElementos = _lista.Count > 0;
+        }
+        else
+        {
+            Console.WriteLine("Authstate es null, no se que decirte");
+        }
+    }
+
+    public void ModificarSubalquiler(Subalquiler subalquiler)
+    {
+        
+    }
+
+    public void ConfirmarEliminacion(Subalquiler subalquiler)
+    {
+    
+    }
+
+    public void VerSubalquiler(Subalquiler subalquiler)
+    {
+        var options = new DialogOptions { CloseOnEscapeKey = true };
+        var parameters = new DialogParameters<VerDatosSubalquiler>();
+        parameters.Add(x => x.Subalquiler, subalquiler);
+        Dialog.Show<VerDatosSubalquiler>("Ver Datos", parameters, options);
+    }
+
+    private void ActualizarLista()
+    {
         _lista = ObtenerSubalquileresDeUseCase.Ejecutar(_userId);
         _tieneElementos = _lista.Count > 0;
     }
-    else
-    {
-        Console.WriteLine("Authstate es null, no se que decirte");
-    }
-}
-
-public void ModificarSubalquiler(Subalquiler subalquiler)
-{
-        
-}
-
-public void ConfirmarEliminacion(Subalquiler subalquiler)
-{
-    
-}
-
-public void VerSubalquiler(Subalquiler subalquiler)
-{
-    var options = new DialogOptions { CloseOnEscapeKey = true };
-    var parameters = new DialogParameters<VerDatosSubalquiler>();
-    parameters.Add(x => x.Subalquiler, subalquiler);
-    Dialog.Show<VerDatosSubalquiler>("Ver Datos", parameters, options);
-}
-
-private void ActualizarLista()
-{
-    _lista = ObtenerSubalquileresDeUseCase.Ejecutar(_userId);
-    _tieneElementos = _lista.Count > 0;
-}
 
 }

@@ -71,6 +71,15 @@ public class RepositorioReserva : IRepositorioReserva
         }
     }
 
+    public List<Reserva> ListarReservasDeSubalquiler(int subalquilerId)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Reservas.Where(r => r.SubalquilerId == subalquilerId).ToList();
+        }
+    }
+
+
     private bool CheckearDisponibilidad(Reserva reserva, Subalquiler? subalquiler)
     {
         if (subalquiler == null)

@@ -10,43 +10,43 @@
                     MaxWidth="MaxWidth.Small"
                     Position="DialogPosition.CenterLeft"/>
 
-<h3>Subalquileres disponibles</h3>
+<h1>Subalquileres disponibles</h1>
 <title>Subalquileres</title>
 
-<MudContainer>
     @if (!_tieneElementos)
     {
     <h2>No hay subalquileres disponibles.</h2>
     }
     else
     {
-        <MudTable Items="_lista" Class="mt-4" Dense="true" Outlined="true">
-            <HeaderContent>
-                <MudTh>Fecha de inicio</MudTh>
-                <MudTh>Fecha de fin</MudTh>
-                <MudTh>Dueño</MudTh>
-                <MudTh>Acción</MudTh>
-            </HeaderContent>
-            <RowTemplate>
-                <MudTd>
-                    @context.FechaInicio.ToString("d")
-                </MudTd>
-                <MudTd>
-                    @context.FechaFin.ToString("d")
-                </MudTd>
-                @{
-                    duenio = ObtenerDuenio.Ejecutar(context.IdDuenio);
-                }
-                <MudTd>
-                    @duenio.Nombre @duenio.Apellido
-                </MudTd>
-                <MudTd>
-                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => VerSubalquiler(@context))">Ver Mas </MudButton>
-                </MudTd>
-            </RowTemplate>
-        </MudTable>
+        <MudContainer>
+            <MudTable Items="_lista" Class="mt-4" Dense="true" Outlined="true">
+                <HeaderContent>
+                    <MudTh>Fecha de inicio</MudTh>
+                    <MudTh>Fecha de fin</MudTh>
+                    <MudTh>Dueño</MudTh>
+                    <MudTh>Acción</MudTh>
+                </HeaderContent>
+                <RowTemplate>
+                    <MudTd>
+                        @context.FechaInicio.ToString("d")
+                    </MudTd>
+                    <MudTd>
+                        @context.FechaFin.ToString("d")
+                    </MudTd>
+                    @{
+                        duenio = ObtenerDuenio.Ejecutar(context.IdDuenio);
+                    }
+                    <MudTd>
+                        @duenio.Nombre @duenio.Apellido
+                    </MudTd>
+                    <MudTd>
+                        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="@(() => VerSubalquiler(@context))">Ver Mas </MudButton>
+                    </MudTd>
+                </RowTemplate>
+            </MudTable>
+        </MudContainer>
     }
-</MudContainer>
 @code {
     List<Subalquiler> _lista = new();
     bool _tieneElementos;

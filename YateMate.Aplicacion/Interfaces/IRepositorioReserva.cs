@@ -10,4 +10,5 @@ public interface IRepositorioReserva
     List<Reserva> ListarReservasDe(string usuarioId);
     Reserva? ObtenerReserva(int id);
     ApplicationUser? ObtenerDuenioReserva(string id);
+    List<Reserva> ListarReservasDeSubalquiler(int subalquilerId);
 }
