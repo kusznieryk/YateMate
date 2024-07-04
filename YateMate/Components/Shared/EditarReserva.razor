@@ -22,17 +22,6 @@
     </TitleContent>
     <DialogContent>
         <EditForm OnSubmit="HandleSubmit" EditContext="editContext" FormName="EditarReserva">
-            <CustomValidator @ref="customValidator" ></CustomValidator>
-            @* <div class="form-floating mb-3"> *@
-            @*     <InputDate class="form-control" id="fechaInicio" @bind-Value="Model.FechaInicio" /> *@
-            @*     <label for="fechaInicio">Fecha de inicio</label> *@
-            @*     <ValidationMessage For="() => Model.FechaInicio" class="text-danger" /> *@
-            @* </div> *@
-            @* <div class="form-floating mb-3"> *@
-            @*     <InputDate class="form-control" id="fechaFin" @bind-Value="Model.FechaFin" /> *@
-            @*     <label for="fechaFin">Fecha de fin</label> *@
-            @*     <ValidationMessage For="() => Model.FechaFin" class="text-danger" /> *@
-            @* </div> *@
             <CustomValidator @ref="customValidator"></CustomValidator>
             <div class="form-group">
                 <MudDateRangePicker T="DateTime?"
@@ -43,11 +32,13 @@
                                     IsDateDisabledFunc="IsDateDisabled"/>
                 <ValidationMessage For="@(() => Model.FechaRango)"/>
             </div>
-            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleSubmit">Confirmar cambio</MudButton>
+            
         </EditForm>
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
+        <div style="flex-grow: 1;"></div>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleSubmit">Confirmar cambio</MudButton>
     </DialogActions>
 </MudDialog>
 
@@ -66,6 +57,12 @@
     Subalquiler? _subalquiler;
     string _err = "";
     Reserva reservaQueVaABaseDeDatos;
+    
+    [SupplyParameterFromForm] private InputModel Model { get; set; } = new();
+    private EditContext? editContext;
+    public CustomValidator customValidator;
+    private List<(DateTime Start, DateTime End)> fechasOcupadas = new();
+    
     
     private bool IsDateDisabled(DateTime date)
     {
@@ -90,11 +87,6 @@
     
     void Cancel() => MudDialog!.Cancel();
     
-    [SupplyParameterFromForm] private InputModel Model { get; set; } = new();
-    private EditContext? editContext;
-    public CustomValidator customValidator;
-    private List<(DateTime Start, DateTime End)> fechasOcupadas = new List<(DateTime Start, DateTime End)>();
-
     
     protected override async Task OnInitializedAsync()
     {
@@ -103,6 +95,8 @@
         Model.SubalquilerId ??= Reserva.SubalquilerId;
         editContext = new(Model);
         fechasOcupadas = await ObtenerFechasOcupadasUseCase.Ejecutar(Subalquiler.Id);
+        fechasOcupadas.Remove((Reserva.FechaInicio, Reserva.FechaFin));
+        
     }
     
     public void HandleSubmit()
@@ -114,7 +108,8 @@
         {
             reservaQueVaABaseDeDatos = new Reserva(Model.SubalquilerId.Value, Model.UsuarioId, Model.FechaRango.Start.Value, Model.FechaRango.End.Value);
             reservaQueVaABaseDeDatos.Id = Reserva.Id;
-            if (!CheckearDisponibilidad(reservaQueVaABaseDeDatos,Subalquiler))
+            // if (!CheckearDisponibilidad(reservaQueVaABaseDeDatos,Subalquiler))
+            if(IsDateDisabled(reservaQueVaABaseDeDatos.FechaInicio) || IsDateDisabled(reservaQueVaABaseDeDatos.FechaFin))
             {
                 errors.Add("FechaRango", new List<string> {
                     $"El periodo seleccionado contiene otras reservas, por favor ingrese otro."
@@ -149,20 +144,20 @@
         Submit();
     }
     
-    private bool CheckearDisponibilidad(Reserva reserva, Subalquiler? subalquiler)
-    {
-        if (subalquiler == null)
-        {
-            return false;
-        }
-        var reservasSubalquiler = ListarReservasDeSubalquilerUseCase.Ejecutar(subalquiler.Id);
-        if (reservasSubalquiler.Count == 0)
-        {
-            return true; // Está disponible si no hay reservas existentes
-        }
-        return !reservasSubalquiler.Any(r => (r.FechaInicio >= reserva.FechaInicio && r.FechaInicio <= reserva.FechaFin) 
-                                             || (r.FechaFin >= reserva.FechaInicio && r.FechaFin <= reserva.FechaFin));
-    }
+    // private bool CheckearDisponibilidad(Reserva reserva, Subalquiler? subalquiler)
+    // {
+    //     if (subalquiler == null)
+    //     {
+    //         return false;
+    //     }
+    //     var reservasSubalquiler = ListarReservasDeSubalquilerUseCase.Ejecutar(subalquiler.Id);
+    //     if (reservasSubalquiler.Count == 0)
+    //     {
+    //         return true; // Está disponible si no hay reservas existentes
+    //     }
+    //     return !reservasSubalquiler.Any(r => (r.FechaInicio >= reserva.FechaInicio && r.FechaInicio <= reserva.FechaFin) 
+    //                                          || (r.FechaFin >= reserva.FechaInicio && r.FechaFin <= reserva.FechaFin));
+    // }
     
     
     private sealed class InputModel
