@@ -8,53 +8,51 @@
 @inject EmailSender EmailSender
 @inject CancelarReservaUseCase CancelarReservaUseCase
 @inject ObtenerDuenioSubalquilerUseCase ObtenerDuenioSubalquilerUseCase
+@inject ObtenerDuenioReservaUseCase ObtenerDuenioReservaUseCase
 @inject ObtenerContactosDeUseCase ObtenerContactosDeUseCase
 @inject NavigationManager Navegador;
 @inject IDialogService Dialog
 
 <MudDialog>
     <TitleContent>
-        <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
+        <MudText Typo="Typo.h6" Align="Align.Center">
             Viendo datos
         </MudText>
     </TitleContent>
     <DialogContent>
-        <MudCard>
-            <MudCardHeader>
-                <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Amarra Nº @Subalquiler.IdAmarra</MudText>
-                </CardHeaderContent>
-            </MudCardHeader>
+        <MudCard Elevation="0">
             <MudCardContent>
-                <MudText>Dueño de la amarra: @ObtenerDuenioSubalquilerUseCase.Ejecutar(Subalquiler.IdDuenio).Nombre</MudText>
+                <MudText Typo="Typo.h6" Align="Align.Center" Class="mb-4">Amarra Nº @Subalquiler.IdAmarra</MudText>
+                <MudText Typo="Typo.body1" Align="Align.Center">Desde: @Reserva.FechaInicio.ToString("d")</MudText>
+                <MudText Typo="Typo.body1" Align="Align.Center" Class="mb-4">Hasta: @Reserva.FechaFin.ToString("d")</MudText>
+                @{
+                    duenio = ObtenerDuenioSubalquilerUseCase.Ejecutar(Subalquiler.IdDuenio);
+                }
+                <MudText Typo="Typo.body2" Color="Color.Info" Align="Align.Center">
+                    @duenio.Nombre @duenio.Apellido
+                    <MudIcon Icon="@Icons.Material.Filled.Person" Size="Size.Small" Class="ml-1"/>
+                </MudText>
             </MudCardContent>
         </MudCard>
     </DialogContent>
     <DialogActions>
-        <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
-        <div style="flex-grow: 1;"></div>
+        <MudButton Variant="Variant.Text" Color="Color.Default" OnClick="Cancel">Cerrar</MudButton>
+        <MudSpacer />
+        @if (!Subalquiler.EstaEliminado)
+        {
+            <MudButton Variant="Variant.Filled"
+                       StartIcon="@Icons.Material.Filled.Edit"
+                       OnClick="@(() => EditarReserva(Reserva))"
+                       Color="Color.Primary"
+                       Size="Size.Small">Editar
+            </MudButton>
+        }
         <MudButton Variant="Variant.Filled"
-                   Href=""
-                   StartIcon="@Icons.Material.Filled.Edit"
-                   OnClick="@(() => EditarReserva(Reserva))"
-                   Color="Color.Primary"
-                   Size="Size.Small">Editar
-        </MudButton>
-        <MudButton Variant="Variant.Filled"
-                   Href=""
                    StartIcon="@Icons.Material.Filled.Delete"
                    OnClick="CancelarHandler"
                    Color="Color.Error"
-                   Size="Size.Small"> Cancelar reserva
+                   Size="Size.Small">Cancelar reserva
         </MudButton>
-        @* @if (!_contactos.Select(u => u.Id).Contains(Subalquiler.IdDuenio)) *@
-        @* { *@
-        @* <MudButton Variant="Variant.Filled" *@
-        @*            @onclick="@(() => Navegador.NavigateTo($"/chat/{Subalquiler.IdDuenio}"))" *@
-        @*            Color="Color.Primary" StartIcon="@Icons.Material.Filled.ChatBubble" *@
-        @*            Size="Size.Small"> Iniciar Conversación *@
-        @* </MudButton> *@
-        @* } *@
     </DialogActions>
 </MudDialog>
 
@@ -66,7 +64,7 @@
     private Task<AuthenticationState>? AuthenticationState { get; set; }
     private string? _userId;
     List<ApplicationUser> _contactos = new List<ApplicationUser>();
-
+    ApplicationUser duenio;
 
     protected override async Task OnInitializedAsync()
     {
@@ -87,23 +85,27 @@
     {
         var parameters = new DialogParameters<EditarReserva>();
         parameters.Add(x => x.Reserva, reserva);
+        parameters.Add(x=>x.Subalquiler,Subalquiler);
         Dialog.Show<EditarReserva>("Editar", parameters);
     }
     
     
     [Inject] private IDialogService? DialogService { get; set; }
 
-    private async void CancelarHandler()
+    async Task CancelarHandler()
     {
         bool? result = await DialogService.ShowMessageBox(
             "Cancelar", 
-            $"¿Desea confirmar la cancelación de la reserva al subalquiler de la amarra \"{Subalquiler.IdAmarra}\"?", 
+            $"¿Desea confirmar la cancelación de la reserva al subalquiler de la amarra Nº{Subalquiler.IdAmarra}?", 
             yesText:"Confirmar", cancelText:"Salir");
         StateHasChanged();
         if (result is true)
         {
             CancelarReservaUseCase.Ejecutar(Reserva.Id);
-            NavigationManager.NavigateTo($"/ListadoReservas", true);
+            var mailDuenio = ObtenerDuenioSubalquilerUseCase.Ejecutar(Subalquiler.IdDuenio).Email;
+            var duenioReserva = ObtenerDuenioReservaUseCase.Ejecutar(Reserva.UsuarioId);
+            // await EmailSender.SendMessageCancelacion(mailDuenio, Reserva, duenioReserva,Subalquiler);
+            NavigationManager.NavigateTo($"/ListadoMisReservas", true);
         }
     }
 

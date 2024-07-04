@@ -1,0 +1,76 @@
+@page "/ListarReservas/{Id:int?}"
+
+@rendermode InteractiveServer
+@using YateMate.Aplicacion.UseCases.Reserva
+@inject ListarReservasDeSubalquilerUseCase ListarReservasDeSubalquilerUseCase
+@inject ObtenerDuenioReservaUseCase ObtenerDuenioReservaUseCase
+
+
+<MudDialogProvider  FullWidth="true"
+                    MaxWidth="MaxWidth.Small"
+                    Position="DialogPosition.CenterLeft"/>
+
+<h1>Reservas</h1>
+<title>Reservas</title>
+
+@if (!_tieneElementos)
+{
+    <h2>No tiene reservas vigentes.</h2>
+}
+else
+{
+    <MudPaper Width="100%" Class="darkbackground" MinHeight="350" Style="border: none; box-shadow: none;">
+        <MudContainer>
+            <MudGrid>
+                @foreach (var reserva in _lista)
+                {
+                    duenio = ObtenerDuenioReservaUseCase.Ejecutar(reserva.UsuarioId);
+                    <MudItem xs="4" Style="display:flex;">
+                        <MudPaper Width="100%" Square="false" Class="pa-10 ma-2 infobox" Style="border: none; box-shadow: none;">
+                            <MudCard>
+                                <MudCardContent>
+                                    <MudStack Spacing="2" AlignItems="AlignItems.Center">
+                                        <MudText Typo="Typo.h6" Align="Align.Center">
+                                            @duenio.Nombre @duenio.Apellido
+                                        </MudText>
+                                        <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Info" Size="Size.Large" />
+                                        <MudDivider />
+                                        <MudText Typo="Typo.body2" Align="Align.Center">
+                                            Desde: @reserva.FechaInicio.ToString("d")
+                                        </MudText>
+                                        <MudText Typo="Typo.body2" Align="Align.Center">
+                                            Hasta: @reserva.FechaFin.ToString("d")
+                                        </MudText>
+                                    </MudStack>
+                                </MudCardContent>
+                            </MudCard>
+                        </MudPaper>
+                    </MudItem>
+                }
+            </MudGrid>
+        </MudContainer>
+    </MudPaper>
+}
+
+@code {
+    [Parameter] public int? Id { get; set; }
+    List<Reserva> _lista = new List<Reserva>();
+    bool _tieneElementos;
+
+    ApplicationUser duenio;
+    
+
+    protected override void OnInitialized()
+    {
+        _lista = ListarReservasDeSubalquilerUseCase.Ejecutar(Id.Value);
+    }
+
+    protected override void OnParametersSet()
+    {
+        if (_lista.Count > 0)
+        {
+            _tieneElementos = true;
+        }
+    }
+
+}

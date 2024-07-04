@@ -9,7 +9,8 @@
 @inject ModificarReservaUseCase ModificarReservaUseCase
 @inject ObtenerDuenioSubalquilerUseCase ObtenerDuenioSubalquilerUseCase
 @inject ObtenerDuenioReservaUseCase ObtenerDuenioReservaUseCase
-@inject ObtenerSubalquilerUseCase ObtenerSubalquilerUseCase
+@inject ObtenerFechasOcupadasUseCase ObtenerFechasOcupadasUseCase
+@inject ListarReservasDeSubalquilerUseCase ListarReservasDeSubalquilerUseCase
 @inject EmailSender EmailSender
 
 @rendermode InteractiveServer
@@ -22,17 +23,27 @@
     <DialogContent>
         <EditForm OnSubmit="HandleSubmit" EditContext="editContext" FormName="EditarReserva">
             <CustomValidator @ref="customValidator" ></CustomValidator>
-            <div class="form-floating mb-3">
-                <InputDate class="form-control" id="fechaInicio" @bind-Value="Model.FechaInicio" />
-                <label for="fechaInicio">Fecha de inicio</label>
-                <ValidationMessage For="() => Model.FechaInicio" class="text-danger" />
+            @* <div class="form-floating mb-3"> *@
+            @*     <InputDate class="form-control" id="fechaInicio" @bind-Value="Model.FechaInicio" /> *@
+            @*     <label for="fechaInicio">Fecha de inicio</label> *@
+            @*     <ValidationMessage For="() => Model.FechaInicio" class="text-danger" /> *@
+            @* </div> *@
+            @* <div class="form-floating mb-3"> *@
+            @*     <InputDate class="form-control" id="fechaFin" @bind-Value="Model.FechaFin" /> *@
+            @*     <label for="fechaFin">Fecha de fin</label> *@
+            @*     <ValidationMessage For="() => Model.FechaFin" class="text-danger" /> *@
+            @* </div> *@
+            <CustomValidator @ref="customValidator"></CustomValidator>
+            <div class="form-group">
+                <MudDateRangePicker T="DateTime?"
+                                    @bind-DateRange="Model.FechaRango"
+                                    PickerVariant="PickerVariant.Static"
+                                    MinDate="Subalquiler.FechaInicio"
+                                    MaxDate="Subalquiler.FechaFin"
+                                    IsDateDisabledFunc="IsDateDisabled"/>
+                <ValidationMessage For="@(() => Model.FechaRango)"/>
             </div>
-            <div class="form-floating mb-3">
-                <InputDate class="form-control" id="fechaFin" @bind-Value="Model.FechaFin" />
-                <label for="fechaFin">Fecha de fin</label>
-                <ValidationMessage For="() => Model.FechaFin" class="text-danger" />
-            </div>
-            <button type="submit" class="w-100 btn btn-lg btn-primary">Cargar reserva</button>
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleSubmit">Confirmar cambio</MudButton>
         </EditForm>
     </DialogContent>
     <DialogActions>
@@ -43,6 +54,7 @@
 
 @code{
     [Parameter] public Reserva Reserva { get; set; }
+    [Parameter] public Subalquiler Subalquiler { get; set; }
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
     
     [CascadingParameter]
@@ -53,13 +65,25 @@
     bool _esNuevoReserva = true;
     Subalquiler? _subalquiler;
     string _err = "";
+    Reserva reservaQueVaABaseDeDatos;
+    
+    private bool IsDateDisabled(DateTime date)
+    {
+        foreach (var fecha in fechasOcupadas)
+        {
+            if (date >= fecha.Start && date <= fecha.End)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
     
     async Task Submit()
     {
-        _subalquiler = ObtenerSubalquilerUseCase.Ejecutar(Reserva.SubalquilerId);
-        var mailDuenio = ObtenerDuenioSubalquilerUseCase.Ejecutar(_subalquiler.IdDuenio).Email;
-        var duenioReserva = ObtenerDuenioReservaUseCase.Ejecutar(Reserva.UsuarioId);
-        await EmailSender.SendMessageCambioReserva(mailDuenio, Reserva, duenioReserva,_subalquiler);
+        var mailDuenio = ObtenerDuenioSubalquilerUseCase.Ejecutar(Subalquiler.IdDuenio).Email;
+        var duenioReserva = ObtenerDuenioReservaUseCase.Ejecutar(reservaQueVaABaseDeDatos.UsuarioId);
+        // await EmailSender.SendMessageCambioReserva(mailDuenio, reservaQueVaABaseDeDatos, duenioReserva,Subalquiler);
         Navegador.Refresh(forceReload: true);
         MudDialog!.Close(DialogResult.Ok(true));
     }
@@ -69,15 +93,16 @@
     [SupplyParameterFromForm] private InputModel Model { get; set; } = new();
     private EditContext? editContext;
     public CustomValidator customValidator;
+    private List<(DateTime Start, DateTime End)> fechasOcupadas = new List<(DateTime Start, DateTime End)>();
+
     
-    protected override void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         Model ??= new InputModel();
         Model.UsuarioId ??= Reserva.UsuarioId;
         Model.SubalquilerId ??= Reserva.SubalquilerId;
-        Model.FechaInicio ??= Reserva.FechaInicio;
-        Model.FechaFin ??= Reserva.FechaFin;
         editContext = new(Model);
+        fechasOcupadas = await ObtenerFechasOcupadasUseCase.Ejecutar(Subalquiler.Id);
     }
     
     public void HandleSubmit()
@@ -85,14 +110,25 @@
         customValidator.ClearErrors();
         Model.UsuarioId = Reserva.UsuarioId;
         var errors = new Dictionary<string, List<string>>();
-        foreach (var property in Model.GetType().GetProperties()) //me cago en microsoft
+        if (Model.FechaRango != null)
         {
-            var value = property.GetValue(Model);
-            if (String.IsNullOrWhiteSpace(value?.ToString()))
+            reservaQueVaABaseDeDatos = new Reserva(Model.SubalquilerId.Value, Model.UsuarioId, Model.FechaRango.Start.Value, Model.FechaRango.End.Value);
+            reservaQueVaABaseDeDatos.Id = Reserva.Id;
+            if (!CheckearDisponibilidad(reservaQueVaABaseDeDatos,Subalquiler))
             {
-                Console.WriteLine($"El campo {property.Name} estaba vacio");
-                errors.Add(property.Name, new List<string>() {"Este campo es obligatorio"});
+                errors.Add("FechaRango", new List<string> {
+                    $"El periodo seleccionado contiene otras reservas, por favor ingrese otro."
+                });
+                customValidator.DisplayErrors(errors);
+                return;
             }
+        }
+        else
+        {
+            errors.Add("FechaRango", new List<string>
+            {
+                "Por favor ingrese un rango de fechas para su reserva."
+            });
         }
         if (errors.Count > 0)
         {
@@ -109,23 +145,30 @@
     
     public void ValidSubmit()
     {
-        Model.UsuarioId = Reserva.UsuarioId;
-        var reservaQueVaABaseDeDatos = new Reserva(Model.SubalquilerId.Value, Model.UsuarioId, Model.FechaInicio.Value, Model.FechaFin.Value);
-        reservaQueVaABaseDeDatos.Id = Reserva.Id;
         ModificarReservaUseCase.Ejecutar(reservaQueVaABaseDeDatos);
         Submit();
+    }
+    
+    private bool CheckearDisponibilidad(Reserva reserva, Subalquiler? subalquiler)
+    {
+        if (subalquiler == null)
+        {
+            return false;
+        }
+        var reservasSubalquiler = ListarReservasDeSubalquilerUseCase.Ejecutar(subalquiler.Id);
+        if (reservasSubalquiler.Count == 0)
+        {
+            return true; // Está disponible si no hay reservas existentes
+        }
+        return !reservasSubalquiler.Any(r => (r.FechaInicio >= reserva.FechaInicio && r.FechaInicio <= reserva.FechaFin) 
+                                             || (r.FechaFin >= reserva.FechaInicio && r.FechaFin <= reserva.FechaFin));
     }
     
     
     private sealed class InputModel
     {
-        [Required(ErrorMessage = "Ingresa una fecha de inicio")]
-        [Display(Name = "Fecha de inicio")]
-        public DateTime? FechaInicio { get; set; }
-    
-        [Required(ErrorMessage = "Ingresa una fecha de fin")]
-        [Display(Name = "Fecha de fin")]
-        public DateTime? FechaFin { get; set; }
+        [Required(ErrorMessage = "Obligatorio.")]
+        public DateRange? FechaRango { get; set; }
 
         public string? UsuarioId { get; set; } = null;
         public int? SubalquilerId { get; set; } = null;

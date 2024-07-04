@@ -1,24 +1,19 @@
+using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
 using YateMate.Aplicacion.Entidades;
 using YateMate.Aplicacion.Interfaces;
+using YateMate.Aplicacion.UseCases.Reserva;
 
 namespace YateMate.Repositorio;
 
 public class RepositorioReserva : IRepositorioReserva
 {
-    public void HacerReserva(Reserva reserva, Subalquiler? subalquiler)
+    public void HacerReserva(Reserva reserva)
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
-            if (subalquiler != null)
-            {
-                if (CheckearDisponibilidad(reserva, subalquiler))
-                {
-                    context.Add(reserva);
-                    // subalquiler.Reservas.Add(reserva);
-                    context.SaveChanges();
-                }
-            }
+            context.Add(reserva);
+            context.SaveChanges();
         }
     }
 
@@ -55,13 +50,6 @@ public class RepositorioReserva : IRepositorioReserva
         }
     }
 
-    public List<Reserva> ListarReservasDeSubalquiler(int subalquilerId)
-    {
-        using (var context = ApplicationDbContext.CrearContexto())
-        {
-            return context.Reservas.Where(r => r.SubalquilerId.Equals(subalquilerId)).ToList();
-        }
-    }
 
     public Reserva? ObtenerReserva(int id)
     {
@@ -78,20 +66,26 @@ public class RepositorioReserva : IRepositorioReserva
             return context.ApplicationUsers.FirstOrDefault(a => a.Id == id);
         }
     }
-
-    private bool CheckearDisponibilidad(Reserva reserva, Subalquiler? subalquiler)
+    
+    public async Task<List<(DateTime Start, DateTime End)>> ObtenerFechasOcupadas(int subalquilerId)
     {
-        if (subalquiler == null)
+        using (var context = ApplicationDbContext.CrearContexto())
         {
-            return false;
+            var reservas = await context.Reservas
+                .Where(r => r.SubalquilerId == subalquilerId)
+                .Select(r => new { r.FechaInicio, r.FechaFin })
+                .ToListAsync();
+
+            return reservas.Select(r => (r.FechaInicio, r.FechaFin)).ToList();
         }
-        var reservasSubalquiler = subalquiler.Reservas;
-        if (reservasSubalquiler == null || !reservasSubalquiler.Any())
+    }
+
+    public List<Reserva> ListarReservasDeSubalquiler(int subalquilerId)
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
         {
-            return true; // Está disponible si no hay reservas existentes
+            return context.Reservas.Where(r => r.SubalquilerId.Equals(subalquilerId)).ToList();
         }
-        return !reservasSubalquiler.Any(r => (r.FechaInicio >= reserva.FechaInicio && r.FechaInicio <= reserva.FechaFin) 
-                                            || (r.FechaFin >= reserva.FechaInicio && r.FechaFin <= reserva.FechaFin));
     }
 
     public List<Reserva> ObtenerReservasDeSubalquiler(int id)

@@ -105,6 +105,8 @@ public class Program
         builder.Services.AddTransient<ListarReservasDeUseCase>();
         builder.Services.AddTransient<ObtenerReservaUseCase>();
         builder.Services.AddTransient<ObtenerDuenioReservaUseCase>();
+        builder.Services.AddTransient<ListarReservasDeSubalquilerUseCase>();
+        builder.Services.AddTransient<ObtenerFechasOcupadasUseCase>();
         builder.Services.AddTransient<ObtenerReservasDeSubalquilerUseCase>();
         builder.Services.AddScoped<IRepositorioReserva, RepositorioReserva>();
 
