@@ -1,60 +1,99 @@
 @page "/VerDatosSubalquiler"
 @using YateMate.Aplicacion.Entidades
 @using YateMate.Aplicacion.UseCases.Subalquiler
+@using YateMate.Aplicacion.UseCases.Reserva
 @using MudBlazor
+@using YateMate.Components.Account.Pages
+
 @inject EliminarSubalquilerUseCase EliminarSubalquilerUseCase
+@inject ObtenerFechasOcupadasUseCase ObtenerFechasOcupadasUseCase
+@inject ObtenerFechasReservadasUseCase ObtenerFechasReservadasUseCase
+@inject ModificarSubalquilerUseCase ModificarSubalquilerUseCase
 @inject NavigationManager NavigationManager
+
 <MudDialog>
-    <TitleContent>
-        <MudText Typo="Typo.h6" Style="display: flex; justify-content: center; width: 100%;">
-            Viendo datos del subalquiler
-        </MudText>
-    </TitleContent>
     <DialogContent>
-        <MudCard>
-            <MudCardHeader>
-                <CardHeaderContent>
-                    <MudText Typo="Typo.h6">Detalle de subalquiler</MudText>
-                </CardHeaderContent>
-            </MudCardHeader>
-            <MudCardContent>
-                <MudText>Fecha de Inicio: @Subalquiler!.FechaInicio.ToShortDateString()</MudText>
-                <MudText>Fecha de Fin: @Subalquiler.FechaFin.ToShortDateString()</MudText>
-            </MudCardContent>
-        </MudCard>
+        @if (!_modificando)
+        {
+            <MudCard>
+                <MudCardHeader>
+                    <CardHeaderContent>
+                        <MudText Typo="Typo.h6">Detalle de subalquiler</MudText>
+                    </CardHeaderContent>
+                </MudCardHeader>
+                <MudCardContent>
+                    <MudText>Fecha de Inicio: @Subalquiler!.FechaInicio.ToShortDateString()</MudText>
+                    <MudText>Fecha de Fin: @Subalquiler.FechaFin.ToShortDateString()</MudText>
+                </MudCardContent>
+            </MudCard>
+        }
+        else
+        {
+            <EditForm OnSubmit="HandleSubmit" EditContext="editContext" FormName="ModificarSubalquiler">
+                <CustomValidator @ref="customValidator"></CustomValidator>
+
+                <MudDateRangePicker T="DateTime?"
+                                    @bind-DateRange="dateModel.FechaRango"
+                                    PickerVariant="PickerVariant.Static"
+                                    MinDate="DateTime.Today"
+                                    IsDateDisabledFunc="IsDateDisabled"
+                />
+                <ValidationMessage For="@(() => dateModel.FechaRango)"/>
+            </EditForm>
+        }
+        
     </DialogContent>
     <DialogActions>
         <MudButton OnClick="Cancel" Style="margin-left: auto">Cerrar</MudButton>
         <div style="flex-grow: 1;"></div>
-        <MudButton Variant="Variant.Filled"
-                   StartIcon="@Icons.Material.Filled.Edit"
-                   OnClick="@(() => Editar(Subalquiler.Id))"
-                   Color="Color.Primary"
-                   Size="Size.Small">Modificar
-        </MudButton>
-        @if (Subalquiler.Reservas == null || !Subalquiler.Reservas.Any())
+        @if (!_modificando)
         {
-        <MudButton Variant="Variant.Filled"
-                   StartIcon="@Icons.Material.Filled.Delete"
-                   OnClick="EliminarHandler"
-                   Color="Color.Error"
-                   Size="Size.Small">Eliminar
-        </MudButton>
+            
+            <MudButton Variant="Variant.Filled"
+                       StartIcon="@Icons.Material.Filled.Edit"
+                       OnClick="Editar"
+                       Color="Color.Primary"
+                       Size="Size.Small">Modificar
+            </MudButton>
+            @if (Subalquiler.Reservas == null || !Subalquiler.Reservas.Any())
+            {
+                <MudButton Variant="Variant.Filled"
+                           StartIcon="@Icons.Material.Filled.Delete"
+                           OnClick="EliminarHandler"
+                           Color="Color.Error"
+                           Size="Size.Small">Eliminar
+                </MudButton>
+            }   
         }
+        else
+        {
+            <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="HandleSubmit">Confirmar</MudButton>
+        }
+        
     </DialogActions>
 </MudDialog>
 
 @code {
+
+    bool _modificando;
     [Parameter] public Subalquiler Subalquiler { get; set; } = null!;
     [CascadingParameter] MudDialogInstance? MudDialog { get; set; }
+
+    private EditContext? editContext;
+    public CustomValidator customValidator;
+    private Model dateModel = new();
+    private List<(DateTime Start, DateTime End)> fechasOcupadasReservas = new();
+    private List<(DateTime Start, DateTime End)> fechasOcupadasSubalquileres = new();
+
     void Cancel() => MudDialog!.Cancel();
-    
+
     [Inject] private IDialogService? DialogService { get; set; }
+
     private async void EliminarHandler()
     {
         bool? result = await DialogService.ShowMessageBox(
-            "Eliminar", 
-            $"¿Desea eliminar el subalquiler?", 
+            "Eliminar",
+            $"¿Desea eliminar el subalquiler?",
             yesText: "Eliminar", cancelText: "Cancelar");
 
         if (result == true)
@@ -64,9 +103,103 @@
             MudDialog!.Close(DialogResult.Ok(true));
         }
     }
-    void Editar(int id)
+
+    async Task Editar()
     {
-        MudDialog!.Close(DialogResult.Ok(true));
-        NavigationManager.NavigateTo($"subalquiler/{id}");
+        editContext = new EditContext(dateModel);
+        fechasOcupadasReservas = await ObtenerFechasOcupadasUseCase.Ejecutar(Subalquiler.Id);
+        fechasOcupadasSubalquileres = ObtenerFechasReservadasUseCase.Ejecutar(Subalquiler.IdAmarra);
+        fechasOcupadasSubalquileres.Remove((Subalquiler.FechaInicio, Subalquiler.FechaFin));
+        _modificando = true;
+        MudDialog.SetTitle("Modificando fecha");
     }
+
+    void ValidSubmit()
+    {
+        Subalquiler.FechaInicio = dateModel.FechaRango.Start.Value;
+        Subalquiler.FechaFin = dateModel.FechaRango.End.Value;
+        ModificarSubalquilerUseCase.Ejecutar(Subalquiler);
+        MudDialog!.Close(DialogResult.Ok(true));
+        NavigationManager.NavigateTo("/ListadoMisSubalquileres", true);
+    }
+
+    public void HandleSubmit()
+    {
+        customValidator.ClearErrors();
+        var errors = new Dictionary<string, List<string>>();
+        if (dateModel.FechaRango != null)
+        {
+            if (IsDateDisabledReserva(dateModel.FechaRango.Start!.Value) || IsDateDisabledReserva(dateModel.FechaRango.End!.Value))
+            {
+                errors.Add("FechaRango", new List<string>
+                {
+                    $"El periodo seleccionado ya fue publicado por una reserva, por favor ingrese otro."
+                });
+                customValidator.DisplayErrors(errors);
+                return;
+            }
+
+            if (IsDateDisabledSubalquiler(dateModel.FechaRango.Start!.Value) || IsDateDisabledSubalquiler(dateModel.FechaRango.End!.Value))
+            {
+                errors.Add("FechaRango", new List<string>
+                {
+                    $"El periodo seleccionado ya fue publicado por uno de tus subalquiler, por favor ingrese otro."
+                });
+                customValidator.DisplayErrors(errors);
+                return;
+            }
+        }
+        else
+        {
+            errors.Add("FechaRango", new List<string>
+            {
+                "Por favor ingrese un rango de fechas para su reserva."
+            });
+        }
+
+        if (errors.Count > 0)
+        {
+            customValidator.DisplayErrors(errors);
+            return;
+        }
+
+        ValidSubmit();
+    }
+
+    private bool IsDateDisabled(DateTime date)
+    {
+        return IsDateDisabledReserva(date) || IsDateDisabledSubalquiler(date);
+    }
+
+    private bool IsDateDisabledReserva(DateTime date)
+    {
+        foreach (var fecha in fechasOcupadasReservas)
+        {
+            if (date >= fecha.Start && date <= fecha.End)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private bool IsDateDisabledSubalquiler(DateTime date)
+    {
+        foreach (var fecha in fechasOcupadasSubalquileres)
+        {
+            if (date >= fecha.Start && date <= fecha.End)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public class Model
+    {
+        public DateRange? FechaRango { get; set; }
+    }
+
 }
