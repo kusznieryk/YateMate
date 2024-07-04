@@ -159,10 +159,10 @@
         {
             _resultadoApi = "Se estableció conexion con el servidor pero este no respondió";
         }
-        // catch(Exception e)
-        // {
-        //     _resultadoApi = $"Problemas de conexion: {e.Message}";
-        // }
+        catch(Exception e)
+        {
+            _resultadoApi = $"Problemas de conexion: {e.Message}";
+        }
         
     }
 }

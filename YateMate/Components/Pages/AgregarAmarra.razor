@@ -26,7 +26,7 @@
         <InputSelect id="tamanio" @bind-Value="Model.Tamanio" class="form-select" aria-required="true" TValue="TamanioEstandar">
             @foreach (TamanioEstandar tam in Enum.GetValues(typeof(TamanioEstandar)))
             {
-            <option value=@tam> @tam </option>
+            <option value=@tam> @(tam.ToString().Replace("Pies", "'").Replace("De","")) </option>
             }
         </InputSelect>
 
@@ -106,8 +106,8 @@
         [Display(Name = "Precio")]
         public double Precio { get; set; } = 0;
 
-        [Required(ErrorMessage = "Ingresa un tamaño en M³")]
-        [Display(Name = "Tamaño")]
+        [Required(ErrorMessage = "Elija un tamaño")]
+        [Display(Name = "(Eslora x Manga x Calado)")]
         public TamanioEstandar Tamanio { get; set; } = TamanioEstandar.De20Piesx10Piesx10Pies;
 
         [Required(ErrorMessage = "Ingresa la ubicacion")]
