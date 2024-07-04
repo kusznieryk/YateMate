@@ -22,7 +22,7 @@
     <MudTable Items="_lista" Class="mt-4" Dense="true" Outlined="true">
         <HeaderContent>
             <MudTh>Precio por dia</MudTh>
-            <MudTh>Tamaño</MudTh>
+            <MudTh>(Eslora x Manga x Calado)</MudTh>
             <MudTh>Ubicacion</MudTh>
             <MudTh>Acción</MudTh>
         </HeaderContent>
@@ -31,7 +31,7 @@
                 @context.Precio
             </MudTd>
             <MudTd>
-                @context.Tamanio
+                @context.Tamanio.ToString().Replace("Pies", "'").Replace("De","")
             </MudTd>
             <MudTd>
                 @context.Ubicacion

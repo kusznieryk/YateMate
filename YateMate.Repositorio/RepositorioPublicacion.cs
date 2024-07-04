@@ -36,7 +36,7 @@ public class RepositorioPublicacion : IRepositorioPublicacion
         {
             var embarcaciones = context.Embarcaciones.Where(embarcacion => embarcacion.ClienteId == idCliente)
                 .Select(embarcacion => embarcacion.Id);
-            return context.Publicaciones.Where(publicacion => embarcaciones.Contains(publicacion.EmbarcacionId))
+            return context.Publicaciones.Where(publicacion => embarcaciones.Contains(publicacion.EmbarcacionId) && !publicacion.EstaEliminado)
                 .ToList();
         }
     }
@@ -45,7 +45,7 @@ public class RepositorioPublicacion : IRepositorioPublicacion
     {
         using (var context = ApplicationDbContext.CrearContexto())
         {
-            return context.Publicaciones.FirstOrDefault((publicacion => publicacion.EmbarcacionId == idEmbarcacion));
+            return context.Publicaciones.FirstOrDefault((publicacion => publicacion.EmbarcacionId == idEmbarcacion && !publicacion.EstaEliminado));
         }
     }
 
@@ -56,20 +56,10 @@ public class RepositorioPublicacion : IRepositorioPublicacion
             var publicacionAEliminar = context.Publicaciones.FirstOrDefault(b => b.EmbarcacionId == idEmb);
             if (publicacionAEliminar != null)
             {
-                var tieneTruequeAcordado =
-                    context.Ofertas.Any(oferta => oferta.PublicacionId == publicacionAEliminar.Id && oferta.Aceptada);
-                if (tieneTruequeAcordado)
-                {
-                    publicacionAEliminar.EstaEliminado = true;
-                }
-                else
-                {
-                    context.Remove(publicacionAEliminar);
-                }
+                publicacionAEliminar.EstaEliminado = true;
                 context.SaveChanges();
             }
         }
-
         return true;
     }
 

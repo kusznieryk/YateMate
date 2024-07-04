@@ -24,14 +24,14 @@
     {
     <MudTable Items="@_amarras" Class="mt-4" Dense="true" Outlined="true">
         <HeaderContent>
-            <MudTh>Tamaño</MudTh>
+            <MudTh>Tamaño (Eslora x Manga x Calado) </MudTh>
             <MudTh>Precio</MudTh>
             <MudTh>Ubicacion</MudTh>
             <MudTh>Acciones</MudTh>
 
         </HeaderContent>
         <RowTemplate>
-            <MudTd>@context.Tamanio </MudTd>
+            <MudTd>@context.Tamanio.ToString().Replace("Pies", "'").Replace("De","") </MudTd>
             <MudTd>@context.Precio</MudTd>
             <MudTd>@context.Ubicacion</MudTd>
             <MudTd>

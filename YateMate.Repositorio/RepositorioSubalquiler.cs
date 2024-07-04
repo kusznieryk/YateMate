@@ -33,7 +33,7 @@ public class RepositorioSubalquiler : IRepositorioSubalquiler
             var subalquilerAEliminar= context.Subalquileres.FirstOrDefault(s => s.Id== idSubalquiler);
             if (subalquilerAEliminar != null)
             {
-                context.Remove(subalquilerAEliminar);
+                subalquilerAEliminar.EstaEliminado = true;
             }
             context.SaveChanges();
         }    
