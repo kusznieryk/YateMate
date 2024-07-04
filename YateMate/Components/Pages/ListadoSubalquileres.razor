@@ -30,13 +30,13 @@
                     </MudStack>
                 </MudItem>
                 <MudItem sm="12" md="6">
-                    <h5>Filtrar por Tamaño</h5>
+                    <h5>Filtrar por Tamaño (Eslora x Manga x Calado)</h5>
 
                     <MudToggleGroup T="TamanioEstandar" SelectionMode="SelectionMode.MultiSelection" @bind-Values="opciones" Color="Color.Secondary" CheckMark Vertical Outline="false">
                         @foreach (TamanioEstandar tam in Enum.GetValues(typeof(TamanioEstandar)))
                         {
                             <MudToggleItem T="TamanioEstandar" Value="@tam" UnselectedIcon="@Icons.Material.Filled.CheckBoxOutlineBlank" SelectedIcon="@Icons.Material.Filled.CheckBox">
-                                @(tam.ToString())
+                                @(tam.ToString().Replace("Pies", "'").Replace("De",""))
                             </MudToggleItem>
                         }
                     </MudToggleGroup>
