@@ -9,5 +9,5 @@ public class Amarra
     public TamanioEstandar Tamanio { get; set; }
     public bool Borrado { get; set; } = false;
     [MaxLength(60)] public string Ubicacion { get; set; } = "";
-    public string UsuarioId { get; set; } = "";
+    public string? UsuarioId { get; set; } = "";
 }

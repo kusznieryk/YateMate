@@ -167,7 +167,6 @@ namespace YateMate.Migrations
                         .HasColumnType("TEXT");
 
                     b.Property<string>("UsuarioId")
-                        .IsRequired()
                         .HasColumnType("TEXT");
 
                     b.HasKey("Id");
@@ -504,10 +503,6 @@ namespace YateMate.Migrations
 
                     b.Property<int>("PublicacionId")
                         .HasColumnType("INTEGER");
-
-                    b.Property<string>("UsuarioId")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
 
                     b.HasKey("Id");
 
