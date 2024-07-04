@@ -96,6 +96,7 @@ public class Program
         builder.Services.AddTransient<ModificarSubalquilerUseCase>();
         builder.Services.AddTransient<EliminarSubalquilerUseCase>();
         builder.Services.AddTransient<ObtenerDuenioSubalquilerUseCase>();
+        builder.Services.AddTransient<ObtenerFechasReservadasUseCase>();
         builder.Services.AddScoped<IRepositorioSubalquiler, RepositorioSubalquiler>();
 
         builder.Services.AddTransient<HacerReservaUseCase>();
