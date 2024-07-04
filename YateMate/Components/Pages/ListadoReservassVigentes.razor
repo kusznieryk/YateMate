@@ -1,0 +1,63 @@
+@page "/ListadoReservasVigentes"
+@using YateMate.Aplicacion.UseCases.Amarras
+@using YateMate.Aplicacion.UseCases.ApplicationUser
+@using YateMate.Aplicacion.UseCases.Reserva
+@using YateMate.Aplicacion.UseCases.Subalquiler
+@inject ObtenerReservasVigentesUseCase ObtenerReservasVigentesUseCase
+@inject ObtenerDuenioSubalquilerUseCase ObtenerDuenio
+@inject ObtenerApplicationUserUseCase ObtenerUser
+@inject ObtenerAmarraUseCase ObtenerAmarraUseCase
+@inject ObtenerSubalquilerUseCase ObtenerSubalquilerUseCase
+@rendermode InteractiveServer
+
+<h3>Subalquileres Vigentes</h3>
+
+<MudContainer>
+    @if (!_tieneElementos)
+    {
+    <h2>No hay reservas vigentes.</h2>
+    }
+    else
+    {
+    <MudTable Items="_lista" Class="mt-4" Dense="true" Outlined="true">
+        <HeaderContent>
+            <MudTh>Fecha de inicio</MudTh>
+            <MudTh>Fecha de fin</MudTh>
+            <MudTh>Ubicacion</MudTh>  
+            <MudTh>Ingresante</MudTh>
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>
+                @context.FechaInicio
+            </MudTd>
+            <MudTd>
+                @context.FechaFin
+            </MudTd>
+            <MudTd>
+                @(ObtenerAmarraUseCase.Ejecutar( ObtenerSubalquilerUseCase.Ejecutar(context.SubalquilerId).IdAmarra).Ubicacion)
+            </MudTd>
+          @{
+                usuario = ObtenerUser.Ejecutar(context.UsuarioId)?? new ApplicationUser();
+                
+            }
+            <MudTd> 
+                @(usuario.Nombre)   @(usuario.Apellido)
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+    }
+</MudContainer>
+
+@code {
+    List<Reserva> _lista = new();
+    bool _tieneElementos;
+    ApplicationUser usuario;
+    
+    protected override void OnInitialized()
+    {
+        _lista = ObtenerReservasVigentesUseCase.Ejecutar();
+        _tieneElementos = _lista.Count > 0;
+    }
+    
+
+}

@@ -50,6 +50,14 @@ public class RepositorioReserva : IRepositorioReserva
         }
     }
 
+    public List<Reserva> ListarReservas()
+    {
+        using (var context = ApplicationDbContext.CrearContexto())
+        {
+            return context.Reservas.ToList();
+        }    
+    }
+
 
     public Reserva? ObtenerReserva(int id)
     {

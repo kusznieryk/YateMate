@@ -1,12 +1,14 @@
 @page "/ListadoMisReservas"
 
 @rendermode InteractiveServer
+@using YateMate.Aplicacion.UseCases.Amarras
 @using YateMate.Components.Shared
 @using YateMate.Aplicacion.UseCases.Reserva
 @using YateMate.Aplicacion.UseCases.Subalquiler
 @inject ListarReservasDeUseCase ListarReservasDeUseCase
 @inject ObtenerDuenioSubalquilerUseCase ObtenerDuenioSubalquilerUseCase
 @inject ObtenerSubalquilerUseCase ObtenerSubalquilerUseCase
+@inject ObtenerAmarraUseCase ObtenerAmarraUseCase
 @inject IDialogService Dialog
 @inject NavigationManager Navegador;
 
@@ -31,12 +33,12 @@ else
                     subalquiler = ObtenerSubalquilerUseCase.Ejecutar(reserva.SubalquilerId);
                     duenio = ObtenerDuenioSubalquilerUseCase.Ejecutar(subalquiler.IdDuenio);
                     <MudItem xs="4" Style="display:flex;">
-                        <MudPaper Width="100%" Square="false" Class="pa-10 ma-2 infobox" Style="border: none; box-shadow: none;">
+                        <MudPaper Width="100%" Square="false" Class="pa-15 ma-2 infobox" Style="border: none; box-shadow: none;">
                             <MudCard>
                                 <MudCardContent>
                                     <MudStack Spacing="2" AlignItems="AlignItems.Center">
                                         <MudText Typo="Typo.h6" Align="Align.Center">
-                                            Amarra Nº @subalquiler?.IdAmarra
+                                            Amarra con ubicacion: @(ObtenerAmarraUseCase.Ejecutar( ObtenerSubalquilerUseCase.Ejecutar(reserva.SubalquilerId).IdAmarra).Ubicacion)
                                         </MudText>
                                         <MudIcon Icon="@Icons.Material.Filled.Person" Color="Color.Info" Size="Size.Large" />
                                         <MudText Typo="Typo.body2" Align="Align.Center">

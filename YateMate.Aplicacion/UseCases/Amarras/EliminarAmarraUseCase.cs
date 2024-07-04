@@ -8,8 +8,6 @@ public class EliminarAmarraUseCase(IRepositorioAmarra repo, IRepositorioSubalqui
 {
     public void Ejecutar(int idAmarra)
     {
-        var listaDeSubalquileres=repoSub.ObtenerSubalquileresDeLaAmarra(idAmarra);
-        listaDeSubalquileres.ForEach(sub => repoSub.EliminarSubalquiler(sub.Id));
         repo.EliminarAmarra(idAmarra);
     }
 }

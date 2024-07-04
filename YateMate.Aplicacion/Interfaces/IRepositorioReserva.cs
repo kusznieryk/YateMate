@@ -8,6 +8,7 @@ public interface IRepositorioReserva
     void CancelarReserva(int id);
     void ModificarReserva(Reserva reserva);
     List<Reserva> ListarReservasDe(string usuarioId);
+    List<Reserva> ListarReservas();
     List<Reserva> ListarReservasDeSubalquiler(int subalquilerId);
     Reserva? ObtenerReserva(int id);
     ApplicationUser? ObtenerDuenioReserva(string id);
