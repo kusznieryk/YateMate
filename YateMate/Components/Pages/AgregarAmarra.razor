@@ -1,118 +1,50 @@
-@page "/AgregarAmarra/{UserId}/{AmarraIdString?}"
-@using System.ComponentModel.DataAnnotations
+@page "/AgregarAmarra/{UserId}"
 @using YateMate.Aplicacion.UseCases.Amarras
-@using YateMate.Components.Account.Pages
-@inject AgregarAmarraUseCase AgregarAmarr
-@inject NavigationManager Naviagation
-@inject ObtenerAmarraUseCase ObtenerAmarra
-@inject ModificarAmarraUseCase ModificarAmarra
 @rendermode InteractiveServer
+@inject ListarAmarrasVaciasUseCase Listar
+@inject AgregarAmarraUseCase AgregarAmarraUseCase
+@inject NavigationManager NavigationManager
 <h1>Agregar Amarra</h1>
+<title>Agregar Amarra</title>
 
-<EditForm Model="@Model" OnSubmit="HandleSubmit" FormName="AgregarAmarra" >
+<MudContainer>
+    <MudTable Items="@_amarras" Class="mt-4" Dense="true" Outlined="true">
+        <HeaderContent>
+            <MudTh>Tamaño (Eslora x Manga x Calado) </MudTh>
+            <MudTh>Precio</MudTh>
+            <MudTh>Ubicacion</MudTh>
+            <MudTh>Acciones</MudTh>
+
+        </HeaderContent>
+        <RowTemplate>
+            <MudTd>@context.Tamanio.ToString().Replace("Pies", "'").Replace("De","") </MudTd>
+            <MudTd>@context.Precio</MudTd>
+            <MudTd>@context.Ubicacion</MudTd>
+            <MudTd>
+                <div class="button-container">
+                </div>
+                <div class="button-container">
+                    <MudButton Variant="Variant.Filled" Color="Color.Primary" OnClick="()=>HandleClick(context.Id)">
+                     Agregar Amarra
+                    </MudButton>
+                </div>
+            </MudTd>
+        </RowTemplate>
+    </MudTable>
+</MudContainer>
+@code
+{
     
-    <CustomValidator @ref="customValidator"></CustomValidator>
-    <div class="form-floating mb-3">
-        <InputNumber step="0.1" class="form-control" id="precio" @bind-Value="Model.Precio"/>
-        <label for="precio">Precio por dia</label>
-        <ValidationMessage For="() => Model.Precio" class="text-danger" />
-    </div>
-    <div class="form-floating mb-3">
-        <InputText @bind-Value="Model.Ubicacion" id="ubicacion" class="form-control"  />
-        <label for="ubicacion">Ubicacion</label>
-        <ValidationMessage For="() => Model.Ubicacion" class="text-danger" />
-    </div>
-    <div class="form-floating mb-3">
-        <InputSelect id="tamanio" @bind-Value="Model.Tamanio" class="form-select" aria-required="true" TValue="TamanioEstandar">
-            @foreach (TamanioEstandar tam in Enum.GetValues(typeof(TamanioEstandar)))
-            {
-            <option value=@tam> @(tam.ToString().Replace("Pies", "'").Replace("De","")) </option>
-            }
-        </InputSelect>
+    [Parameter] public string UserId  { get; set; }= null!;
+    private List<Amarra> _amarras { get; set; } = null!;
 
-    </div>
-
-<button type="submit" class="w-100 btn btn-lg btn-primary">
-     @(AmarraId == null ? "Cargar" : "Modificar")
-    amarra
-</button>
-</EditForm>
-
-@code{
-    [Parameter] public string UserId { get; set; } = null!;
-    [Parameter] public string? AmarraIdString { get; set; } = null;
-    int? AmarraId { get;set;}
-    private InputModel? Model { get; set; } =null;
-    private EditContext? editContext=null!;
-    public CustomValidator customValidator;
-    private Amarra? viejaAmarra;
-    protected override void OnParametersSet()
+    void HandleClick(int amarraId)
     {
-        AmarraId= int.Parse(AmarraIdString??"0");
-        Model ??= new InputModel();
-        if (AmarraId != null)
-        {
-            viejaAmarra = ObtenerAmarra.Ejecutar(AmarraId??0);
-            if (viejaAmarra != null)
-            {
-                Model.Ubicacion = viejaAmarra.Ubicacion;
-                Model.Precio = viejaAmarra.Precio;
-                Model.Tamanio = viejaAmarra.Tamanio;
-            }
-            else AmarraId = null;
-        }
-        editContext = new(Model);
-        base.OnParametersSet();
+        AgregarAmarraUseCase.Ejecutar(amarraId, UserId);
+        NavigationManager.NavigateTo("/listarAmarras/"+UserId, true);
     }
-
     protected override void OnInitialized()
     {
-        
+        _amarras = Listar.Ejecutar();
     }
-
-    protected void HandleSubmit()
-    {
-        var errors = new Dictionary<string, List<string>>();
-        foreach (var property in Model.GetType().GetProperties()) //me cago en microsoft
-        {
-            var value = property.GetValue(Model);
-            if (String.IsNullOrWhiteSpace(value?.ToString()))
-                errors.Add(property.Name, new List<string>() {"Este campo es obligatorio"});
-        }
-        
-        if (errors.Count > 0)
-        {
-            customValidator.DisplayErrors(errors);
-            return;
-        }
-            var nueva = new Amarra();
-            nueva.Ubicacion = Model.Ubicacion ?? "";
-            nueva.Precio = Model.Precio;
-            nueva.UsuarioId = UserId;
-            nueva.Tamanio = Model.Tamanio;
-            if (AmarraId == null)
-                AgregarAmarr.Ejecutar(nueva);
-            else
-            {
-                nueva.Id = AmarraId??0;
-                ModificarAmarra.Ejecutar(nueva);
-            }
-            Naviagation.NavigateTo("/listarAmarras/" + UserId, true);
-    }
-
-    private  class InputModel
-    {
-        [Required(ErrorMessage = "Ingresa un Precio")]
-        [Display(Name = "Precio")]
-        public double Precio { get; set; } = 0;
-
-        [Required(ErrorMessage = "Elija un tamaño")]
-        [Display(Name = "(Eslora x Manga x Calado)")]
-        public TamanioEstandar Tamanio { get; set; } = TamanioEstandar.De20Piesx10Piesx10Pies;
-
-        [Required(ErrorMessage = "Ingresa la ubicacion")]
-        [Display(Name = "Ubicacion")]
-        public string Ubicacion { get; set;} = null!;
-    }
-
 }

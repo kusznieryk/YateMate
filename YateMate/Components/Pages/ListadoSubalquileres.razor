@@ -102,7 +102,7 @@ else
             var authState = await AuthenticationState;
             var user = authState.User;
             _userId = user.Claims.FirstOrDefault()?.Value;
-            _listaOriginal = ObtenerSubalquileresUseCase.Ejecutar().Where(s => !s.IdDuenio.Equals(_userId).Where(s => TieneDiasLibres(s)).ToList();
+            _listaOriginal = ObtenerSubalquileresUseCase.Ejecutar().Where(s => !s.IdDuenio.Equals(_userId)).Where(s => TieneDiasLibres(s)).ToList();
             _lista = new List<Subalquiler>(_listaOriginal);
             _tieneElementos = _lista.Count > 0;
         }

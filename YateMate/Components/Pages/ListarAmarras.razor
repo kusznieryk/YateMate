@@ -22,6 +22,11 @@
     }
     else
     {
+        <MudButton Variant="Variant.Filled"
+                   Color="Color.Primary"
+                   Size="Size.Large">
+            <MudLink href="@{"/AgregarAmarra/"+UserId}" Color="Color.Tertiary" > Agregar Amarra</MudLink>
+        </MudButton>
     <MudTable Items="@_amarras" Class="mt-4" Dense="true" Outlined="true">
         <HeaderContent>
             <MudTh>Tamaño (Eslora x Manga x Calado) </MudTh>
@@ -41,11 +46,7 @@
                 *@
                 </div>
                 <div class="button-container">
-                    <MudButton Variant="Variant.Filled" Color="Color.Secondary">
-                        <MudLink href="@{"/AgregarAmarra/"+UserId+"/"+@context.Id}" Color="Color.Tertiary"> Modificar Amarra</MudLink>
-                    </MudButton>
-
-                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => ConfirmarEliminacion(context))">Eliminar Amarra</MudButton>
+                    <MudButton Variant="Variant.Filled" Color="Color.Error" OnClick="@(() => ConfirmarEliminacion(context))">Quitar Amarra</MudButton>
                 </div>
             </MudTd>
 
@@ -63,7 +64,7 @@
     void ConfirmarEliminacion(Amarra amarra)
     {
         amarraEliminar = amarra;
-        _dialogo.Mensaje = $"Deseas eliminar a la amarra con id {amarra.Id} ?";
+        _dialogo.Mensaje = $"Deseas Quitarle a la amarra con id {amarra.Id} al usuario ?";
         _dialogo.Mostrar();
     }
 

@@ -120,6 +120,7 @@ public class Program
         builder.Services.AddTransient<FiltrarPorFechaUseCase>();
         builder.Services.AddTransient<FiltrarPorTamanioUseCase>();
         builder.Services.AddTransient<ObtenerAmarraUseCase>();
+        builder.Services.AddTransient<ListarAmarrasVaciasUseCase>();
         builder.Services.AddTransient<AgregarAmarraUseCase>();
         builder.Services.AddScoped<IRepositorioAmarra, RepositorioAmarra>();
 

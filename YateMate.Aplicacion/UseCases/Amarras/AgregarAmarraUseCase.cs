@@ -5,8 +5,8 @@ namespace YateMate.Aplicacion.UseCases.Amarras;
 
 public class AgregarAmarraUseCase(IRepositorioAmarra repo)
 {
-    public void Ejecutar(Amarra amarra)
+    public void Ejecutar(int amarraId, string userId )
     {
-        repo.AgregarAmarra(amarra);
+        repo.AgregarAmarra(amarraId, userId);
     }
 }
